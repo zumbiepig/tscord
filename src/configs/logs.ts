@@ -1,5 +1,4 @@
 export const logsConfig: LogsConfigType = {
-
 	debug: false, // set the discordx client debug logs
 	logTailMaxSize: 50, // max size of the last logs kept in memory
 
@@ -49,4 +48,4 @@ export const logsConfig: LogsConfigType = {
 		console: true,
 		channel: null,
 	},
-}
+};

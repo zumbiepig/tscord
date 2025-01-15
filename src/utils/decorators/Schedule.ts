@@ -1,9 +1,9 @@
-import { CronJob } from 'cron'
-import { isValidCron } from 'cron-validator'
-import { container, InjectionToken } from 'tsyringe'
+import { CronJob } from 'cron';
+import { isValidCron } from 'cron-validator';
+import { container, type InjectionToken } from 'tsyringe';
 
-import { generalConfig } from '@/configs'
-import { resolveDependency } from '@/utils/functions'
+import { generalConfig } from '@/configs';
+import { resolveDependency } from '@/utils/functions';
 
 /**
  * Schedule a job to be executed at a specific time (cron)
@@ -12,18 +12,21 @@ import { resolveDependency } from '@/utils/functions'
  */
 export function Schedule(cronExpression: string, jobName?: string) {
 	if (!isValidCron(cronExpression, { alias: true, seconds: true }))
-		throw new Error(`Invalid cron expression: ${cronExpression}`)
+		throw new Error(`Invalid cron expression: ${cronExpression}`);
 
 	return (
-		target: any,
+		target: object,
 		propertyKey: string,
-		descriptor: PropertyDescriptor
+		descriptor: PropertyDescriptor,
 	) => {
 		// associate the context to the function, with the injected dependencies defined
-		const oldDescriptor = descriptor.value
-		descriptor.value = function (...args: any[]) {
-			return oldDescriptor.apply(container.resolve(this.constructor as InjectionToken<any>), args)
-		}
+		const oldDescriptor = descriptor.value;
+		descriptor.value = function (...args: unknown[]) {
+			return oldDescriptor.apply(
+				container.resolve(this.constructor as InjectionToken),
+				args,
+			);
+		};
 
 		const job = new CronJob(
 			cronExpression,
@@ -31,12 +34,16 @@ export function Schedule(cronExpression: string, jobName?: string) {
 			null,
 			false,
 			generalConfig.timezone,
-			target
-		)
+			target,
+		);
 
-		import('@/services').then(async (services) => {
-			const scheduler = await resolveDependency(services.Scheduler)
-			scheduler.addJob(jobName ?? propertyKey, job)
-		})
-	}
+		import('@/services')
+			.then(async (services) => {
+				const scheduler = await resolveDependency(services.Scheduler);
+				scheduler.addJob(jobName ?? propertyKey, job);
+			})
+			.catch(() => {
+				throw new Error('Failed to schedule job');
+			});
+	};
 }

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import type { Translation } from '../i18n-types'
+import type { Translation } from '../i18n-types';
 
 const uk = {
 	GUARDS: {
@@ -63,9 +62,10 @@ const uk = {
 		},
 		PING: {
 			DESCRIPTION: "Перевірка зв'язку!",
-			MESSAGE: '{member} Чути добре! Генерація повідомлення зайняла {time} мілісекунд. {heartbeat}',
+			MESSAGE:
+				'{member} Чути добре! Генерація повідомлення зайняла {time} мілісекунд. {heartbeat}',
 		},
 	},
-} satisfies Translation
+} satisfies Translation;
 
-export default uk
+export default uk;

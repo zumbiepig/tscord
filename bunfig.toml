@@ -1,0 +1,8 @@
+telemetry = false
+
+[install]
+saveTextLockfile = true
+
+[run]
+shell = "bun"
+bun = true

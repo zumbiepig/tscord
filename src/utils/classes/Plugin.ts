@@ -1,28 +1,27 @@
-import fs from 'node:fs'
-import { sep } from 'node:path'
+import fs from 'node:fs';
+import { sep } from 'node:path';
 
-import { importx, resolve } from '@discordx/importer'
-import { AnyEntity, EntityClass } from '@mikro-orm/core'
-import semver from 'semver'
-import { BaseTranslation } from 'typesafe-i18n'
+import { importx, resolve } from '@discordx/importer';
+import { type AnyEntity, type EntityClass } from '@mikro-orm/core';
+import semver from 'semver';
+import { type BaseTranslation } from 'typesafe-i18n';
 
-import { locales } from '@/i18n'
-import { BaseController } from '@/utils/classes'
-import { getSourceCodeLocation, getTscordVersion } from '@/utils/functions'
+import { locales } from '@/i18n';
+import { BaseController } from '@/utils/classes';
+import { getSourceCodeLocation, getTscordVersion } from '@/utils/functions';
 
 export class Plugin {
-
 	// Common values
-	private _path: string
-	private _name: string
-	private _version: string
-	private _valid: boolean = true
+	private _path: string;
+	private _name!: string;
+	private _version!: string;
+	private _valid = true;
 
 	// Specific values
-	private _entities: { [key: string]: EntityClass<AnyEntity> }
-	private _controllers: { [key: string]: typeof BaseController }
-	private _services: { [key: string]: any }
-	private _translations: { [key: string]: BaseTranslation }
+	private _entities!: Record<string, EntityClass<AnyEntity>>;
+	private _controllers!: Record<string, typeof BaseController>;
+	private _services!: Record<string, unknown>;
+	private _translations!: Record<string, BaseTranslation>;
 
 	constructor(path: string) {
 		this._path = path.replace('file://', '')
@@ -34,128 +33,146 @@ export class Plugin {
 			return this.stopLoad('plugin.json not found')
 
 		// read plugin.json
-		const pluginConfig = await import(`${this._path}/plugin.json`)
+		const pluginConfig = await import(`${this._path}/plugin.json`);
 
 		// check if the plugin.json is valid
-		if (!pluginConfig.name)
-			return this.stopLoad('Missing name in plugin.json')
-		if (!pluginConfig.version)
-			return this.stopLoad('Missing version in plugin.json')
-		if (!pluginConfig.tscordRequiredVersion)
-			return this.stopLoad('Missing tscordRequiredVersion in plugin.json')
+		if (!pluginConfig.name) {
+			this.stopLoad('Missing name in plugin.json');
+			return;
+		}
+		if (!pluginConfig.version) {
+			this.stopLoad('Missing version in plugin.json');
+			return;
+		}
+		if (!pluginConfig.tscordRequiredVersion) {
+			this.stopLoad('Missing tscordRequiredVersion in plugin.json');
+			return;
+		}
 
 		// check plugin.json values
-		if (!pluginConfig.name.match(/^[a-zA-Z0-9-_]+$/))
-			return this.stopLoad('Invalid name in plugin.json')
-		if (!semver.valid(pluginConfig.version))
-			return this.stopLoad('Invalid version in plugin.json')
+		if (!pluginConfig.name.match(/^[a-zA-Z0-9-_]+$/)) {
+			this.stopLoad('Invalid name in plugin.json');
+			return;
+		}
+		if (!semver.valid(pluginConfig.version)) {
+			this.stopLoad('Invalid version in plugin.json');
+			return;
+		}
 
 		// check if the plugin is compatible with the current version of Tscord
-		if (!semver.satisfies(semver.coerce(getTscordVersion())!, pluginConfig.tscordRequiredVersion))
-			return this.stopLoad(`Incompatible with the current version of Tscord (v${getTscordVersion()})`)
+		if (
+			!semver.satisfies(
+				semver.coerce(getTscordVersion()) ?? '',
+				pluginConfig.tscordRequiredVersion,
+			)
+		) {
+			this.stopLoad(
+				`Incompatible with the current version of TSCord (v${getTscordVersion()})`,
+			);
+			return;
+		}
 
 		// assign common values
-		this._name = pluginConfig.name
-		this._version = pluginConfig.version
+		this._name = pluginConfig.name;
+		this._version = pluginConfig.version;
 
 		// Load specific values
-		this._entities = await this.getEntities()
-		this._controllers = await this.getControllers()
-		this._services = await this.getServices()
-		this._translations = await this.getTranslations()
+		this._entities = await this.getEntities();
+		this._controllers = await this.getControllers();
+		this._services = await this.getServices();
+		this._translations = await this.getTranslations();
 	}
 
 	private stopLoad(error: string): void {
-		this._valid = false
-		console.error(`Plugin ${this._name ? this._name : this._path} ${this._version ? `v${this._version}` : ''} is not valid: ${error}`)
+		this._valid = false;
+		console.error(
+			`Plugin ${this._name ? this._name : this._path} ${this._version ? `v${this._version}` : ''} is not valid: ${error}`,
+		);
 	}
 
-	private async getControllers(): Promise<{ [key: string]: typeof BaseController }> {
-		if (!fs.existsSync(`${this._path}/api/controllers`))
-			return {}
+	private async getControllers(): Promise<
+		Record<string, typeof BaseController>
+	> {
+		if (!fs.existsSync(`${this._path}/api/controllers`)) return {};
 
-		return import(`${this._path}/api/controllers`)
+		return import(`${this._path}/api/controllers`);
 	}
 
-	private async getEntities(): Promise<{ [key: string]: EntityClass<AnyEntity> }> {
-		if (!fs.existsSync(`${this._path}/entities`))
-			return {}
+	private async getEntities(): Promise<Record<string, EntityClass<AnyEntity>>> {
+		if (!fs.existsSync(`${this._path}/entities`)) return {};
 
-		return import(`${this._path}/entities`)
+		return import(`${this._path}/entities`);
 	}
 
-	private async getServices(): Promise<{ [key: string]: any }> {
-		if (!fs.existsSync(`${this._path}/services`))
-			return {}
+	private async getServices(): Promise<Record<string, unknown>> {
+		if (!fs.existsSync(`${this._path}/services`)) return {};
 
-		return import(`${this._path}/services`)
+		return import(`${this._path}/services`);
 	}
 
-	private async getTranslations(): Promise<{ [key: string]: BaseTranslation }> {
-		const translations: { [key: string]: BaseTranslation } = {}
+	private async getTranslations(): Promise<Record<string, BaseTranslation>> {
+		const translations: Record<string, BaseTranslation> = {};
 
-		const localesPath = await resolve(`${this._path}/i18n/*.{ts,js}`)
+		const localesPath = await resolve(`${this._path}/i18n/*.{ts,js}`);
 		for (const localeFile of localesPath) {
-			const locale = localeFile.split(sep).at(-1)?.split('.')[0] || 'unknown'
+			const locale = localeFile.split(sep).at(-1)?.split('.')[0] ?? 'unknown';
 
-			translations[locale] = (await import(localeFile)).default
+			translations[locale] = (await import(localeFile)).default;
 		}
 
 		for (const defaultLocale of locales) {
-			const path = `${getSourceCodeLocation()}/i18n/${defaultLocale}/${this._name}/_custom.`
+			const path = `${getSourceCodeLocation()}/i18n/${defaultLocale}/${this._name}/_custom.`;
 			if (fs.existsSync(`${path}js`))
-				translations[defaultLocale] = (await import(`${path}js`)).default
+				translations[defaultLocale] = (await import(`${path}js`)).default;
 			else if (fs.existsSync(`${path}ts`))
-				translations[defaultLocale] = (await import(`${path}ts`)).default
+				translations[defaultLocale] = (await import(`${path}ts`)).default;
 		}
 
-		return translations
+		return translations;
 	}
 
-	public execMain(): void {
-		if (!fs.existsSync(`${this._path}/main.ts`))
-			return
-		import(`${this._path}/main.ts`)
+	public async execMain(): Promise<void> {
+		if (!fs.existsSync(`${this._path}/main.ts`)) return;
+		await import(`${this._path}/main.ts`);
 	}
 
 	public async importCommands(): Promise<void> {
-		await importx(`${this._path}/commands/**/*.{ts,js}`)
+		await importx(`${this._path}/commands/**/*.{ts,js}`);
 	}
 
 	public async importEvents(): Promise<void> {
-		await importx(`${this._path}/events/**/*.{ts,js}`)
+		await importx(`${this._path}/events/**/*.{ts,js}`);
 	}
 
 	public isValid(): boolean {
-		return this._valid
+		return this._valid;
 	}
 
 	get path() {
-		return this._path
+		return this._path;
 	}
 
 	get name() {
-		return this._name
+		return this._name;
 	}
 
 	get version() {
-		return this._version
+		return this._version;
 	}
 
 	get entities() {
-		return this._entities
+		return this._entities;
 	}
 
 	get controllers() {
-		return this._controllers
+		return this._controllers;
 	}
 
 	get services() {
-		return this._services
+		return this._services;
 	}
 
 	get translations() {
-		return this._translations
+		return this._translations;
 	}
-
 }

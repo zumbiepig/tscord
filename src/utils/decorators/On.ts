@@ -1,4 +1,9 @@
-import { DOn, EventOptions, MetadataStorage, MethodDecoratorEx } from 'discordx'
+import {
+	DOn,
+	type EventOptions,
+	MetadataStorage,
+	type MethodDecoratorEx,
+} from 'discordx';
 
 /**
  * Handle both discord and custom events with a defined handler
@@ -10,21 +15,24 @@ import { DOn, EventOptions, MetadataStorage, MethodDecoratorEx } from 'discordx'
  *
  * @category Decorator
  */
-export function On(event: string, options?: Omit<EventOptions, 'event'>): MethodDecoratorEx {
+export function On(
+	event: string,
+	options?: Omit<EventOptions, 'event'>,
+): MethodDecoratorEx {
 	return function <T>(
 		target: Record<string, T>,
 		key: string,
-		descriptor?: PropertyDescriptor
+		descriptor?: PropertyDescriptor,
 	) {
-		const clazz = target as unknown as new () => unknown
+		const clazz = target as unknown as new () => unknown;
 		const on = DOn.create({
 			botIds: options?.botIds,
 			event,
 			once: false,
 			rest: false,
 			priority: options?.priority,
-		}).decorate(clazz.constructor, key, descriptor?.value)
+		}).decorate(clazz.constructor, key, descriptor?.value);
 
-		MetadataStorage.instance.addOn(on)
-	}
+		MetadataStorage.instance.addOn(on);
+	};
 }

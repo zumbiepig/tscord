@@ -1,5 +1,4 @@
-/* eslint-disable */
-import type { BaseTranslation } from '../i18n-types'
+import type { BaseTranslation } from '../i18n-types';
 
 const en = {
 	GUARDS: {
@@ -63,9 +62,10 @@ const en = {
 		},
 		PING: {
 			DESCRIPTION: 'Pong!',
-			MESSAGE: '{member:string} Pong! The message round-trip took {time:number}ms.{heartbeat:string}',
+			MESSAGE:
+				'{member:string} Pong! The message round-trip took {time:number}ms.{heartbeat:string}',
 		},
 	},
-} satisfies BaseTranslation
+} satisfies BaseTranslation;
 
-export default en
+export default en;

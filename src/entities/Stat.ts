@@ -1,5 +1,10 @@
-import { Entity, EntityRepositoryType, PrimaryKey, Property } from '@mikro-orm/core'
-import { EntityRepository } from '@mikro-orm/sqlite'
+import {
+	Entity,
+	EntityRepositoryType,
+	PrimaryKey,
+	Property,
+} from '@mikro-orm/core';
+import { EntityRepository } from '@mikro-orm/sqlite';
 
 // ===========================================
 // ================= Entity ==================
@@ -7,30 +12,26 @@ import { EntityRepository } from '@mikro-orm/sqlite'
 
 @Entity({ repository: () => StatRepository })
 export class Stat {
-
-	[EntityRepositoryType]?: StatRepository
+	[EntityRepositoryType]?: StatRepository;
 
 	@PrimaryKey()
-    id: number
+	id: number;
 
 	@Property()
-    type!: string
+	type!: string;
 
 	@Property()
-    value: string = ''
+	value = '';
 
 	@Property({ type: 'json', nullable: true })
-    additionalData?: any
+	additionalData?: unknown;
 
 	@Property()
-    createdAt: Date = new Date()
-
+	createdAt: Date = new Date();
 }
 
 // ===========================================
 // =========== Custom Repository =============
 // ===========================================
 
-export class StatRepository extends EntityRepository<Stat> {
-
-}
+export class StatRepository extends EntityRepository<Stat> {}

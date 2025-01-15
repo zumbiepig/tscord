@@ -1,19 +1,18 @@
-import { Options } from '@mikro-orm/core'
-import { EntityGenerator } from '@mikro-orm/entity-generator'
-import { Migrator } from '@mikro-orm/migrations'
-import { SqlHighlighter } from '@mikro-orm/sql-highlighter'
-import { SqliteDriver } from '@mikro-orm/sqlite'
+import { Options } from '@mikro-orm/core';
+import { EntityGenerator } from '@mikro-orm/entity-generator';
+import { Migrator } from '@mikro-orm/migrations';
+import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
+import { SqliteDriver } from '@mikro-orm/sqlite';
 
 // eslint-disable-next-line unused-imports/no-unused-imports
-import { env } from '@/env'
+import { env } from '@/env';
 
-type Config = {
-	production: Options
-	development?: Options
+interface Config {
+	production: Options;
+	development?: Options;
 }
 
 export const databaseConfig: DatabaseConfigType = {
-
 	path: './database/', // path to the folder containing the migrations and SQLite database (if used)
 
 	// config for setting up an automated backup of the database (ONLY FOR SQLITE)
@@ -21,12 +20,10 @@ export const databaseConfig: DatabaseConfigType = {
 		enabled: false,
 		path: './database/backups/', // path to the backups folder (should be in the database/ folder)
 	},
-}
+};
 
 const envMikroORMConfig = {
-
 	production: {
-
 		/**
 		 * SQLite
 		 */
@@ -78,22 +75,19 @@ const envMikroORMConfig = {
 			snapshot: true,
 		},
 
-		extensions: [
-			Migrator,
-			EntityGenerator,
-		],
+		extensions: [Migrator, EntityGenerator],
 	},
 
-	development: {
+	development: {},
+} satisfies Config;
 
-	},
-
-} satisfies Config
-
-if (!envMikroORMConfig.development || Object.keys(envMikroORMConfig.development).length === 0)
-	envMikroORMConfig.development = envMikroORMConfig.production
+if (
+	!envMikroORMConfig.development ||
+	Object.keys(envMikroORMConfig.development).length === 0
+)
+	envMikroORMConfig.development = envMikroORMConfig.production;
 
 export const mikroORMConfig = envMikroORMConfig as {
-	production: typeof envMikroORMConfig['production']
-	development: typeof envMikroORMConfig['production']
-}
+	production: (typeof envMikroORMConfig)['production'];
+	development: (typeof envMikroORMConfig)['development'];
+};

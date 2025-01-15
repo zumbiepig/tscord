@@ -1,3 +1,1 @@
-type state = {
-	[key: string]: any
-}
+type state = Record<string, unknown>;

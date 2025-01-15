@@ -1,16 +1,14 @@
-// @ts-nocheck
-import 'reflect-metadata'
-import 'dotenv/config'
+import 'reflect-metadata';
 
-import process from 'node:process'
+import { defineConfig } from '@mikro-orm/core';
 
-import { DatabaseDriver, defineConfig, Options } from '@mikro-orm/core'
+import { mikroORMConfig } from './src/configs/database';
 
-import { mikroORMConfig } from './src/configs/database'
-
-export default async () => {
+export default () => {
 	return defineConfig({
-		...mikroORMConfig[process.env.NODE_ENV || 'development'] as Options<DatabaseDriver>,
-		entities: [`src/entities/*.{ts,js}`, `src/plugins/*/entities/*.{ts,js}`],
-	})
-}
+		...mikroORMConfig[
+			process.env.NODE_ENV === 'production' ? 'production' : 'development'
+		],
+		entities: [`src/entities/*.ts`, `src/plugins/*/entities/*.ts`],
+	});
+};

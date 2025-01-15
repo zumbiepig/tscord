@@ -262,9 +262,9 @@ The following is the list of supported scopes:
 - `services`
 - `utils`
 - `cli`
-OR
+  OR
 - if the commits are relative to an issue, you can pass the `#{id}` of the issue (e.g: `fix(#51): api error handling`)
-OR
+  OR
 - none/empty string: useful for `test` and `refactor` changes that are done across all packages (e.g. `test: add missing unit tests`) and for docs changes that are not related to a specific package (e.g. `docs: fix typo in tutorial`).
 
 ##### Summary

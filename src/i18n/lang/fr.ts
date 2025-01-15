@@ -1,5 +1,4 @@
-/* eslint-disable */
-import type { Translation } from '../i18n-types'
+import type { Translation } from '../i18n-types';
 
 const fr = {
 	GUARDS: {
@@ -63,9 +62,10 @@ const fr = {
 		},
 		PING: {
 			DESCRIPTION: 'Pong!',
-			MESSAGE: '{member} Pong! Le temps de réponse de la réponse était {time}ms.{heartbeat}',
+			MESSAGE:
+				'{member} Pong! Le temps de réponse de la réponse était {time}ms.{heartbeat}',
 		},
 	},
-} satisfies Translation
+} satisfies Translation;
 
-export default fr
+export default fr;

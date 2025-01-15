@@ -1,0 +1,37 @@
+import eslint from '@eslint/js';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import tseslint from 'typescript-eslint';
+
+export default tseslint.config(
+	eslint.configs.recommended,
+	tseslint.configs.eslintRecommended,
+	...tseslint.configs.strictTypeChecked,
+	...tseslint.configs.stylisticTypeChecked,
+	{
+		languageOptions: {
+			parserOptions: {
+				projectService: true,
+				tsconfigRootDir: import.meta.dir,
+			},
+		},
+		plugins: {
+			'simple-import-sort': simpleImportSort,
+		},
+		rules: {
+			'@typescript-eslint/ban-ts-comment': 'warn',
+			'@typescript-eslint/no-unused-vars': [
+				'error',
+				{
+					args: 'all',
+					argsIgnorePattern: '^_',
+					caughtErrors: 'all',
+					caughtErrorsIgnorePattern: '^_',
+					destructuredArrayIgnorePattern: '^_',
+					varsIgnorePattern: '^_',
+					ignoreRestSiblings: true,
+				},
+			],
+			'simple-import-sort/imports': 'error',
+		},
+	},
+);
