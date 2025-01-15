@@ -47,7 +47,7 @@
     "archiver": "^7.0.1",
     "axios": "~1.7.9",
     "body-parser": "^1.20.3",
-    "boxen": "~5.1.2",
+    "boxen": "~8.0.1",
     "case": "~1.6.3",
     "chalk": "~4.1.2",
     "chokidar": "~3.6.0",
