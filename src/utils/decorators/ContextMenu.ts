@@ -8,6 +8,12 @@ import {
 	setOptionsLocalization,
 } from '@/utils/functions';
 
+import type {
+	ContextMenuOptions,
+	ContextMenuOptionsX,
+	TranslationsNestedPaths,
+} from '../types/localization';
+
 /**
  * Interact with context menu with a defined identifier
  *

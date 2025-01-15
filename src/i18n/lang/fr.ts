@@ -1,6 +1,6 @@
 import type { Translation } from '../i18n-types';
 
-const fr = {
+export default {
 	GUARDS: {
 		DISABLED_COMMAND: 'Cette commande est désactivée.',
 		MAINTENANCE: 'Ce bot est en mode maintenance.',
@@ -66,6 +66,4 @@ const fr = {
 				'{member} Pong! Le temps de réponse de la réponse était {time}ms.{heartbeat}',
 		},
 	},
-} satisfies Translation;
-
-export default fr;
+} as Translation;

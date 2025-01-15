@@ -14,7 +14,7 @@ import {
  */
 export const Maintenance: GuardFunction<
 	ArgsOf<'messageCreate' | 'interactionCreate'>
-> = async (arg, client, next) => {
+> = async (arg, _client, next) => {
 	if (
 		arg instanceof CommandInteraction ||
 		arg instanceof SimpleCommandMessage ||

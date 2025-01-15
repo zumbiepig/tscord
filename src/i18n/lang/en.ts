@@ -1,6 +1,6 @@
 import type { BaseTranslation } from '../i18n-types';
 
-const en = {
+export default {
 	GUARDS: {
 		DISABLED_COMMAND: 'This command is currently disabled.',
 		MAINTENANCE: 'This bot is currently in maintenance mode.',
@@ -66,6 +66,4 @@ const en = {
 				'{member:string} Pong! The message round-trip took {time:number}ms.{heartbeat:string}',
 		},
 	},
-} satisfies BaseTranslation;
-
-export default en;
+} as BaseTranslation;

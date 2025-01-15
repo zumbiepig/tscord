@@ -9,7 +9,7 @@ import { isDev, replyToInteraction, resolveUser } from '@/utils/functions';
  */
 export const Disabled: GuardFunction<
 	CommandInteraction | SimpleCommandMessage | ContextMenuCommandInteraction
-> = async (arg, client, next) => {
+> = async (arg, _client, next) => {
 	const user = resolveUser(arg);
 
 	if (user?.id && isDev(user.id)) {

@@ -14,6 +14,7 @@ import {
 import { SimpleCommandMessage } from 'discordx';
 
 import packageJson from '../../../package.json';
+import type { AllInteractions } from '../types/interactions';
 
 const resolvers = {
 	user: {
@@ -244,7 +245,7 @@ export function resolveCommandName(
 	return (
 		resolvers.commandName[
 			interaction.constructor.name as keyof typeof resolvers.commandName
-		](interaction) || resolvers.commandName.fallback(interaction)
+		](interaction) ?? resolvers.commandName.fallback(interaction)
 	);
 }
 
@@ -252,7 +253,7 @@ export function resolveAction(interaction: AllInteractions) {
 	return (
 		resolvers.action[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.action
-		](interaction) || resolvers.action.fallback(interaction)
+		](interaction) ?? resolvers.action.fallback(interaction)
 	);
 }
 
@@ -260,7 +261,7 @@ export function resolveLocale(interaction: AllInteractions) {
 	return (
 		resolvers.locale[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.locale
-		](interaction) || resolvers.locale.fallback(interaction)
+		](interaction) ?? resolvers.locale.fallback(interaction)
 	);
 }
 
@@ -277,5 +278,5 @@ export function getTypeOfInteraction(
 }
 
 export function getTscordVersion() {
-	return packageJson.tscordVersion;
+	return packageJson.tscord.version;
 }

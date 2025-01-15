@@ -1,8 +1,14 @@
+import type { Options } from '@mikro-orm/core';
+import type { ActivitiesOptions, PresenceStatusData } from 'discord.js';
+import type { GuildResolvable, UserResolvable } from 'discord.js';
+
+import type { Locales } from '@/i18n';
+
 interface GeneralConfigType {
 	name: string;
 	description: string;
 
-	defaultLocale: import('@/i18n').Locales;
+	defaultLocale: Locales;
 	timezone:
 		| 'Africa/Abidjan'
 		| 'Africa/Accra'
@@ -605,30 +611,19 @@ interface GeneralConfigType {
 	simpleCommandsPrefix: string;
 	automaticDeferring: boolean;
 
-	links: {
-		botInvite: string;
-		supportServer: string;
-		gitRepo: string;
-	};
+	ownerId?: UserResolvable;
+	devs?: UserResolvable[];
+	testGuildId?: GuildResolvable;
+
+	activities: ActivitiesOptions[] & { status: PresenceStatusData }[];
 
 	automaticUploadImagesToImgur: boolean;
 
-	ownerId: string;
-	devs: string[];
-	testGuildId: string;
-
-	activities: {
-		status: 'online' | 'dnd' | 'idle' | 'invisible';
-		type:
-			| 'PLAYING'
-			| 'STREAMING'
-			| 'LISTENING'
-			| 'WATCHING'
-			| 'CUSTOM'
-			| 'COMPETING';
-		name: string;
-		url: string;
-	}[];
+	links?: {
+		botInvite?: string;
+		supportServer?: string;
+		gitRepo?: string;
+	};
 }
 
 interface DatabaseConfigType {
@@ -638,6 +633,11 @@ interface DatabaseConfigType {
 		enabled: boolean;
 		path: string;
 	};
+}
+
+interface EnvMikroORMConfigType {
+	production: Options;
+	development?: Options;
 }
 
 interface LogsConfigType {

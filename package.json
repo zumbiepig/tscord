@@ -4,8 +4,12 @@
 	"description": "A fully-featured discord bot template written in Typescript, intended to provide a framework that's easy to use, extend and modify",
 	"license": "MIT",
 	"repository": "github:barthofu/tscord",
-	"module": "src/main.ts",
 	"type": "module",
+	"module": "src/main.ts",
+	"engines": {
+		"node": ">=20"
+	},
+	"engineStrict": true,
 	"scripts": {
 		"postinstall": "bun run -c installoop --rootDir=./src/plugins",
 		"start": "NODE_ENV=production bun run -c ./dist/main.js",
@@ -30,11 +34,11 @@
 		"@mikro-orm/migrations": "~6.4.3",
 		"@mikro-orm/sql-highlighter": "~1.0.1",
 		"@mikro-orm/sqlite": "~6.4.3",
-		"@tsed/common": "^8.4.1",
-		"@tsed/exceptions": "^8.4.1",
-		"@tsed/platform-express": "^8.4.1",
-		"@tsed/schema": "^8.4.1",
-		"@tsed/swagger": "^8.4.1",
+		"@tsed/common": "^8.4.2",
+		"@tsed/exceptions": "^8.4.2",
+		"@tsed/platform-express": "^8.4.2",
+		"@tsed/schema": "^8.4.2",
+		"@tsed/swagger": "^8.4.2",
 		"archiver": "^7.0.1",
 		"axios": "~1.7.9",
 		"body-parser": "^1.20.3",
@@ -84,18 +88,14 @@
 		"typescript": "^5.7.3",
 		"typescript-eslint": "^8.20.0"
 	},
-	"engineStrict": true,
-	"engines": {
-		"node": ">=20"
-	},
-  "tscord": {
-    "version": "2.6"
-  },
-	"mikro-orm": {
-		"useTsNode": true
-	},
 	"trustedDependencies": [
 		"bun",
 		"core-js"
-	]
+	],
+	"tscord": {
+		"version": "2.6"
+	},
+	"mikro-orm": {
+		"useTsNode": true
+	}
 }

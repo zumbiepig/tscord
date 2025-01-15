@@ -102,13 +102,13 @@ export class Logger {
 	) {
 		if (!this.store.get('botHasBeenReloaded')) {
 			console.info = (...args: string[]) => {
-				this.baseLog('info', ...args);
+				void this.baseLog('info', ...args);
 			};
 			console.warn = (...args: string[]) => {
-				this.baseLog('warn', ...args);
+				void this.baseLog('warn', ...args);
 			};
 			console.error = (...args: string[]) => {
-				this.baseLog('error', ...args);
+				void this.baseLog('error', ...args);
 			};
 		}
 	}
@@ -117,13 +117,16 @@ export class Logger {
 	// ======= Base log function =======
 	// =================================
 
-	private baseLog(level: (typeof this.levels)[number], ...args: string[]) {
+	private async baseLog(
+		level: (typeof this.levels)[number],
+		...args: string[]
+	) {
 		const excludedPatterns = ['[typesafe-i18n]'];
 
 		const message = args.join(', ');
 
 		if (!excludedPatterns.some((pattern) => message.includes(pattern))) {
-			this.log(message, level);
+			await this.log(message, level);
 		}
 	}
 
@@ -200,7 +203,7 @@ export class Logger {
 
 		if (
 			channel &&
-			(channel instanceof TextChannel || channel instanceof ThreadChannel)
+			(channel instanceof TextChannel ?? channel instanceof ThreadChannel)
 		) {
 			if (typeof message !== 'string')
 				return channel.send(message).catch((error: unknown) => {
@@ -335,7 +338,7 @@ export class Logger {
 		const message = oneLine`
             (${type})
             "${action}"
-            ${channel instanceof TextChannel || channel instanceof ThreadChannel ? `in channel #${channel.name}` : ''}
+            ${(channel instanceof TextChannel ?? channel instanceof ThreadChannel) ? `in channel #${channel.name}` : ''}
             ${guild ? `in guild ${guild.name}` : ''}
             ${user ? `by ${user.username}#${user.discriminator}` : ''}
         `;
@@ -344,7 +347,8 @@ export class Logger {
             (${chalk.bold.white(type)})
             "${chalk.bold.green(action)}"
             ${
-							channel instanceof TextChannel || channel instanceof ThreadChannel
+							(channel instanceof TextChannel ??
+							channel instanceof ThreadChannel)
 								? `${chalk.dim.italic.gray('in channel')} ${chalk.bold.blue(`#${channel.name}`)}`
 								: ''
 						}
@@ -426,14 +430,14 @@ export class Logger {
 	 * Logs all new users.
 	 * @param user
 	 */
-	logNewUser(user: User) {
+	async logNewUser(user: User) {
 		const message = `(NEW_USER) ${user.tag} (${user.id}) has been added to the db`;
 		const chalkedMessage = `(${chalk.bold.white('NEW_USER')}) ${chalk.bold.green(user.tag)} (${chalk.bold.blue(user.id)}) ${chalk.dim.italic.gray('has been added to the db')}`;
 
 		if (logsConfig.newUser.console) this.console(chalkedMessage);
 		if (logsConfig.newUser.file) this.file(message);
 		if (logsConfig.newUser.channel) {
-			this.discordChannel(logsConfig.newUser.channel, {
+			await this.discordChannel(logsConfig.newUser.channel, {
 				embeds: [
 					{
 						title: 'New user',
@@ -466,9 +470,7 @@ export class Logger {
 				? 'has been added to the db'
 				: type === 'DELETE_GUILD'
 					? 'has been deleted'
-					: type === 'RECOVER_GUILD'
-						? 'has been recovered'
-						: '';
+					: 'has been recovered';
 
 		await resolveDependency(Client).then(async (client) => {
 			const guild = await client.guilds.fetch(guildId).catch(() => null);
@@ -542,10 +544,10 @@ export class Logger {
 		let chalkedMessage = `(${chalk.bold.white('ERROR')})`;
 
 		if (trace[0]) {
-			message += ` ${type === 'Exception' ? 'Exception' : 'Unhandled rejection'} : ${error.message}\n${trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber ?? ''}`).join('\n')}`;
-			embedMessage += `\`\`\`\n${trace.map((frame: StackFrame) => `\> ${frame.file ?? ''}:${frame.lineNumber ?? ''}`).join('\n')}\n\`\`\``;
+			message += ` ${type === 'Exception' ? 'Exception' : 'Unhandled rejection'} : ${error.message}\n${trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber ?? 0}`).join('\n')}`;
+			embedMessage += `\`\`\`\n${trace.map((frame: StackFrame) => `\> ${frame.file ?? ''}:${frame.lineNumber ?? 0}`).join('\n')}\n\`\`\``;
 			embedTitle += `***${type === 'Exception' ? 'Exception' : 'Unhandled rejection'}* : ${error.message}**`;
-			chalkedMessage += ` ${chalk.dim.italic.gray(type === 'Exception' ? 'Exception' : 'Unhandled rejection')} : ${error.message}\n${chalk.dim.italic(trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber ?? ''}`).join('\n'))}`;
+			chalkedMessage += ` ${chalk.dim.italic.gray(type === 'Exception' ? 'Exception' : 'Unhandled rejection')} : ${error.message}\n${chalk.dim.italic(trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber ?? 0}`).join('\n'))}`;
 		} else {
 			if (type === 'Exception') {
 				message += `An exception as occurred in a unknown file\n\t> ${error.message}`;

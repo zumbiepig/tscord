@@ -1,3 +1,4 @@
+import { ActivityType } from 'discord.js';
 import { Client } from 'discordx';
 
 import { generalConfig } from '@/configs';
@@ -45,32 +46,28 @@ export default class ReadyEvent {
 		this.store.update('ready', (e) => ({ ...e, bot: true }));
 	}
 
-	@Schedule('*/15 * * * * *') // cycle every 15 seconds
+	@Schedule('*/15 * * * * *') // cycle activities every 15 seconds
 	async changeActivity() {
 		const client = await resolveDependency(Client);
-		const activity = generalConfig.activities[this.activityIndex];
-		const activityType = [
-			'PLAYING',
-			'STREAMING',
-			'LISTENING',
-			'WATCHING',
-			'CUSTOM',
-			'COMPETING',
-		].indexOf(activity.type);
 
-		client.user?.setPresence({
-			status: activity.status,
-			activities: [
-				{
-					name: activity.name,
-					type: activityType,
-					url: activity.url || undefined,
-				},
-			],
-		});
+		if (generalConfig.activities.length > 0) {
+			const activity = generalConfig.activities[this.activityIndex];
 
-		if (++this.activityIndex === generalConfig.activities.length) {
-			this.activityIndex = 0;
+			if (activity) {
+				client.user?.setPresence({
+					status: activity.status,
+					activities: [
+						{
+							name: activity.name,
+							...(activity.type && { type: activity.type }),
+							...(activity.url && { url: activity.url }),
+						},
+					],
+				});
+			}
+
+			this.activityIndex =
+				(this.activityIndex + 1) % generalConfig.activities.length;
 		}
 	}
 }

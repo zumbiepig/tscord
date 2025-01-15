@@ -30,7 +30,7 @@ export default class SimpleCommandCreateEvent {
 		await this.db.get(Guild).updateLastInteract(command.message.guild?.id);
 
 		await this.stats.registerSimpleCommand(command);
-		this.logger.logInteraction(command);
+		await this.logger.logInteraction(command);
 	}
 
 	// =============================
@@ -50,7 +50,7 @@ export default class SimpleCommandCreateEvent {
 			/**
 			 * @param {SimpleCommandMessage} command
 			 */
-			this.eventManager.emit('simpleCommandCreate', command);
+			await this.eventManager.emit('simpleCommandCreate', command);
 		}
 	}
 }

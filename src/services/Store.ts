@@ -3,15 +3,6 @@ import { Store as RxStore } from 'rxeta';
 import { apiConfig } from '@/configs';
 import { Service } from '@/decorators';
 
-interface State {
-	authorizedAPITokens: string[];
-	botHasBeenReloaded: boolean;
-	ready: {
-		bot: boolean | null;
-		api: boolean | null;
-	};
-}
-
 const initialState: State = {
 	authorizedAPITokens: [],
 	botHasBeenReloaded: false,
@@ -21,9 +12,7 @@ const initialState: State = {
 	},
 };
 
-@Service({
-	keepInstanceAfterHmr: true,
-})
+@Service(true)
 export class Store extends RxStore<State> {
 	constructor() {
 		super(initialState);

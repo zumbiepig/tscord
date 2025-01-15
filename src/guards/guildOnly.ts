@@ -9,7 +9,7 @@ import { replyToInteraction } from '@/utils/functions';
  */
 export const GuildOnly: GuardFunction<
 	CommandInteraction | SimpleCommandMessage
-> = async (arg, client, next) => {
+> = async (arg, _client, next) => {
 	const isInGuild =
 		arg instanceof CommandInteraction ? arg.inGuild() : arg.message.guild;
 

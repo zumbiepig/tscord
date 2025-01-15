@@ -9,7 +9,7 @@ export class EventManager {
 
 	register(eventName: string, callback: Function): void {
 		this._events.set(eventName, [
-			...(this._events.get(eventName) || []),
+			...(this._events.get(eventName) ?? []),
 			callback,
 		]);
 	}

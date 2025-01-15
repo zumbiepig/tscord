@@ -14,27 +14,24 @@ export class ErrorHandler {
 
 			// if instance of BaseError, call `handle` method
 			if (error instanceof BaseError) {
-				error.handle();
+				void error.handle();
 				return;
 			}
 
 			// log the error
-			this.logger.logError(error, 'Exception');
+			void this.logger.logError(error, 'Exception');
 		});
 
 		// catch all Unhandled Rejection (promise)
-		process.on(
-			'unhandledRejection',
-			(error: Error | any, _: Promise<unknown>) => {
-				// if instance of BaseError, call `handle` method
-				if (error instanceof BaseError) {
-					error.handle();
-					return;
-				}
+		process.on('unhandledRejection', (error: Error, _: Promise<unknown>) => {
+			// if instance of BaseError, call `handle` method
+			if (error instanceof BaseError) {
+				void error.handle();
+				return;
+			}
 
-				// log the error
-				this.logger.logError(error, 'unhandledRejection');
-			},
-		);
+			// log the error
+			void this.logger.logError(error, 'unhandledRejection');
+		});
 	}
 }

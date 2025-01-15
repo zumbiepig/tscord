@@ -8,8 +8,6 @@ export const env = cleanEnv(process.env, {
 	NODE_ENV: str({ choices: ['production', 'development'] }),
 
 	BOT_TOKEN: str(),
-	TEST_GUILD_ID: str({ default: undefined }),
-	BOT_OWNER_ID: str({ default: undefined }),
 
 	DATABASE_HOST: host({ default: undefined }),
 	DATABASE_PORT: port({ default: undefined }),
@@ -26,7 +24,11 @@ export const env = cleanEnv(process.env, {
 export function checkEnvironmentVariables() {
 	const config = mikroORMConfig[env.NODE_ENV];
 
-	const isSqliteDatabase = 'dbName' in config && !!config.dbName && !('port' in config && !!config.port);
+	const isSqliteDatabase =
+		config &&
+		'dbName' in config &&
+		config.dbName &&
+		!('port' in config && config.port);
 	if (!isSqliteDatabase) {
 		cleanEnv(env, {
 			DATABASE_HOST: host(),

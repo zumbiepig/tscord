@@ -9,6 +9,8 @@ import { Guard, UserPermissions } from '@/guards';
 import { Database } from '@/services';
 import { resolveGuild, simpleSuccessEmbed } from '@/utils/functions';
 
+import type { InteractionData } from '../../utils/types/interactions';
+
 @Discord()
 @Injectable()
 @Category('Admin')
@@ -27,16 +29,16 @@ export default class PrefixCommand {
 		{ localize }: InteractionData,
 	) {
 		const guild = resolveGuild(interaction);
-		const guildData = await this.db.get(Guild).findOne({ id: guild?.id || '' });
+		const guildData = await this.db.get(Guild).findOne({ id: guild?.id ?? '' });
 
 		if (guildData) {
-			guildData.prefix = prefix || null;
-			this.db.em.persistAndFlush(guildData);
+			guildData.prefix = prefix ?? null;
+			await this.db.em.persistAndFlush(guildData);
 
 			await simpleSuccessEmbed(
 				interaction,
 				localize.COMMANDS.PREFIX.EMBED.DESCRIPTION({
-					prefix: prefix || generalConfig.simpleCommandsPrefix,
+					prefix: prefix ?? generalConfig.simpleCommandsPrefix,
 				}),
 			);
 		} else {

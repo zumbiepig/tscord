@@ -1,14 +1,22 @@
+import type { ApplicationCommandType, Locale } from 'discord.js';
+import type {
+	ApplicationCommandOptions,
+	ApplicationCommandOptions,
+	NotEmpty,
+	SlashChoiceType,
+	SlashGroupOptions,
+} from 'discordx';
+
+import type { Translations } from '@/i18n';
+
 declare enum AdditionalLocaleString {
 	English = 'en',
 }
 
-type TranslationsNestedPaths = NestedPaths<import('@/i18n').Translations>;
+type TranslationsNestedPaths = NestedPaths<Translations>;
 
 type LocalizationMap = Partial<
-	Record<
-		`${import('discord-api-types/v10').Locale | AdditionalLocaleString}`,
-		string
-	>
+	Record<`${Locale | AdditionalLocaleString}`, string>
 >;
 
 interface SanitizedOptions {
@@ -20,40 +28,22 @@ interface SanitizedOptions {
 type Sanitization<K> = Modify<K, SanitizedOptions>;
 
 type ApplicationCommandOptions = Sanitization<
-	WithOptional<
-		import('discordx').ApplicationCommandOptions<string, string>,
-		'description'
-	>
+	WithOptional<ApplicationCommandOptions<string, string>, 'description'>
 >;
 
 type SlashGroupOptions = Sanitization<
-	WithOptional<
-		import('discordx').SlashGroupOptions<string, string, string>,
-		'description'
-	>
+	WithOptional<SlashGroupOptions<string, string, string>, 'description'>
 >;
 
 type SlashOptionOptions = Sanitization<
-	WithOptional<
-		import('discordx').SlashOptionOptions<string, string>,
-		'description'
-	>
+	WithOptional<SlashOptionOptions<string, string>, 'description'>
 >;
 
-type SlashChoiceOption = Modify<
-	import('discordx').SlashChoiceType<string, string | number>,
-	SanitizedOptions
->;
+type SlashChoiceOption = Modify<SlashChoiceType, SanitizedOptions>;
 
 type ContextMenuOptionsX = Omit<
-	import('discordx').ApplicationCommandOptions<
-		import('discordx').NotEmpty<string>,
-		string
-	> & {
-		type: Exclude<
-			import('discord.js').ApplicationCommandType,
-			import('discord.js').ApplicationCommandType.ChatInput
-		>;
+	ApplicationCommandOptions<NotEmpty<string>, string> & {
+		type: Exclude<ApplicationCommandType, ApplicationCommandType.ChatInput>;
 	},
 	'description' | 'descriptionLocalizations'
 >;

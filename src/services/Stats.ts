@@ -70,7 +70,7 @@ export class Stats {
 		const value = resolveAction(interaction);
 		const additionalData = {
 			user: resolveUser(interaction)?.id,
-			guild: resolveGuild(interaction)?.id || 'dm',
+			guild: resolveGuild(interaction)?.id ?? 'dm',
 			channel: resolveChannel(interaction)?.id,
 		};
 
@@ -88,7 +88,7 @@ export class Stats {
 		const value = command.name;
 		const additionalData = {
 			user: command.message.author.id,
-			guild: command.message.guild?.id || 'dm',
+			guild: command.message.guild?.id ?? 'dm',
 			channel: command.message.channel.id,
 		};
 
@@ -149,11 +149,11 @@ export class Stats {
 				.where(allInteractions)
 				.groupBy(['type', 'value']);
 
-			const slashCommands = await query.execute();
+			const slashCommands: StatPerInterval = await query.execute();
 
-			return slashCommands.sort((a: unknown, b: unknown) => b.count - a.count);
+			return slashCommands.sort((a, b) => b.count - a.count);
 		} else if ('aggregate' in this.db.em) {
-			const slashCommands = await this.db.em.aggregate(Stat, [
+			const slashCommands: StatPerInterval = await this.db.em.aggregate(Stat, [
 				{
 					$match: allInteractions,
 				},
@@ -172,7 +172,7 @@ export class Stats {
 				},
 			]);
 
-			return slashCommands.sort((a: unknown, b: unknown) => b.count - a.count);
+			return slashCommands.sort((a, b) => b.count - a.count);
 		} else {
 			return [];
 		}
@@ -237,7 +237,7 @@ export class Stats {
 
 			topGuilds.push({
 				id: guild.id,
-				name: discordGuild.name || '',
+				name: discordGuild.name ?? '',
 				totalCommands: commandsCount,
 			});
 		}
@@ -312,8 +312,8 @@ export class Stats {
 		const sumStats = allDays.map((day) => ({
 			date: day,
 			count:
-				(stats1.find((stat) => stat.date === day)?.count || 0) +
-				(stats2.find((stat) => stat.date === day)?.count || 0),
+				(stats1.find((stat) => stat.date === day)?.count ?? 0) +
+				(stats2.find((stat) => stat.date === day)?.count ?? 0),
 		}));
 
 		return sumStats;

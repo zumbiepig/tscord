@@ -22,8 +22,6 @@ export function oneLine(strings: TemplateStringsArray, ...keys: string[]) {
 	return strings
 		.reduce((result, part, i) => result + part + (keys[i] ?? ''), '')
 		.replace(/(?:\n(?:\s*))+/g, ' ')
-		.split('\NEWLINE')
-		.join('\n')
 		.trim();
 }
 

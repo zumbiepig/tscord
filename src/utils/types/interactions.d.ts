@@ -1,14 +1,25 @@
-// Using inline import makes possible for a type to be casted to the ambient module declaration, so we don't need to import it in other files.
-// https://stackoverflow.com/questions/39040108/import-class-in-definition-file-d-ts
+import type { ICategory } from '@discordx/utilities';
+import type {
+	ButtonInteraction,
+	CommandInteraction,
+	ContextMenuCommandInteraction,
+	ModalSubmitInteraction,
+	StringSelectMenuInteraction,
+} from 'discord.js';
+import type { DApplicationCommand, SimpleCommandMessage } from 'discordx';
+
+import type { Locales } from '@/i18n';
+
+import type { TranslationFunctions } from '../../i18n/i18n-types';
 
 type EmittedInteractions =
-	| import('discord.js').CommandInteraction
-	| import('discordx').SimpleCommandMessage
-	| import('discord.js').ContextMenuCommandInteraction;
+	| CommandInteraction
+	| SimpleCommandMessage
+	| ContextMenuCommandInteraction;
 type OnTheFlyInteractions =
-	| import('discord.js').ButtonInteraction
-	| import('discord.js').StringSelectMenuInteraction
-	| import('discord.js').ModalSubmitInteraction;
+	| ButtonInteraction
+	| StringSelectMenuInteraction
+	| ModalSubmitInteraction;
 
 type AllInteractions = EmittedInteractions | OnTheFlyInteractions;
 
@@ -21,10 +32,9 @@ type InteractionsConstants =
 	| 'STRING_SELECT_MENU_INTERACTION'
 	| 'MODAL_SUBMIT_INTERACTION';
 
-type CommandCategory = import('discordx').DApplicationCommand &
-	import('@discordx/utilities').ICategory;
+type CommandCategory = DApplicationCommand & ICategory;
 
 interface InteractionData {
-	sanitizedLocale: import('src/i18n').Locales;
-	localize: import('src/i18n/i18n-types').TranslationFunctions;
+	sanitizedLocale: Locales;
+	localize: TranslationFunctions;
 }

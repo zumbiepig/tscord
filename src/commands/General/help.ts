@@ -211,7 +211,7 @@ export default class HelpCommand {
 
 		for (const command of commands) {
 			const { category } = command;
-			if (!category || !validString(category)) continue;
+			if (!category ?? !validString(category)) continue;
 
 			if (this._categories.has(category)) {
 				this._categories.get(category)?.push(command);

@@ -1,4 +1,4 @@
-import { ArgsOf, GuardFunction } from 'discordx';
+import { type ArgsOf, type GuardFunction } from 'discordx';
 
 import { resolveUser } from '@/utils/functions';
 
@@ -8,7 +8,7 @@ import { resolveUser } from '@/utils/functions';
 export const NotBot: GuardFunction<
 	| EmittedInteractions
 	| ArgsOf<'messageCreate' | 'messageReactionAdd' | 'voiceStateUpdate'>
-> = async (arg, client, next) => {
+> = async (arg, _client, next) => {
 	const parsedArg = Array.isArray(arg) ? arg[0] : arg;
 	const user = resolveUser(parsedArg);
 

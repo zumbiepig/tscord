@@ -1,16 +1,15 @@
-import { Options } from '@mikro-orm/core';
 import { EntityGenerator } from '@mikro-orm/entity-generator';
 import { Migrator } from '@mikro-orm/migrations';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import { SqliteDriver } from '@mikro-orm/sqlite';
 
-// eslint-disable-next-line unused-imports/no-unused-imports
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { env } from '@/env';
 
-interface Config {
-	production: Options;
-	development?: Options;
-}
+import type {
+	DatabaseConfigType,
+	EnvMikroORMConfigType,
+} from '../utils/types/configs';
 
 export const databaseConfig: DatabaseConfigType = {
 	path: './database/', // path to the folder containing the migrations and SQLite database (if used)
@@ -22,7 +21,7 @@ export const databaseConfig: DatabaseConfigType = {
 	},
 };
 
-const envMikroORMConfig = {
+const envMikroORMConfig: EnvMikroORMConfigType = {
 	production: {
 		/**
 		 * SQLite
@@ -77,9 +76,7 @@ const envMikroORMConfig = {
 
 		extensions: [Migrator, EntityGenerator],
 	},
-
-	development: {},
-} satisfies Config;
+};
 
 if (
 	!envMikroORMConfig.development ||

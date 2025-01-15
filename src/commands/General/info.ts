@@ -7,7 +7,7 @@ import {
 	ButtonStyle,
 	CommandInteraction,
 	EmbedBuilder,
-	EmbedField,
+	type EmbedField,
 } from 'discord.js';
 import { Client } from 'discordx';
 
@@ -27,9 +27,15 @@ import packageJson from '../../../package.json';
 dayjs.extend(relativeTime);
 
 const links = [
-	{ label: 'Invite me!', url: generalConfig.links.botInvite },
-	{ label: 'Support server', url: generalConfig.links.supportServer },
-	{ label: 'GitHub', url: generalConfig.links.gitRepo },
+	...(generalConfig.links?.botInvite
+		? [{ label: 'Invite me!', url: generalConfig.links.botInvite }]
+		: []),
+	...(generalConfig.links?.supportServer
+		? [{ label: 'Support server', url: generalConfig.links.supportServer }]
+		: []),
+	...(generalConfig.links?.gitRepo
+		? [{ label: 'GitHub', url: generalConfig.links.gitRepo }]
+		: []),
 ];
 
 @Discord()
@@ -48,8 +54,8 @@ export default class InfoCommand {
 				name: generalConfig.name,
 				iconURL: interaction.user.displayAvatarURL(),
 			})
-			.setTitle(client.user!.tag)
-			.setThumbnail(client.user!.displayAvatarURL())
+			.setTitle(client.user?.tag ?? '')
+			.setThumbnail(client.user?.displayAvatarURL() ?? '')
 			.setColor(getColor('primary'))
 			.setDescription(generalConfig.description);
 
@@ -58,26 +64,29 @@ export default class InfoCommand {
 		/**
 		 * Owner field
 		 */
-		const owner = await client.users
-			.fetch(generalConfig.ownerId)
-			.catch(() => null);
-		if (owner) {
-			fields.push({
-				name: 'Owner',
-				value: `\`${owner.tag}\``,
-				inline: true,
-			});
+		if (generalConfig.ownerId) {
+			await client.users
+				.fetch(generalConfig.ownerId)
+				.then((owner) => {
+					fields.push({
+						name: 'Owner',
+						value: `\`${owner.tag}\``,
+						inline: true,
+					});
+				})
+				.catch(() => null);
 		}
 
 		/**
 		 * Uptime field
 		 */
-		const uptime = timeAgo(new Date(Date.now() - client.uptime!));
-		fields.push({
-			name: 'Uptime',
-			value: uptime,
-			inline: true,
-		});
+		if (client.uptime) {
+			fields.push({
+				name: 'Uptime',
+				value: timeAgo(new Date(Date.now() - client.uptime)),
+				inline: true,
+			});
+		}
 
 		/**
 		 * Totals field
@@ -85,7 +94,7 @@ export default class InfoCommand {
 		const totalStats = await this.stats.getTotalStats();
 		fields.push({
 			name: 'Totals',
-			value: `**${totalStats.TOTAL_GUILDS}** guilds\n**${totalStats.TOTAL_USERS}** users\n**${totalStats.TOTAL_COMMANDS}** commands`,
+			value: `**${totalStats.TOTAL_GUILDS.toString()}** guilds\n**${totalStats.TOTAL_USERS.toString()}** users\n**${totalStats.TOTAL_COMMANDS.toString()}** commands`,
 			inline: true,
 		});
 
@@ -129,7 +138,7 @@ export default class InfoCommand {
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(...buttons);
 
 		// finally send the embed
-		interaction.followUp({
+		await interaction.followUp({
 			embeds: [embed],
 			components: [row],
 		});

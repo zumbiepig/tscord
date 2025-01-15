@@ -24,13 +24,15 @@ export class Plugin {
 	private _translations!: Record<string, BaseTranslation>;
 
 	constructor(path: string) {
-		this._path = path.replace('file://', '')
+		this._path = path.replace('file://', '');
 	}
 
 	public async load(): Promise<void> {
 		// check if the plugin.json is present
-		if (!fs.existsSync(`${this._path}/plugin.json`))
-			return this.stopLoad('plugin.json not found')
+		if (!fs.existsSync(`${this._path}/plugin.json`)) {
+			this.stopLoad('plugin.json not found');
+			return;
+		}
 
 		// read plugin.json
 		const pluginConfig = await import(`${this._path}/plugin.json`);

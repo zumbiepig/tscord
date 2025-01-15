@@ -3,13 +3,9 @@ import type { constructor } from 'tsyringe/dist/typings/types';
 
 export const keptInstances = new Set<constructor<unknown>>();
 
-interface ServiceOptions {
-	keepInstanceAfterHmr?: boolean;
-}
-
-export function Service<T>(options: ServiceOptions = {}) {
+export function Service<T>(keepInstanceAfterHmr?: boolean) {
 	return function (target: constructor<T>) {
-		if (options.keepInstanceAfterHmr) keptInstances.add(target);
+		if (keepInstanceAfterHmr) keptInstances.add(target);
 
 		singleton()(target);
 	};

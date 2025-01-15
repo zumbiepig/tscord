@@ -9,7 +9,7 @@ import { replyToInteraction, resolveChannel } from '@/utils/functions';
  */
 export const NSFW: GuardFunction<
 	CommandInteraction | SimpleCommandMessage
-> = async (arg, client, next) => {
+> = async (arg, _client, next) => {
 	const channel = resolveChannel(arg);
 
 	if (!(channel instanceof TextChannel && !channel.nsfw)) {

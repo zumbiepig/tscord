@@ -6,6 +6,8 @@ import { Discord, Slash } from '@/decorators';
 import { Guard } from '@/guards';
 import { getColor } from '@/utils/functions';
 
+import type { InteractionData } from '../../utils/types/interactions';
+
 @Discord()
 @Category('General')
 export default class InviteCommand {
@@ -18,13 +20,13 @@ export default class InviteCommand {
 			.setTitle(localize.COMMANDS.INVITE.EMBED.TITLE())
 			.setDescription(
 				localize.COMMANDS.INVITE.EMBED.DESCRIPTION({
-					link: generalConfig.links.botInvite,
+					link: generalConfig.links?.botInvite,
 				}),
 			)
 			.setColor(getColor('primary'))
 			.setFooter({ text: 'Powered by DiscBot Team ❤' });
 
-		interaction.followUp({
+		await interaction.followUp({
 			embeds: [embed],
 		});
 	}

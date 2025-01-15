@@ -1,5 +1,5 @@
 import { RequestContext } from '@mikro-orm/core';
-import { GuardFunction } from 'discordx';
+import { type GuardFunction } from 'discordx';
 
 import { Database } from '@/services';
 import { resolveDependency } from '@/utils/functions';
@@ -9,9 +9,9 @@ import { resolveDependency } from '@/utils/functions';
  */
 export const RequestContextIsolator: GuardFunction = async (
 	_,
-	client,
+	_client,
 	next,
 ) => {
 	const db = await resolveDependency(Database);
-	RequestContext.create(db.orm.em, next);
+	await RequestContext.create(db.orm.em, next);
 };

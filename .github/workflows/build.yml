@@ -5,15 +5,21 @@ on: [push, pull_request, workflow_dispatch, workflow_call]
 jobs:
   build:
     name: Build
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - name: Install dependencies
+        id: install
         run: bun install --frozen-lockfile
       - name: Check formatting
+        if: ${{ !cancelled() && steps.install.conclusion == 'success' }}
         run: bun run format:check
       - name: Lint
+        if: ${{ !cancelled() && steps.install.conclusion == 'success' }}
         run: bun run lint
       - name: Build
+        if: ${{ !cancelled() && steps.install.conclusion == 'success' }}
         run: bun run build

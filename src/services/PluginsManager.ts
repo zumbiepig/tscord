@@ -104,7 +104,7 @@ export class PluginsManager {
 		for (const path of await resolve(
 			`${getSourceCodeLocation()}/i18n/*/*/index.ts`,
 		)) {
-			const name = path.split(sep).at(-2) || '';
+			const name = path.split(sep).at(-2) ?? '';
 
 			if (!pluginsName.includes(name))
 				await fs.rmSync(path.slice(0, -8), { recursive: true, force: true });

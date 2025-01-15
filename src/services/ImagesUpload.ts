@@ -155,7 +155,7 @@ export class ImagesUpload {
 			image.size = uploadResponse.data.size;
 			image.tags = imageBasePath.split('/');
 			image.hash = imageHash;
-			image.deleteHash = uploadResponse.data.deletehash || '';
+			image.deleteHash = uploadResponse.data.deletehash ?? '';
 			await this.db.em.persistAndFlush(image);
 
 			// log the success
