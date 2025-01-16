@@ -2,9 +2,9 @@ import { Context, Middleware, PlatformContext } from '@tsed/common';
 import { BadRequest, Unauthorized } from '@tsed/exceptions';
 import DiscordOauth2 from 'discord-oauth2';
 
-import { env } from '@/env';
+import env from '@/env';
 import { Store } from '@/services';
-import { isDev, resolveDependency } from '@/utils/functions';
+import { isDev, resolveDependencies } from '@/utils/functions';
 
 const discordOauth2 = new DiscordOauth2();
 
@@ -18,7 +18,7 @@ export class DevAuthenticated {
 	private store!: Store;
 
 	constructor() {
-		void resolveDependency(Store).then((store) => {
+		void resolveDependencies([Store]).then(([store]) => {
 			this.store = store;
 		});
 	}

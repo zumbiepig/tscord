@@ -5,34 +5,8 @@
 		"emitDecoratorMetadata": true,
 
 		"paths": {
-			"@/env": ["./src/utils/types/environment.ts"],
-
-			"@/decorators": ["./src/utils/decorators"],
-			"@/decorators/*": ["./src/plugins/*/utils/decorators"],
-
-			"@/errors": ["./src/utils/errors"],
-			"@/errors/*": ["./src/plugins/*/utils/errors"],
-
-			"@/entities": ["./src/entities"],
-			"@/entities/*": ["./src/plugins/*/entities"],
-
-			"@/guards": ["./src/guards"],
-			"@/guards/*": ["./src/plugins/*/guards"],
-
-			"@/services": ["./src/services"],
-			"@/services/*": ["./src/plugins/*/services"],
-
-			"@/i18n": ["./src/i18n"],
-			"@/i18n/*": ["./src/plugins/*/i18n"],
-
-			"@/configs": ["./src/configs"],
-			"@/configs/*": ["./src/plugins/*/configs"],
-
-			"@/utils/classes": ["./src/utils/classes"],
-			"@/utils/classes/*": ["./src/plugins/*/utils/classes"],
-
-			"@/utils/functions": ["./src/utils/functions"],
-			"@/utils/functions/*": ["./src/plugins/*/utils/functions"],
+			"@/env": ["./src/env.ts"],
+			"@/env/*": ["./src/plugins/*/env.ts"],
 
 			"@/api/controllers": ["./src/api/controllers"],
 			"@/api/controllers/*": ["./src/plugins/*/api/controllers"],
@@ -40,7 +14,37 @@
 			"@/api/middlewares": ["./src/api/middlewares"],
 			"@/api/middlewares/*": ["./src/plugins/*/api/middlewares"],
 
-			"@/api/server": ["./src/api/server.ts"]
+			"@/api/server": ["./src/api/server.ts"],
+
+			"@/configs": ["./src/configs"],
+			"@/configs/*": ["./src/plugins/*/configs"],
+
+			"@/entities": ["./src/entities"],
+			"@/entities/*": ["./src/plugins/*/entities"],
+
+			"@/guards": ["./src/guards"],
+			"@/guards/*": ["./src/plugins/*/guards"],
+
+			"@/i18n": ["./src/i18n"],
+			"@/i18n/*": ["./src/plugins/*/i18n"],
+
+			"@/services": ["./src/services"],
+			"@/services/*": ["./src/plugins/*/services"],
+
+			"@/utils/classes": ["./src/utils/classes"],
+			"@/utils/classes/*": ["./src/plugins/*/utils/classes"],
+
+			"@/utils/decorators": ["./src/utils/decorators"],
+			"@/utils/decorators/*": ["./src/plugins/*/utils/decorators"],
+
+			"@/utils/errors": ["./src/utils/errors"],
+			"@/utils/errors/*": ["./src/plugins/*/utils/errors"],
+
+			"@/utils/functions": ["./src/utils/functions"],
+			"@/utils/functions/*": ["./src/plugins/*/utils/functions"],
+
+			"@/utils/types": ["./src/utils/types"],
+			"@/utils/types/*": ["./src/plugins/*/utils/types"]
 		}
 	}
 }

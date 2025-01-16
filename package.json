@@ -7,23 +7,25 @@
 	"type": "module",
 	"module": "src/main.ts",
 	"engines": {
-		"node": ">=20"
+		"node": ">=22",
+		"npm": ">=10"
 	},
 	"engineStrict": true,
 	"scripts": {
-		"postinstall": "bun run -c installoop --rootDir=./src/plugins",
-		"start": "NODE_ENV=production bun run -c ./dist/main.js",
-		"dev": "NODE_ENV=development bun run -c --hot .",
-		"build": "rm -rf ./dist && bun build --minify --sourcemap --target=bun --outdir=dist ./src/main.ts",
-		"build:exec": "rm -rf ./dist && bun build --compile --minify --sourcemap --outfile=dist/tscord-bot ./src/main.ts",
-		"lint": "bun run -c eslint .",
-		"lint:fix": "bun run -c eslint --fix .",
-		"format": "bun run -c prettier --write --list-different .",
-		"format:check": "bun run -c prettier --check .",
-		"i18n": "bun run -c typesafe-i18n",
-		"migration:create": "bun run -c mikro-orm migration:create",
-		"migration:up": "bun run -c mikro-orm migration:up",
-		"migration:down": "bun run -c mikro-orm migration:down"
+		"postinstall": "bun -c run installoop --rootDir=./src/plugins",
+		"start": "NODE_ENV=production bun -c run ./dist/main.js",
+		"dev": "NODE_ENV=development bun -c run i18n:watch & bun -c --hot --no-clear-screen run .",
+		"build": "rm -rf ./dist && bun -c build --minify --sourcemap --target=bun --outdir=dist ./src/main.ts",
+		"build:exec": "rm -rf ./dist && bun -c build --compile --minify --sourcemap --outfile=dist/tscord-bot ./src/main.ts",
+		"lint": "bun -c run eslint .",
+		"lint:fix": "bun -c run eslint --fix .",
+		"format": "bun -c run prettier --write --list-different .",
+		"format:check": "bun -c run prettier --check .",
+		"i18n": "bun -c run typesafe-i18n --no-watch",
+		"i18n:watch": "bun -c run typesafe-i18n",
+		"migration:create": "bun -c run mikro-orm migration:create",
+		"migration:up": "bun -c run mikro-orm migration:up",
+		"migration:down": "bun -c run mikro-orm migration:down"
 	},
 	"dependencies": {
 		"@discordx/importer": "~1.3.1",
@@ -67,7 +69,6 @@
 		"saveqlite": "~1.1.2",
 		"semver": "^7.6.3",
 		"stacktrace-parser": "~0.1.10",
-		"ts-toolbelt": "^9.6.0",
 		"tsyringe": "~4.8.0",
 		"typesafe-i18n": "^5.26.2"
 	},
@@ -87,6 +88,9 @@
 		"prettier": "^3.4.2",
 		"typescript": "^5.7.3",
 		"typescript-eslint": "^8.20.0"
+	},
+	"peerDependencies": {
+		"better-sqlite3": "^11.8.0"
 	},
 	"trustedDependencies": [
 		"bun",

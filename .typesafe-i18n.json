@@ -1,4 +1,6 @@
 {
 	"$schema": "https://unpkg.com/typesafe-i18n/schema/typesafe-i18n.json",
-	"adapter": "node"
+	"adapter": "node",
+	"baseLocale": "en",
+	"runAfterGenerator": "bun -c run prettier --write ./src/i18n"
 }

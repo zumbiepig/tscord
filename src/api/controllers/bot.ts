@@ -37,8 +37,6 @@ import {
 @UseBefore(BotOnline, DevAuthenticated)
 export class BotController extends BaseController {
 	private client!: Client;
-
-	// test
 	private db!: Database;
 
 	constructor() {
@@ -59,7 +57,9 @@ export class BotController extends BaseController {
 		return {
 			user,
 			owner: (
-				await this.client.users.fetch(generalConfig.ownerId).catch(() => null)
+				await this.client.users
+					.fetch(generalConfig.ownerId ?? '')
+					.catch(() => null)
 			)?.toJSON(),
 		};
 	}

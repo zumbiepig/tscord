@@ -1,7 +1,7 @@
 import { Store as RxStore } from 'rxeta';
 
 import { apiConfig } from '@/configs';
-import { Service } from '@/decorators';
+import { Service } from '@/utils/decorators';
 
 const initialState: State = {
 	authorizedAPITokens: [],

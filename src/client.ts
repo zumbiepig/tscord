@@ -1,8 +1,8 @@
 import { GatewayIntentBits, Partials } from 'discord.js';
-import { ClientOptions } from 'discordx';
+import type { ClientOptions } from 'discordx';
 
 import { generalConfig, logsConfig } from '@/configs';
-import { env } from '@/env';
+import env from '@/env';
 import {
 	ExtractLocale,
 	Maintenance,
@@ -12,8 +12,11 @@ import {
 
 export function clientConfig(): ClientOptions {
 	return {
-		// to only use global commands (use @Guild for specific guild command), comment this line
-		botGuilds: env.isDev ? [generalConfig.testGuildId] : undefined,
+		...(env.isDev &&
+			generalConfig.testGuildId && {
+				// to only use global commands (use @Guild for specific guild command), comment this line
+				botGuilds: [generalConfig.testGuildId as string],
+			}),
 
 		// discord intents
 		intents: [

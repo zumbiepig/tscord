@@ -1,11 +1,12 @@
 import { Category } from '@discordx/utilities';
+import { PermissionGuard } from '@discordx/utilities';
 import { ApplicationCommandOptionType, CommandInteraction } from 'discord.js';
+import { Guard } from 'discordx';
 
 import { generalConfig } from '@/configs';
-import { Discord, Injectable, Slash, SlashOption } from '@/decorators';
+import { Discord, Injectable, Slash, SlashOption } from '@/utils/decorators';
 import { Guild } from '@/entities';
 import { UnknownReplyError } from '@/errors';
-import { Guard, UserPermissions } from '@/guards';
 import { Database } from '@/services';
 import { resolveGuild, simpleSuccessEmbed } from '@/utils/functions';
 
@@ -18,7 +19,7 @@ export default class PrefixCommand {
 	constructor(private db: Database) {}
 
 	@Slash({ name: 'prefix' })
-	@Guard(UserPermissions(['Administrator']))
+	@Guard(PermissionGuard(['Administrator']))
 	async prefix(
 		@SlashOption({
 			name: 'prefix',

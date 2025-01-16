@@ -9,7 +9,7 @@ export class InvalidOptionName extends BaseError {
 		);
 	}
 
-	handle() {
+	override handle() {
 		this.logger.console(this.message, 'error');
 		this.kill();
 	}

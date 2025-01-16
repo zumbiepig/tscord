@@ -2,8 +2,8 @@ import { Category } from '@discordx/utilities';
 import { CommandInteraction, EmbedBuilder } from 'discord.js';
 
 import { generalConfig } from '@/configs';
-import { Discord, Slash } from '@/decorators';
-import { Guard } from '@/guards';
+import { Discord, Slash } from '@/utils/decorators';
+import { Guard } from 'discordx';
 import { getColor } from '@/utils/functions';
 
 import type { InteractionData } from '../../utils/types/interactions';

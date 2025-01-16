@@ -5,7 +5,7 @@ export class NoBotTokenError extends BaseError {
 		super('Could not find BOT_TOKEN in your environment');
 	}
 
-	handle() {
+	override handle() {
 		this.logger.console(this.message, 'error');
 		this.kill();
 	}

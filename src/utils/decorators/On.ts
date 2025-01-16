@@ -31,7 +31,11 @@ export function On(
 			once: false,
 			rest: false,
 			priority: options?.priority,
-		}).decorate(clazz.constructor, key, descriptor?.value);
+		}).decorate(
+			clazz.constructor,
+			key,
+			descriptor?.value as Record<string, never> | undefined,
+		);
 
 		MetadataStorage.instance.addOn(on);
 	};

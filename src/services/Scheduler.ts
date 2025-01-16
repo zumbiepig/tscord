@@ -1,16 +1,19 @@
-import { CronJob } from 'cron';
+import { CronJob, type CronOnCompleteCommand } from 'cron';
 
-import { Service } from '@/decorators';
+import { Service } from '@/utils/decorators';
 
 @Service()
 export class Scheduler {
-	private _jobs = new Map<string, CronJob>();
+	private _jobs = new Map<
+		string,
+		CronJob<CronOnCompleteCommand | null, unknown>
+	>();
 
 	get jobs() {
 		return this._jobs;
 	}
 
-	addJob(jobName: string, job: CronJob) {
+	addJob(jobName: string, job: CronJob<CronOnCompleteCommand | null, unknown>) {
 		this._jobs.set(jobName, job);
 	}
 

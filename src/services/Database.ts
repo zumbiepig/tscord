@@ -1,16 +1,27 @@
 import fs from 'node:fs';
 
-import { type EntityName, MikroORM, type Options } from '@mikro-orm/core';
+import {
+	type EntityName,
+	EntityRepository,
+	type GetRepository,
+	MikroORM,
+	type Options,
+} from '@mikro-orm/core';
 import fastFolderSizeSync from 'fast-folder-size/sync';
 import { backup, restore } from 'saveqlite';
 import { delay, inject } from 'tsyringe';
 
 import { databaseConfig, mikroORMConfig } from '@/configs';
-import { Schedule, Service } from '@/decorators';
 import * as entities from '@/entities';
-import { env } from '@/env';
+import env from '@/env';
 import { Logger, PluginsManager, Store } from '@/services';
+import { Schedule, Service } from '@/utils/decorators';
 import { resolveDependency } from '@/utils/functions';
+import type {
+	DatabaseDriver,
+	DatabaseEntityManager,
+	DatabaseSize,
+} from '@/utils/types';
 
 @Service()
 export class Database {
@@ -68,7 +79,9 @@ export class Database {
 	 * Shorthand to get custom and natives repositories
 	 * @param entity Entity of the custom repository to get
 	 */
-	get<T extends object>(entity: EntityName<T>) {
+	get<T extends object>(
+		entity: EntityName<T>,
+	): GetRepository<T, EntityRepository<T>> {
 		return this._orm.em.getRepository(entity);
 	}
 
@@ -81,14 +94,14 @@ export class Database {
 
 		if (!databaseConfig.backup.enabled && !snapshotName) return false;
 		if (!this.isSQLiteDatabase()) {
-			this.logger.log("Database is not SQLite, couldn't backup");
+			await this.logger.log("Database is not SQLite, couldn't backup");
 
 			return false;
 		}
 
 		const backupPath = databaseConfig.backup.path;
 		if (!backupPath) {
-			this.logger.log("Backup path not set, couldn't backup", 'error', true);
+			await this.logger.log("Backup path not set, couldn't backup", 'error');
 
 			return false;
 		}
@@ -99,7 +112,7 @@ export class Database {
 
 		try {
 			await backup(
-				mikroORMConfig[env.NODE_ENV].dbName,
+				mikroORMConfig[env.NODE_ENV].dbName ?? '',
 				`${snapshotName}.txt`,
 				objectsPath,
 			);
@@ -113,7 +126,7 @@ export class Database {
 						? e.message
 						: 'Unknown error';
 
-			this.logger.log(`Couldn't backup : ${errorMessage}`, 'error', true);
+			await this.logger.log(`Couldn't backup : ${errorMessage}`, 'error');
 
 			return false;
 		}
@@ -126,20 +139,23 @@ export class Database {
 	 */
 	async restore(snapshotName: string): Promise<boolean> {
 		if (!this.isSQLiteDatabase()) {
-			this.logger.log("Database is not SQLite, couldn't restore", 'error');
+			await this.logger.log(
+				"Database is not SQLite, couldn't restore",
+				'error',
+			);
 
 			return false;
 		}
 
 		const backupPath = databaseConfig.backup.path;
 		if (!backupPath)
-			this.logger.log("Backup path not set, couldn't restore", 'error', true);
+			await this.logger.log("Backup path not set, couldn't restore", 'error');
 
 		try {
 			console.debug(mikroORMConfig[env.NODE_ENV].dbName);
 			console.debug(`${backupPath}${snapshotName}`);
 			await restore(
-				mikroORMConfig[env.NODE_ENV].dbName,
+				mikroORMConfig[env.NODE_ENV].dbName ?? '',
 				`${backupPath}${snapshotName}`,
 			);
 
@@ -148,20 +164,19 @@ export class Database {
 			return true;
 		} catch (error) {
 			console.debug(error);
-			this.logger.log(
+			await this.logger.log(
 				"Snapshot file not found, couldn't restore",
 				'error',
-				true,
 			);
 
 			return false;
 		}
 	}
 
-	getBackupList(): string[] | null {
+	async getBackupList(): Promise<string[] | null> {
 		const backupPath = databaseConfig.backup.path;
 		if (!backupPath) {
-			this.logger.log(
+			await this.logger.log(
 				"Backup path not set, couldn't get list of backups",
 				'error',
 			);
@@ -182,10 +197,12 @@ export class Database {
 		};
 
 		if (this.isSQLiteDatabase()) {
-			const dbPath = mikroORMConfig[env.NODE_ENV].dbName!;
-			const dbSize = fs.statSync(dbPath).size;
+			const dbPath = mikroORMConfig[env.NODE_ENV].dbName;
+			if (dbPath) {
+				const dbSize = fs.statSync(dbPath).size;
 
-			size.db = dbSize;
+				size.db = dbSize;
+			}
 		}
 
 		const backupPath = databaseConfig.backup.path;

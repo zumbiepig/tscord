@@ -637,7 +637,7 @@ interface DatabaseConfigType {
 
 interface EnvMikroORMConfigType {
 	production: Options;
-	development?: Options;
+	development: Options;
 }
 
 interface LogsConfigType {

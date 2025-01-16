@@ -1,10 +1,9 @@
 import type { ApplicationCommandType, Locale } from 'discord.js';
 import type {
-	ApplicationCommandOptions,
-	ApplicationCommandOptions,
-	NotEmpty,
-	SlashChoiceType,
-	SlashGroupOptions,
+	ApplicationCommandOptions as ApplicationCommandOptionsX,
+	NotEmpty as NotEmptyX,
+	SlashChoiceType as SlashChoiceTypeX,
+	SlashGroupOptions as SlashGroupOptionsX,
 } from 'discordx';
 
 import type { Translations } from '@/i18n';
@@ -28,29 +27,31 @@ interface SanitizedOptions {
 type Sanitization<K> = Modify<K, SanitizedOptions>;
 
 type ApplicationCommandOptions = Sanitization<
-	WithOptional<ApplicationCommandOptions<string, string>, 'description'>
+	WithOptional<ApplicationCommandOptionsX<string, string>, 'description'>
 >;
 
 type SlashGroupOptions = Sanitization<
-	WithOptional<SlashGroupOptions<string, string, string>, 'description'>
+	WithOptional<SlashGroupOptionsX<string, string, string>, 'description'>
 >;
 
 type SlashOptionOptions = Sanitization<
-	WithOptional<SlashOptionOptions<string, string>, 'description'>
+	WithOptional<SlashOptionOptionsX<string, string>, 'description'>
 >;
 
-type SlashChoiceOption = Modify<SlashChoiceType, SanitizedOptions>;
-
-type ContextMenuOptionsX = Omit<
-	ApplicationCommandOptions<NotEmpty<string>, string> & {
-		type: Exclude<ApplicationCommandType, ApplicationCommandType.ChatInput>;
-	},
-	'description' | 'descriptionLocalizations'
->;
+type SlashChoiceType = Modify<SlashChoiceTypeX, SanitizedOptions>;
 
 type ContextMenuOptions = Modify<
-	Modify<ContextMenuOptionsX, SanitizedOptions>,
+	Modify<
+		Omit<
+			ApplicationCommandOptionsX<NotEmptyX<string>, string>,
+			'description' | 'descriptionLocalizations'
+		>,
+		SanitizedOptions
+	>,
 	{
-		type: ContextMenuOptionsX['type'] | 'USER' | 'MESSAGE';
+		type:
+			| Exclude<ApplicationCommandType, ApplicationCommandType.ChatInput>
+			| ApplicationCommandType.User
+			| ApplicationCommandType.Message;
 	}
 >;

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
-import process from 'node:process';
+import { dirname } from 'node:path';
 
-import { env } from '@/env';
+import { main } from 'bun';
 
 /**
  * recursively get files paths from a directory
@@ -29,5 +29,5 @@ export function fileOrDirectoryExists(path: string): boolean {
 }
 
 export function getSourceCodeLocation(): string {
-	return `${process.cwd()}/${env.isProduction ? 'build' : 'src'}`;
+	return dirname(main);
 }

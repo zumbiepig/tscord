@@ -1,4 +1,4 @@
-import { ArgsOf, GuardFunction } from 'discordx';
+import type { ArgsOf, GuardFunction } from 'discordx';
 
 /**
  * Pass only when the message match with a passed regular expression
@@ -10,7 +10,8 @@ export function Match(regex: RegExp) {
 		_client,
 		next,
 	) => {
-		if (message.content.match(regex)) await next();
+		if (message.content.match(regex)) return next();
+		else return;
 	};
 
 	return guard;

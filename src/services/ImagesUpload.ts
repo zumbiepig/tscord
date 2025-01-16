@@ -1,15 +1,15 @@
 import path from 'node:path';
 import { promisify } from 'node:util';
 
-import axios from 'axios';
+import axios, { type AxiosResponse } from 'axios';
 import chalk from 'chalk';
 import { imageHash as callbackImageHash } from 'image-hash';
 import { ImgurClient } from 'imgur';
 
-import { Service } from '@/decorators';
 import { Image, ImageRepository } from '@/entities';
-import { env } from '@/env';
+import env from '@/env';
 import { Database, Logger } from '@/services';
+import { Service } from '@/utils/decorators';
 import {
 	base64Encode,
 	fileOrDirectoryExists,
@@ -22,7 +22,7 @@ const imageHasher = promisify(callbackImageHash);
 export class ImagesUpload {
 	private validImageExtensions = ['.png', '.jpg', '.jpeg'];
 	private imageFolderPath = path.join(
-		__dirname,
+		import.meta.dir,
 		'..',
 		'..',
 		'assets',
@@ -54,7 +54,7 @@ export class ImagesUpload {
 
 	async syncWithDatabase() {
 		if (!fileOrDirectoryExists(this.imageFolderPath))
-			this.logger.log(
+			await this.logger.log(
 				"Image folder does not exist, couldn't sync with database",
 				'warn',
 			);
@@ -68,7 +68,7 @@ export class ImagesUpload {
 		const imagesInDb = await this.imageRepo.findAll();
 
 		for (const image of imagesInDb) {
-			const imagePath = `${image.basePath !== '' ? `${image.basePath}/` : ''}${image.fileName}`;
+			const imagePath = `${image.basePath !== '' ? `${image.basePath ?? ''}/` : ''}${image.fileName}`;
 
 			// delete the image if it is not in the filesystem anymore
 			if (!images.includes(imagePath)) {
@@ -95,12 +95,11 @@ export class ImagesUpload {
 
 			if (!imageInDb) await this.addNewImageToImgur(imagePath, imageHash);
 			else if (
-				imageInDb &&
-				(imageInDb.basePath !== imagePath.split('/').slice(0, -1).join('/') ||
-					imageInDb.fileName !== imagePath.split('/').slice(-1)[0])
+				imageInDb.basePath !== imagePath.split('/').slice(0, -1).join('/') ||
+				imageInDb.fileName !== imagePath.split('/').slice(-1)[0]
 			)
 				console.warn(
-					`Image ${chalk.bold.green(imagePath)} has the same hash as ${chalk.bold.green(imageInDb.basePath + (imageInDb.basePath?.length ? '/' : '') + imageInDb.fileName)} so it will skip`,
+					`Image ${chalk.bold.green(imagePath)} has the same hash as ${chalk.bold.green(imageInDb.basePath ?? '' + '/' + imageInDb.fileName)} so it will skip`,
 				);
 		}
 	}
@@ -110,10 +109,9 @@ export class ImagesUpload {
 
 		await this.imgurClient.deleteImage(image.deleteHash);
 
-		this.logger.log(
+		await this.logger.log(
 			`Image ${image.fileName} deleted from database because it is not in the filesystem anymore`,
 			'info',
-			true,
 		);
 	}
 
@@ -128,20 +126,19 @@ export class ImagesUpload {
 		const base64 = base64Encode(`${this.imageFolderPath}/${imagePath}`);
 
 		try {
-			const imageFileName = imagePath.split('/').at(-1);
+			const imageFileName = imagePath.split('/').at(-1) ?? '';
 			const imageBasePath = imagePath.split('/').slice(0, -1).join('/');
 
 			const uploadResponse = await this.imgurClient.upload({
 				image: base64,
 				type: 'base64',
-				name: imageFileName ?? '',
+				name: imageFileName,
 			});
 
 			if (!uploadResponse.success) {
-				this.logger.log(
-					`Error uploading image ${imageFileName} to imgur: ${uploadResponse.status} ${uploadResponse.data}`,
+				await this.logger.log(
+					`Error uploading image ${imageFileName} to imgur: ${uploadResponse.status.toString()} ${JSON.stringify(uploadResponse.data)}`,
 					'error',
-					true,
 				);
 
 				return;
@@ -159,13 +156,15 @@ export class ImagesUpload {
 			await this.db.em.persistAndFlush(image);
 
 			// log the success
-			this.logger.log(
+			await this.logger.log(
 				`Image ${chalk.bold.green(imagePath)} uploaded to imgur`,
 				'info',
-				true,
 			);
-		} catch (error: unknown) {
-			this.logger.log(error?.toString(), 'error', true);
+		} catch (error) {
+			await this.logger.log(
+				error instanceof Error ? error.message : String(error),
+				'error',
+			);
 		}
 	}
 

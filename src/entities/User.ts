@@ -6,14 +6,14 @@ import {
 } from '@mikro-orm/core';
 import { EntityRepository } from '@mikro-orm/sqlite';
 
-import { CustomBaseEntity } from './BaseEntity';
+import { BaseEntity } from '@/utils/classes';
 
 // ===========================================
 // ================= Entity ==================
 // ===========================================
 
 @Entity({ repository: () => UserRepository })
-export class User extends CustomBaseEntity {
+export class User extends BaseEntity {
 	[EntityRepositoryType]?: UserRepository;
 
 	@PrimaryKey({ autoincrement: false })

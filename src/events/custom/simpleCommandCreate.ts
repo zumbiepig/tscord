@@ -1,6 +1,6 @@
 import { ArgsOf, Client, Guard, SimpleCommandMessage } from 'discordx';
 
-import { Discord, Injectable, On, OnCustom } from '@/decorators';
+import { Discord, Injectable, On, OnCustom } from '@/utils/decorators';
 import { Guild, User } from '@/entities';
 import { Maintenance } from '@/guards';
 import { Database, EventManager, Logger, Stats } from '@/services';

@@ -4,16 +4,16 @@ import { Required } from '@tsed/schema';
 
 import { DevAuthenticated } from '@/api/middlewares';
 import { databaseConfig } from '@/configs';
-import { Injectable } from '@/decorators';
 import { Database } from '@/services';
 import { BaseController } from '@/utils/classes';
+import { Injectable } from '@/utils/decorators';
 import { formatDate, resolveDependencies } from '@/utils/functions';
 
 @Controller('/database')
 @UseBefore(DevAuthenticated)
 @Injectable()
 export class DatabaseController extends BaseController {
-	private db: Database;
+	private db!: Database;
 
 	constructor() {
 		super();
@@ -56,14 +56,14 @@ export class DatabaseController extends BaseController {
 	}
 
 	@Get('/backups')
-	getBackups() {
+	async getBackups() {
 		const backupPath = databaseConfig.backup.path;
 		if (!backupPath)
 			throw new InternalServerError(
 				"Backup path not set, couldn't find backups",
 			);
 
-		const backupList = this.db.getBackupList();
+		const backupList = await this.db.getBackupList();
 
 		if (backupList) return backupList;
 		else

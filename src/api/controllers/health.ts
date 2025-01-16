@@ -10,10 +10,10 @@ import { DevAuthenticated } from '../middlewares/devAuthenticated';
 
 @Controller('/health')
 export class HealthController extends BaseController {
-	private client: Client;
-	private db: Database;
-	private stats: Stats;
-	private logger: Logger;
+	private client!: Client;
+	private db!: Database;
+	private stats!: Stats;
+	private logger!: Logger;
 
 	constructor() {
 		super();

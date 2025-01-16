@@ -7,7 +7,7 @@ import {
 	User,
 } from 'discord.js';
 
-import { Discord, Injectable, Slash, SlashOption } from '@/decorators';
+import { Discord, Injectable, Slash, SlashOption } from '@/utils/decorators';
 import { Stats } from '@/services';
 import { getColor } from '@/utils/functions';
 

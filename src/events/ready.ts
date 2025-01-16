@@ -2,7 +2,7 @@ import { ActivityType } from 'discord.js';
 import { Client } from 'discordx';
 
 import { generalConfig } from '@/configs';
-import { Discord, Injectable, Once, Schedule } from '@/decorators';
+import { Discord, Injectable, Once, Schedule } from '@/utils/decorators';
 import { Data } from '@/entities';
 import { Database, Logger, Scheduler, Store } from '@/services';
 import { resolveDependency, syncAllGuilds } from '@/utils/functions';

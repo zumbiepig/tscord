@@ -6,7 +6,7 @@ import {
 } from '@mikro-orm/core';
 import { EntityRepository } from '@mikro-orm/sqlite';
 
-import { CustomBaseEntity } from './BaseEntity';
+import { BaseEntity } from '@/utils/classes';
 
 /**
  * Default data for the Data table (dynamic EAV key/value pattern)
@@ -24,7 +24,7 @@ type DataType = keyof typeof defaultData;
 // ===========================================
 
 @Entity({ repository: () => DataRepository })
-export class Data extends CustomBaseEntity {
+export class Data extends BaseEntity {
 	[EntityRepositoryType]?: DataRepository;
 
 	@PrimaryKey()
@@ -39,10 +39,10 @@ export class Data extends CustomBaseEntity {
 // ===========================================
 
 export class DataRepository extends EntityRepository<Data> {
-	async get<T extends DataType>(key: T): Promise<(typeof defaultData)[T]> {
-		const data = await this.findOne({ key });
-
-		return JSON.parse(data!.value);
+	async get<T extends DataType>(key: T) {
+		return JSON.parse(
+			(await this.findOne({ key }))?.value ?? '',
+		) as (typeof defaultData)[T];
 	}
 
 	async set<T extends DataType>(

@@ -1,5 +1,5 @@
 import { CommandInteraction, ContextMenuCommandInteraction } from 'discord.js';
-import { GuardFunction, SimpleCommandMessage } from 'discordx';
+import { type GuardFunction, SimpleCommandMessage } from 'discordx';
 
 import { getLocaleFromInteraction, L } from '@/i18n';
 import { isDev, replyToInteraction, resolveUser } from '@/utils/functions';
@@ -11,18 +11,13 @@ export const Disabled: GuardFunction<
 	CommandInteraction | SimpleCommandMessage | ContextMenuCommandInteraction
 > = async (arg, _client, next) => {
 	const user = resolveUser(arg);
-
 	if (user?.id && isDev(user.id)) {
 		return next();
 	} else {
-		if (
-			arg instanceof CommandInteraction ||
-			arg instanceof SimpleCommandMessage
-		) {
-			const locale = getLocaleFromInteraction(arg);
-			const localizedReplyMessage = L[locale].GUARDS.DISABLED_COMMAND();
-
-			await replyToInteraction(arg, localizedReplyMessage);
-		}
+		await replyToInteraction(
+			arg,
+			L[getLocaleFromInteraction(arg)].GUARDS.DISABLED_COMMAND(),
+		);
+		return;
 	}
 };

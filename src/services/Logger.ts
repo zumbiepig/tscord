@@ -20,10 +20,10 @@ import { delay, inject } from 'tsyringe';
 
 import * as controllers from '@/api/controllers';
 import { apiConfig, logsConfig } from '@/configs';
-import { Schedule, Service } from '@/decorators';
-import { env } from '@/env';
+import env from '@/env';
 import { locales } from '@/i18n';
 import { Pastebin, PluginsManager, Scheduler, Store } from '@/services';
+import { Schedule, Service } from '@/utils/decorators';
 import {
 	fileOrDirectoryExists,
 	formatDate,
@@ -37,12 +37,18 @@ import {
 	resolveUser,
 	validString,
 } from '@/utils/functions';
+import type { AllInteractions, InteractionsConstants } from '@/utils/types';
 
 const defaultConsole = { ...console };
 
 @Service()
 export class Logger {
-	private readonly logPath: string = path.join(__dirname, '..', '..', 'logs');
+	private readonly logPath: string = path.join(
+		import.meta.dir,
+		'..',
+		'..',
+		'logs',
+	);
 	private readonly logArchivePath: string = path.join(this.logPath, 'archives');
 
 	private readonly levels = ['info', 'warn', 'error'] as const;
@@ -202,8 +208,8 @@ export class Logger {
 			.catch(() => null);
 
 		if (
-			channel &&
-			(channel instanceof TextChannel ?? channel instanceof ThreadChannel)
+			(channel && channel instanceof TextChannel) ||
+			channel instanceof ThreadChannel
 		) {
 			if (typeof message !== 'string')
 				return channel.send(message).catch((error: unknown) => {
@@ -338,7 +344,7 @@ export class Logger {
 		const message = oneLine`
             (${type})
             "${action}"
-            ${(channel instanceof TextChannel ?? channel instanceof ThreadChannel) ? `in channel #${channel.name}` : ''}
+            ${channel instanceof TextChannel || channel instanceof ThreadChannel ? `in channel #${channel.name}` : ''}
             ${guild ? `in guild ${guild.name}` : ''}
             ${user ? `by ${user.username}#${user.discriminator}` : ''}
         `;
@@ -347,8 +353,7 @@ export class Logger {
             (${chalk.bold.white(type)})
             "${chalk.bold.green(action)}"
             ${
-							(channel instanceof TextChannel ??
-							channel instanceof ThreadChannel)
+							channel instanceof TextChannel || channel instanceof ThreadChannel
 								? `${chalk.dim.italic.gray('in channel')} ${chalk.bold.blue(`#${channel.name}`)}`
 								: ''
 						}
@@ -544,10 +549,10 @@ export class Logger {
 		let chalkedMessage = `(${chalk.bold.white('ERROR')})`;
 
 		if (trace[0]) {
-			message += ` ${type === 'Exception' ? 'Exception' : 'Unhandled rejection'} : ${error.message}\n${trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber ?? 0}`).join('\n')}`;
-			embedMessage += `\`\`\`\n${trace.map((frame: StackFrame) => `\> ${frame.file ?? ''}:${frame.lineNumber ?? 0}`).join('\n')}\n\`\`\``;
+			message += ` ${type === 'Exception' ? 'Exception' : 'Unhandled rejection'} : ${error.message}\n${trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n')}`;
+			embedMessage += `\`\`\`\n${trace.map((frame: StackFrame) => `> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n')}\n\`\`\``;
 			embedTitle += `***${type === 'Exception' ? 'Exception' : 'Unhandled rejection'}* : ${error.message}**`;
-			chalkedMessage += ` ${chalk.dim.italic.gray(type === 'Exception' ? 'Exception' : 'Unhandled rejection')} : ${error.message}\n${chalk.dim.italic(trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber ?? 0}`).join('\n'))}`;
+			chalkedMessage += ` ${chalk.dim.italic.gray(type === 'Exception' ? 'Exception' : 'Unhandled rejection')} : ${error.message}\n${chalk.dim.italic(trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n'))}`;
 		} else {
 			if (type === 'Exception') {
 				message += `An exception as occurred in a unknown file\n\t> ${error.message}`;
@@ -651,15 +656,14 @@ export class Logger {
 
 		// entities
 		const entities = fs
-			.readdirSync(path.join(__dirname, '..', 'entities'))
+			.readdirSync(path.join(import.meta.dir, '..', 'entities'))
 			.filter(
 				(entity) =>
 					!entity.startsWith('index') && !entity.startsWith('BaseEntity'),
 			);
 
 		const pluginsEntitesCount = this.pluginsManager.plugins.reduce(
-			(acc, plugin) =>
-				acc + (plugin.entities ? Object.values(plugin.entities).length : 0),
+			(acc, plugin) => acc + Object.values(plugin.entities).length,
 			0,
 		);
 
@@ -673,12 +677,11 @@ export class Logger {
 
 		// services
 		const services = fs
-			.readdirSync(path.join(__dirname, '..', 'services'))
+			.readdirSync(path.join(import.meta.dir, '..', 'services'))
 			.filter((service) => !service.startsWith('index'));
 
 		const pluginsServicesCount = this.pluginsManager.plugins.reduce(
-			(acc, plugin) =>
-				acc + (plugin.services ? Object.values(plugin.services).length : 0),
+			(acc, plugin) => acc + Object.values(plugin.services).length,
 			0,
 		);
 

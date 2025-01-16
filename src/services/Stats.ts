@@ -8,7 +8,7 @@ import pidusage from 'pidusage';
 import { delay, inject } from 'tsyringe';
 
 import { statsConfig } from '@/configs';
-import { Schedule, Service } from '@/decorators';
+import { Schedule, Service } from '@/utils/decorators';
 import { Guild, Stat, User } from '@/entities';
 import { Database } from '@/services';
 import {
@@ -20,6 +20,11 @@ import {
 	resolveGuild,
 	resolveUser,
 } from '@/utils/functions';
+import type {
+	AllInteractions,
+	InteractionsConstants,
+	StatPerInterval,
+} from '@/utils/types';
 
 const allInteractions = {
 	$or: [
@@ -381,9 +386,9 @@ export class Stats {
 	}
 
 	/**
-	 * Run each day at 23:59 to update daily stats.
+	 * Run each day at 00:00 to update daily stats.
 	 */
-	@Schedule('59 59 23 * * *')
+	@Schedule('0 0 * * *')
 	async registerDailyStats() {
 		const totalStats = await this.getTotalStats();
 

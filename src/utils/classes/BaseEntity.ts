@@ -1,6 +1,6 @@
 import { Property } from '@mikro-orm/core';
 
-export abstract class CustomBaseEntity {
+export abstract class BaseEntity {
 	@Property()
 	createdAt: Date = new Date();
 

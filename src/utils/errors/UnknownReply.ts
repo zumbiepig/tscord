@@ -13,8 +13,8 @@ export class UnknownReplyError extends BaseError {
 		this.interaction = interaction;
 	}
 
-	override async handle() {
+	override handle() {
 		const locale = getLocaleFromInteraction(this.interaction);
-		await simpleErrorEmbed(this.interaction, L[locale].ERRORS.UNKNOWN());
+		void simpleErrorEmbed(this.interaction, L[locale].ERRORS.UNKNOWN());
 	}
 }

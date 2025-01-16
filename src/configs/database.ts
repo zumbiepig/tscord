@@ -3,13 +3,12 @@ import { Migrator } from '@mikro-orm/migrations';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import { SqliteDriver } from '@mikro-orm/sqlite';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { env } from '@/env';
-
 import type {
 	DatabaseConfigType,
 	EnvMikroORMConfigType,
 } from '../utils/types/configs';
+
+// import env from '@/env';
 
 export const databaseConfig: DatabaseConfigType = {
 	path: './database/', // path to the folder containing the migrations and SQLite database (if used)
@@ -32,38 +31,38 @@ const envMikroORMConfig: EnvMikroORMConfigType = {
 		/**
 		 * MongoDB
 		 */
-		// driver: MongoDriver,
-		// clientUrl: env['DATABASE_HOST'],
+		/* driver: MongoDriver,
+		clientUrl: env.DATABASE_HOST, */
 
 		/**
 		 * PostgreSQL
 		 */
-		// driver: PostgreSqlDriver,
-		// dbName: env.DATABASE_NAME,
-		// host: env.DATABASE_HOST,
-		// port: Number(env.DATABASE_PORT),
-		// user: env.DATABASE_USER,
-		// password: env.DATABASE_PASSWORD,
+		/* driver: PostgreSqlDriver,
+		dbName: env.DATABASE_NAME,
+		host: env.DATABASE_HOST,
+		port: env.DATABASE_PORT,
+		user: env.DATABASE_USER,
+		password: env.DATABASE_PASSWORD, */
 
 		/**
 		 * MySQL
 		 */
-		// driver: MySqlDriver,
-		// dbName: env.DATABASE_NAME,
-		// host: env.DATABASE_HOST,
-		// port: Number(env.DATABASE_PORT),
-		// user: env.DATABASE_USER,
-		// password: env.DATABASE_PASSWORD,
+		/* driver: MySqlDriver,
+		dbName: env.DATABASE_NAME,
+		host: env.DATABASE_HOST,
+		port: env.DATABASE_PORT,
+		user: env.DATABASE_USER,
+		password: env.DATABASE_PASSWORD, */
 
 		/**
 		 * MariaDB
 		 */
-		// driver: MariaDbDriver,
-		// dbName: env.DATABASE_NAME,
-		// host: env.DATABASE_HOST,
-		// port: Number(env.DATABASE_PORT),
-		// user: env.DATABASE_USER,
-		// password: env.DATABASE_PASSWORD,
+		/* driver: MariaDbDriver,
+		dbName: env.DATABASE_NAME,
+		host: env.DATABASE_HOST,
+		port: Number(env.DATABASE_PORT),
+		user: env.DATABASE_USER,
+		password: env.DATABASE_PASSWORD, */
 
 		highlighter: new SqlHighlighter(),
 		debug: false,
@@ -76,12 +75,12 @@ const envMikroORMConfig: EnvMikroORMConfigType = {
 
 		extensions: [Migrator, EntityGenerator],
 	},
+	development: {
+		// leave blank to autofill from production
+	},
 };
 
-if (
-	!envMikroORMConfig.development ||
-	Object.keys(envMikroORMConfig.development).length === 0
-)
+if (Object.keys(envMikroORMConfig.development).length === 0)
 	envMikroORMConfig.development = envMikroORMConfig.production;
 
 export const mikroORMConfig = envMikroORMConfig as {

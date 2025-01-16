@@ -1,5 +1,9 @@
 import { CommandInteraction, ContextMenuCommandInteraction } from 'discord.js';
-import { ArgsOf, GuardFunction, SimpleCommandMessage } from 'discordx';
+import {
+	type ArgsOf,
+	type GuardFunction,
+	SimpleCommandMessage,
+} from 'discordx';
 
 import { getLocaleFromInteraction, L } from '@/i18n';
 import {
@@ -16,26 +20,21 @@ export const Maintenance: GuardFunction<
 	ArgsOf<'messageCreate' | 'interactionCreate'>
 > = async (arg, _client, next) => {
 	if (
-		arg instanceof CommandInteraction ||
-		arg instanceof SimpleCommandMessage ||
-		arg instanceof ContextMenuCommandInteraction
+		(await isInMaintenance()) &&
+		(arg instanceof CommandInteraction ||
+			arg instanceof SimpleCommandMessage ||
+			arg instanceof ContextMenuCommandInteraction)
 	) {
 		const user = resolveUser(arg);
-		const maintenance = await isInMaintenance();
-
-		if (maintenance && user?.id && !isDev(user.id)) {
-			const locale = getLocaleFromInteraction(arg);
-			const localizedReplyMessage = L[locale].GUARDS.MAINTENANCE();
-
-			if (
-				arg instanceof CommandInteraction ||
-				arg instanceof SimpleCommandMessage
-			)
-				await replyToInteraction(arg, localizedReplyMessage);
-		} else {
-			return next();
+		if (user?.id && !isDev(user.id)) {
+			await replyToInteraction(
+				arg,
+				L[getLocaleFromInteraction(arg)].GUARDS.MAINTENANCE(),
+			);
+			return;
 		}
-	} else {
+	} else;
+	{
 		return next();
 	}
 };

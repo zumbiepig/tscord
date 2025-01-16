@@ -6,7 +6,7 @@ import { resolveDependencies } from '@/utils/functions';
 
 @Middleware()
 export class BotOnline {
-	private client: Client;
+	private client!: Client;
 
 	constructor() {
 		void resolveDependencies([Client]).then(([client]) => {

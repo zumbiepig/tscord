@@ -1,5 +1,4 @@
 import 'core-js/full/reflect';
-import 'dotenv/config';
 
 import process from 'node:process';
 
@@ -19,9 +18,7 @@ import type { constructor } from 'tsyringe/dist/typings/types';
 
 import { Server } from '@/api/server';
 import { apiConfig, generalConfig } from '@/configs';
-import { keptInstances } from '@/decorators';
-import { checkEnvironmentVariables, env } from '@/env';
-import { NoBotTokenError } from '@/errors';
+import env from '@/env';
 import {
 	Database,
 	ErrorHandler,
@@ -31,12 +28,13 @@ import {
 	PluginsManager,
 	Store,
 } from '@/services';
+import { keptInstances } from '@/utils/decorators';
+import { NoBotTokenError } from '@/utils/errors';
 import { initDataTable, resolveDependency } from '@/utils/functions';
 
 import { clientConfig } from './client';
 
-// eslint-disable-next-line node/no-path-concat
-const importPattern = `${__dirname}/{events,commands}/**/*.{ts,js}`;
+const importPattern = `${import.meta.dir}/{events,commands}/**/*.ts`;
 
 /**
  * Import files
@@ -108,9 +106,6 @@ async function reload(client: Client) {
 async function init() {
 	const logger = await resolveDependency(Logger);
 
-	// check environment variables
-	checkEnvironmentVariables();
-
 	// init error handler
 	await resolveDependency(ErrorHandler);
 
@@ -175,7 +170,7 @@ async function init() {
 				}
 
 				// upload images to imgur if configured
-				if (env.IMGUR_CLIENT_ID && generalConfig.automaticUploadImagesToImgur) {
+				if (generalConfig.automaticUploadImagesToImgur) {
 					const imagesUpload = await resolveDependency(ImagesUpload);
 					await imagesUpload.syncWithDatabase();
 				}
@@ -209,4 +204,4 @@ async function init() {
 	});
 }
 
-init();
+await init();

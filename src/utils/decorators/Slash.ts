@@ -1,7 +1,7 @@
 import {
-	ApplicationCommandOptions as ApplicationCommandOptionsX,
+	type ApplicationCommandOptions as ApplicationCommandOptionsX,
 	Slash as SlashX,
-	VerifyName,
+	type VerifyName,
 } from 'discordx';
 
 import {
@@ -10,6 +10,10 @@ import {
 	setFallbackDescription,
 	setOptionsLocalization,
 } from '@/utils/functions';
+import type {
+	ApplicationCommandOptions,
+	TranslationsNestedPaths,
+} from '@/utils/types';
 
 /**
  * Handle a slash command

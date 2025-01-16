@@ -1,13 +1,13 @@
-import { Service } from '@/decorators';
 import { Logger } from '@/services';
+import { Service } from '@/utils/decorators';
 
 @Service()
 export class EventManager {
-	private _events = new Map<string, Function[]>();
+	private _events = new Map<string, ((..._: unknown[]) => unknown)[]>();
 
 	constructor(private logger: Logger) {}
 
-	register(eventName: string, callback: Function): void {
+	register(eventName: string, callback: (..._: unknown[]) => unknown): void {
 		this._events.set(eventName, [
 			...(this._events.get(eventName) ?? []),
 			callback,
@@ -25,10 +25,9 @@ export class EventManager {
 			} catch (error) {
 				console.error(error);
 				if (error instanceof Error)
-					this.logger.log(
+					await this.logger.log(
 						`[EventError - ${eventName}] ${error.toString()}`,
 						'error',
-						true,
 					);
 			}
 		}

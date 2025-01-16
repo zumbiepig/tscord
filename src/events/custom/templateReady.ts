@@ -1,4 +1,4 @@
-import { Discord, OnCustom } from '@/decorators';
+import { Discord, OnCustom } from '@/utils/decorators';
 
 @Discord()
 export default class TemplateReadyEvent {

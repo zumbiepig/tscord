@@ -2,7 +2,7 @@ import { Category } from '@discordx/utilities';
 import { CommandInteraction, Message } from 'discord.js';
 import { Client } from 'discordx';
 
-import { Discord, Slash } from '@/decorators';
+import { Discord, Slash } from '@/utils/decorators';
 
 @Discord()
 @Category('General')

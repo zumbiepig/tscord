@@ -30,7 +30,7 @@ export async function syncUser(user: DUser) {
 
 		// record new user both in logs and stats
 		await stats.register('NEW_USER', user.id);
-		logger.logNewUser(user);
+		await logger.logNewUser(user);
 	}
 }
 
@@ -65,7 +65,7 @@ export async function syncGuild(guildId: string, client: Client) {
 			await db.em.persistAndFlush(deletedGuildData);
 
 			await stats.register('RECOVER_GUILD', guildId);
-			logger.logGuild('RECOVER_GUILD', guildId);
+			await logger.logGuild('RECOVER_GUILD', guildId);
 		} else {
 			// create new guild
 
@@ -74,7 +74,7 @@ export async function syncGuild(guildId: string, client: Client) {
 			await db.em.persistAndFlush(newGuild);
 
 			await stats.register('NEW_GUILD', guildId);
-			logger.logGuild('NEW_GUILD', guildId);
+			await logger.logGuild('NEW_GUILD', guildId);
 		}
 	} else if (!fetchedGuild) {
 		// guild is deleted but still exists in the database
@@ -83,7 +83,7 @@ export async function syncGuild(guildId: string, client: Client) {
 		await db.em.persistAndFlush(guildData);
 
 		await stats.register('DELETE_GUILD', guildId);
-		logger.logGuild('DELETE_GUILD', guildId);
+		await logger.logGuild('DELETE_GUILD', guildId);
 	}
 }
 

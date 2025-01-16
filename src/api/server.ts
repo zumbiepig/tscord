@@ -11,9 +11,10 @@ import bodyParser from 'body-parser';
 
 import * as controllers from '@/api/controllers';
 import { Log } from '@/api/middlewares';
-import { Service } from '@/decorators';
-import { env } from '@/env';
+import { Service } from '@/utils/decorators';
 import { Database, PluginsManager, Store } from '@/services';
+
+import env from '@/env';
 
 @Service()
 export class Server {
@@ -42,7 +43,7 @@ export class Server {
 	@CreateRequestContext()
 	async start(): Promise<void> {
 		const platform = await PlatformExpress.bootstrap(Server, {
-			rootDir: __dirname,
+			rootDir: import.meta.dir,
 			httpPort: env.API_PORT,
 			httpsPort: false,
 			acceptMimes: ['application/json'],

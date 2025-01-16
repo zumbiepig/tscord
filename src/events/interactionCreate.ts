@@ -2,7 +2,7 @@ import { CommandInteraction } from 'discord.js';
 import { ArgsOf, Client } from 'discordx';
 
 import { generalConfig } from '@/configs';
-import { Discord, Guard, Injectable, On } from '@/decorators';
+import { Discord, Guard, Injectable, On } from '@/utils/decorators';
 import { Guild, User } from '@/entities';
 import { Maintenance } from '@/guards';
 import { Database, Logger, Stats } from '@/services';

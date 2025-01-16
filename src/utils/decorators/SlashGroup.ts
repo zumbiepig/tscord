@@ -1,9 +1,9 @@
 import {
-	ClassDecoratorEx,
-	ClassMethodDecorator,
+	type ClassDecoratorEx,
+	type ClassMethodDecorator,
 	SlashGroup as SlashGroupX,
-	SlashGroupOptions as SlashGroupOptionsX,
-	VerifyName,
+	type SlashGroupOptions as SlashGroupOptionsX,
+	type VerifyName,
 } from 'discordx';
 
 import {
@@ -12,6 +12,7 @@ import {
 	setFallbackDescription,
 	setOptionsLocalization,
 } from '@/utils/functions';
+import type { SlashGroupOptions, TranslationsNestedPaths } from '@/utils/types';
 
 /**
  * Create slash group

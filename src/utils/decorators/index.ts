@@ -1,24 +1,12 @@
-export {
-	Bot,
-	ButtonComponent,
-	Discord,
-	Guard,
-	Guild,
-	ModalComponent,
-	SelectMenuComponent,
-	SimpleCommand,
-	SimpleCommandOption,
-} from 'discordx';
-
-export * from './On.js';
-export * from './Once.js';
-export * from './Slash.js';
-export * from './SlashOption.js';
-export * from './SlashChoice.js';
-export * from './SlashGroup.js';
-export * from './ContextMenu.js';
-export * from './Schedule.js';
-export * from './OnCustom.js';
-export * from './Service.js';
-export * from './Injectable.js';
-export * from './AutoInjectable.js';
+export * from './AutoInjectable';
+export * from './ContextMenu';
+export * from './Injectable';
+export * from './On';
+export * from './Once';
+export * from './OnCustom';
+export * from './Schedule';
+export * from './Service';
+export * from './Slash';
+export * from './SlashChoice';
+export * from './SlashGroup';
+export * from './SlashOption';

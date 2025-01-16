@@ -1,6 +1,6 @@
 import { Message } from 'discord.js';
 
-import { Discord, On } from '@/decorators';
+import { Discord, On } from '@/utils/decorators';
 
 @Discord()
 export default class messagePinnedEvent {

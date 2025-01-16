@@ -1,4 +1,4 @@
-import { CronJob } from 'cron';
+import { type CronCommand, CronJob } from 'cron';
 import { isValidCron } from 'cron-validator';
 import { container, type InjectionToken } from 'tsyringe';
 
@@ -15,12 +15,12 @@ export function Schedule(cronExpression: string, jobName?: string) {
 		throw new Error(`Invalid cron expression: ${cronExpression}`);
 
 	return (
-		target: object,
+		target: unknown,
 		propertyKey: string,
 		descriptor: PropertyDescriptor,
 	) => {
 		// associate the context to the function, with the injected dependencies defined
-		const oldDescriptor = descriptor.value;
+		const oldDescriptor = descriptor.value as (...args: unknown[]) => unknown;
 		descriptor.value = function (...args: unknown[]) {
 			return oldDescriptor.apply(
 				container.resolve(this.constructor as InjectionToken),
@@ -30,7 +30,7 @@ export function Schedule(cronExpression: string, jobName?: string) {
 
 		const job = new CronJob(
 			cronExpression,
-			descriptor.value,
+			descriptor.value as CronCommand<unknown>,
 			null,
 			false,
 			generalConfig.timezone,

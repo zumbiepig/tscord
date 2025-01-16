@@ -1,6 +1,7 @@
 import { generalConfig } from '@/configs';
 import { resolveLocale } from '@/utils/functions';
 
+import type { AllInteractions } from '../utils/types/interactions';
 import { detectLocale } from './i18n-util';
 
 function allInteractionsLocaleDetector(interaction: AllInteractions) {

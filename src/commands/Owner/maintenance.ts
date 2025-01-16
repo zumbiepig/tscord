@@ -1,8 +1,10 @@
 import { ApplicationCommandOptionType, CommandInteraction } from 'discord.js';
+import { Discord, Guard } from 'discordx';
 
-import { Discord, Guard, Slash, SlashOption } from '@/decorators';
 import { Disabled } from '@/guards';
+import { Slash, SlashOption } from '@/utils/decorators';
 import { setMaintenance, simpleSuccessEmbed } from '@/utils/functions';
+import type { InteractionData } from '@/utils/types';
 
 @Discord()
 export default class MaintenanceCommand {

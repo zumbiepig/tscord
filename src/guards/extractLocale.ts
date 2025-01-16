@@ -8,6 +8,7 @@ import {
 import { type GuardFunction, SimpleCommandMessage } from 'discordx';
 
 import { getLocaleFromInteraction, L } from '@/i18n';
+import type { InteractionData } from '@/utils/types';
 
 /**
  * Extract locale from any interaction and pass it as guard data
@@ -23,13 +24,10 @@ export const ExtractLocale: GuardFunction<
 		interaction instanceof StringSelectMenuInteraction ||
 		interaction instanceof ButtonInteraction
 	) {
-		const sanitizedLocale = getLocaleFromInteraction(
-			interaction as AllInteractions,
-		);
-
+		const sanitizedLocale = getLocaleFromInteraction(interaction);
 		guardData.sanitizedLocale = sanitizedLocale;
 		guardData.localize = L[sanitizedLocale];
 	}
 
-	await next(guardData);
+	return next(guardData);
 };

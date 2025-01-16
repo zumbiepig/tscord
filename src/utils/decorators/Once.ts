@@ -27,7 +27,11 @@ export function Once(event: string, options?: EventOptions): MethodDecoratorEx {
 			event,
 			once: true,
 			rest: false,
-		}).decorate(clazz.constructor, key, descriptor?.value);
+		}).decorate(
+			clazz.constructor,
+			key,
+			descriptor?.value as Record<string, never> | undefined,
+		);
 
 		MetadataStorage.instance.addOn(on);
 	};

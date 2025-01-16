@@ -1,6 +1,6 @@
 import { ArgsOf, Client } from 'discordx';
 
-import { Discord, Guard, On } from '@/decorators';
+import { Discord, Guard, On } from '@/utils/decorators';
 import { Maintenance } from '@/guards';
 
 @Discord()

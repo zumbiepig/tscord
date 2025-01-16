@@ -10,10 +10,10 @@ import {
 	type EmbedField,
 } from 'discord.js';
 import { Client } from 'discordx';
+import { Guard } from 'discordx';
 
 import { generalConfig } from '@/configs';
-import { Discord, Injectable, Slash } from '@/decorators';
-import { Guard } from '@/guards';
+import { Discord, Injectable, Slash } from '@/utils/decorators';
 import { Stats } from '@/services';
 import {
 	getColor,

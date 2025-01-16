@@ -1,8 +1,7 @@
-export * from './BaseEntity';
-
-export * from './User';
+export * from '../utils/classes/BaseEntity';
+export * from './Data';
 export * from './Guild';
-export { Data } from './Data';
-export * from './Stat';
 export * from './Image';
 export * from './Pastebin';
+export * from './Stat';
+export * from './User';

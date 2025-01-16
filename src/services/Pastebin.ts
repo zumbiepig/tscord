@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { Paste, RentryClient } from 'rentry-pastebin';
 
-import { Schedule, Service } from '@/decorators';
+import { Schedule, Service } from '@/utils/decorators';
 import { Pastebin as PastebinEntity } from '@/entities';
 import { Database } from '@/services';
 

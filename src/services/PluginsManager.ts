@@ -9,7 +9,7 @@ import {
 	storeTranslationsToDisk,
 } from 'typesafe-i18n/importer';
 
-import { Service } from '@/decorators';
+import { Service } from '@/utils/decorators';
 import { locales } from '@/i18n';
 import { Store } from '@/services';
 import { BaseController, Plugin } from '@/utils/classes';

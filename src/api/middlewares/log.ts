@@ -2,21 +2,21 @@ import { Context, Middleware, PlatformContext } from '@tsed/common';
 import chalk from 'chalk';
 
 import { Logger } from '@/services';
-import { resolveDependency } from '@/utils/functions';
+import { resolveDependencies } from '@/utils/functions';
 
 @Middleware()
 export class Log {
-	private logger: Logger;
+	private logger!: Logger;
 
 	constructor() {
-		void resolveDependency(Logger).then((logger) => {
+		void resolveDependencies([Logger]).then(([logger]) => {
 			this.logger = logger;
 		});
 	}
 
 	use(@Context() { request }: PlatformContext) {
 		// don't log anything if the request has a `logIgnore` query param
-		if (!request.query.logIgnore) {
+		if (!request.query['logIgnore']) {
 			const { method, url } = request;
 
 			const message = `(API) ${method} - ${url}`;
@@ -25,7 +25,7 @@ export class Log {
 			this.logger.console(chalkedMessage);
 			this.logger.file(message);
 		} else {
-			delete request.query.logIgnore;
+			delete request.query['logIgnore'];
 		}
 	}
 }

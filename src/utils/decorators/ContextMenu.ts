@@ -1,4 +1,3 @@
-import { ApplicationCommandType } from 'discord.js';
 import { ContextMenu as ContextMenuX } from 'discordx';
 
 import {
@@ -7,12 +6,10 @@ import {
 	sanitizeLocales,
 	setOptionsLocalization,
 } from '@/utils/functions';
-
 import type {
 	ContextMenuOptions,
-	ContextMenuOptionsX,
 	TranslationsNestedPaths,
-} from '../types/localization';
+} from '@/utils/types';
 
 /**
  * Interact with context menu with a defined identifier
@@ -41,19 +38,12 @@ export function ContextMenu(options: ContextMenuOptions) {
 
 	if (localizationSource) {
 		options = setOptionsLocalization({
-			target: 'name',
 			options,
+			target: 'name',
 			localizationSource,
-			nameFallback: commandNameFromFile,
+			...(commandNameFromFile && { nameFallback: commandNameFromFile }),
 		});
 	}
 
-	options = sanitizeLocales(options);
-
-	// interop type string if any into enum types
-	if (options.type === 'USER') options.type = ApplicationCommandType.User;
-	else if (options.type === 'MESSAGE')
-		options.type = ApplicationCommandType.Message;
-
-	return ContextMenuX(options as ContextMenuOptionsX);
+	return ContextMenuX(sanitizeLocales(options));
 }
