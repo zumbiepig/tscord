@@ -65,7 +65,7 @@ export class Server {
 		});
 
 		await server.listen().then(() => {
-			this.store.set('ready', (state) => ({ ...state, api: true }));
+			this.store.update('ready', (state) => ({ ...state, api: true }));
 		});
 	}
 }
