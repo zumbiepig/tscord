@@ -1,7 +1,7 @@
-import { ArgsOf, Client } from 'discordx';
+import { type ArgsOf, Client, Discord, Guard } from 'discordx';
 
-import { Discord, Guard, On } from '@/utils/decorators';
 import { Maintenance } from '@/guards';
+import { On } from '@/utils/decorators';
 
 @Discord()
 export default class MessageCreateEvent {

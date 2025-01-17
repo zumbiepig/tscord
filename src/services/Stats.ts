@@ -8,9 +8,9 @@ import pidusage from 'pidusage';
 import { delay, inject } from 'tsyringe';
 
 import { statsConfig } from '@/configs';
-import { Schedule, Service } from '@/utils/decorators';
 import { Guild, Stat, User } from '@/entities';
 import { Database } from '@/services';
+import { Schedule, Service } from '@/utils/decorators';
 import {
 	datejs,
 	formatDate,
@@ -158,7 +158,11 @@ export class Stats {
 
 			return slashCommands.sort((a, b) => b.count - a.count);
 		} else if ('aggregate' in this.db.em) {
-			const slashCommands: StatPerInterval = await this.db.em.aggregate(Stat, [
+			const slashCommands: StatPerInterval = await (
+				this.db.em as keyof typeof this.db.em & {
+					aggregate: (_: unknown, __: unknown) => Promise<StatPerInterval>;
+				}
+			).aggregate(Stat, [
 				{
 					$match: allInteractions,
 				},
@@ -242,7 +246,7 @@ export class Stats {
 
 			topGuilds.push({
 				id: guild.id,
-				name: discordGuild.name ?? '',
+				name: discordGuild.name,
 				totalCommands: commandsCount,
 			});
 		}
@@ -367,12 +371,10 @@ export class Stats {
 		return {
 			cpu: await osu.cpu.usage(),
 			memory: await osu.mem.info(),
-			os: await osu.os.oos(),
-			uptime: await osu.os.uptime(),
-			hostname: await osu.os.hostname(),
-			platform: await osu.os.platform(),
-
-			// drive: osu.drive.info(),
+			os: await osu.os.oos()(),
+			uptime: osu.os.uptime(),
+			hostname: osu.os.hostname(),
+			platform: osu.os.platform(),
 		};
 	}
 

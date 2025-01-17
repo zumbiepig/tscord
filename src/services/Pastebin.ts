@@ -1,16 +1,16 @@
 import dayjs from 'dayjs';
 import { Paste, RentryClient } from 'rentry-pastebin';
 
-import { Schedule, Service } from '@/utils/decorators';
 import { Pastebin as PastebinEntity } from '@/entities';
 import { Database } from '@/services';
+import { Schedule, Service } from '@/utils/decorators';
 
 @Service()
 export class Pastebin {
 	private client: RentryClient = new RentryClient();
 
 	constructor(private db: Database) {
-		this.client.createToken();
+		void this.client.createToken();
 	}
 
 	private async waitForToken(): Promise<void> {
@@ -43,7 +43,7 @@ export class Pastebin {
 
 		if (!paste) return;
 
-		await this.client.deletePaste(id, paste.editCode);
+		this.client.deletePaste(id, paste.editCode);
 		await this.db.get(PastebinEntity).nativeDelete(paste);
 	}
 
@@ -57,7 +57,7 @@ export class Pastebin {
 			const diff = dayjs().diff(dayjs(paste.createdAt), 'day');
 
 			if (diff >= paste.lifetime)
-				await this.client.deletePaste(paste.id, paste.editCode);
+				this.client.deletePaste(paste.id, paste.editCode);
 		}
 	}
 }

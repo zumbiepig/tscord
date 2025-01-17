@@ -5,8 +5,9 @@ import {
 	SimpleCommandMessage,
 } from 'discordx';
 
-import { getLocaleFromInteraction, L } from '@/i18n';
+import { L } from '@/i18n';
 import {
+	getLocaleFromInteraction,
 	isDev,
 	isInMaintenance,
 	replyToInteraction,

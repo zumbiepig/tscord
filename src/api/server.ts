@@ -7,18 +7,17 @@ import {
 	PlatformApplication,
 } from '@tsed/common';
 import { PlatformExpress } from '@tsed/platform-express';
-import bodyParser from 'body-parser';
+import { json, urlencoded } from 'body-parser';
 
 import * as controllers from '@/api/controllers';
 import { Log } from '@/api/middlewares';
-import { Service } from '@/utils/decorators';
-import { Database, PluginsManager, Store } from '@/services';
-
 import env from '@/env';
+import { Database, PluginsManager, Store } from '@/services';
+import { Service } from '@/utils/decorators';
 
 @Service()
 export class Server {
-	@Inject() app: PlatformApplication;
+	@Inject() app!: PlatformApplication;
 
 	orm: MikroORM;
 
@@ -32,8 +31,8 @@ export class Server {
 
 	$beforeRoutesInit() {
 		this.app
-			.use(bodyParser.json())
-			.use(bodyParser.urlencoded({ extended: true }))
+			.use(json())
+			.use(urlencoded({ extended: true }))
 			.use(Log)
 			.use(PlatformAcceptMimesMiddleware);
 
@@ -41,8 +40,8 @@ export class Server {
 	}
 
 	@CreateRequestContext()
-	async start(): Promise<void> {
-		const platform = await PlatformExpress.bootstrap(Server, {
+	async start() {
+		const server = await PlatformExpress.bootstrap(Server, {
 			rootDir: import.meta.dir,
 			httpPort: env.API_PORT,
 			httpsPort: false,
@@ -56,7 +55,7 @@ export class Server {
 			swagger: [
 				{
 					path: '/docs',
-					specVersion: '3.0.1',
+					specVersion: '3.1.0',
 				},
 			],
 			logger: {
@@ -65,8 +64,8 @@ export class Server {
 			},
 		});
 
-		await platform.listen().then(() => {
-			this.store.update('ready', (e) => ({ ...e, api: true }));
+		await server.listen().then(() => {
+			this.store.update('ready', (state) => ({ ...state, api: true }));
 		});
 	}
 }

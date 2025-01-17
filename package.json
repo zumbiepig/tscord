@@ -12,11 +12,10 @@
 	},
 	"engineStrict": true,
 	"scripts": {
-		"postinstall": "bun -c run installoop --rootDir=./src/plugins",
-		"start": "NODE_ENV=production bun -c run ./dist/main.js",
-		"dev": "NODE_ENV=development bun -c run i18n:watch & bun -c --hot --no-clear-screen run .",
-		"build": "rm -rf ./dist && bun -c build --minify --sourcemap --target=bun --outdir=dist ./src/main.ts",
-		"build:exec": "rm -rf ./dist && bun -c build --compile --minify --sourcemap --outfile=dist/tscord-bot ./src/main.ts",
+		"postinstall": "bun -c run installoop --rootDir=./src/plugins/*",
+		"start": "NODE_ENV=production bun -c run i18n && bun -c run .",
+		"dev": "NODE_ENV=development bun -c --hot --inspect --no-clear-screen run .",
+		"build": "rm -rf ./dist && bun -c build --compile --minify --sourcemap --outfile=dist/tscord-bot ./src/main.ts",
 		"lint": "bun -c run eslint .",
 		"lint:fix": "bun -c run eslint --fix .",
 		"format": "bun -c run prettier --write --list-different .",
@@ -43,16 +42,17 @@
 		"@tsed/swagger": "^8.4.2",
 		"archiver": "^7.0.1",
 		"axios": "~1.7.9",
+		"better-sqlite3": "^11.8.0",
 		"body-parser": "^1.20.3",
 		"boxen": "~8.0.1",
+		"bun": "^1.1.43",
 		"case": "~1.6.3",
 		"chalk": "~5.4.1",
-		"chokidar": "~4.0.3",
 		"core-js": "^3.40.0",
 		"cron": "~3.5.0",
 		"cron-validator": "~1.3.1",
 		"dayjs": "~1.11.13",
-		"discord-api-types": "~0.37.115",
+		"discord-api-types": "~0.37.116",
 		"discord-logs": "~2.2.1",
 		"discord-oauth2": "~2.12.1",
 		"discord.js": "~14.17.3",
@@ -81,7 +81,6 @@
 		"@types/node-os-utils": "^1.3.4",
 		"@types/pidusage": "^2.0.5",
 		"@types/semver": "^7.5.8",
-		"bun": "^1.1.43",
 		"eslint": "^9.18.0",
 		"eslint-plugin-simple-import-sort": "^12.1.1",
 		"installoop": "^1.1.0",
@@ -89,17 +88,11 @@
 		"typescript": "^5.7.3",
 		"typescript-eslint": "^8.20.0"
 	},
-	"peerDependencies": {
-		"better-sqlite3": "^11.8.0"
-	},
 	"trustedDependencies": [
 		"bun",
 		"core-js"
 	],
 	"tscord": {
 		"version": "2.6"
-	},
-	"mikro-orm": {
-		"useTsNode": true
 	}
 }

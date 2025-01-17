@@ -8,9 +8,7 @@ import type {
 } from 'discord.js';
 import type { DApplicationCommand, SimpleCommandMessage } from 'discordx';
 
-import type { Locales } from '@/i18n';
-
-import type { TranslationFunctions } from '../../i18n/i18n-types';
+import type { Locales, TranslationFunctions } from '@/i18n';
 
 type EmittedInteractions =
 	| CommandInteraction

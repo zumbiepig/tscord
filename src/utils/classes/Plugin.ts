@@ -1,14 +1,13 @@
 import { existsSync } from 'node:fs';
-import { resolve } from 'node:path';
 
 import { importx } from '@discordx/importer';
 import { type AnyEntity, type EntityClass } from '@mikro-orm/core';
 import { coerce, satisfies, valid } from 'semver';
 
 import { generalConfig } from '@/configs';
-import { type Locales, locales, type Translation } from '@/i18n';
+import { type BaseTranslation, type Locales, locales } from '@/i18n';
+import packageJson from '@/packageJson';
 import { BaseController } from '@/utils/classes';
-import { getTscordVersion } from '@/utils/functions';
 
 export class Plugin {
 	// Common values
@@ -21,17 +20,17 @@ export class Plugin {
 	private _entities!: Record<string, EntityClass<AnyEntity>>;
 	private _controllers!: Record<string, typeof BaseController>;
 	private _services!: Record<string, unknown>;
-	private _translations!: Record<string, Translation>;
+	private _translations!: Record<Locales, BaseTranslation>;
 
 	constructor(path: string) {
-		this._path = path.replace('file://', '');
+		this._path = path;
 	}
 
-	public async load(): Promise<void> {
+	public async load(): Promise<boolean> {
 		// check if the plugin.json is present
 		if (!existsSync(`${this._path}/plugin.json`)) {
 			this.stopLoad('plugin.json not found');
-			return;
+			return false;
 		}
 
 		// read plugin.json
@@ -43,41 +42,45 @@ export class Plugin {
 		// check if the plugin.json is valid
 		if (!pluginConfig['name']) {
 			this.stopLoad('Missing name in plugin.json');
-			return;
+			return false;
 		}
 		if (!pluginConfig['version']) {
 			this.stopLoad('Missing version in plugin.json');
-			return;
+			return false;
 		}
 		if (!pluginConfig['tscordVersion']) {
 			this.stopLoad('Missing tscordVersion in plugin.json');
-			return;
+			return false;
 		}
 
 		// check plugin.json values
 		if (!/^[a-zA-Z0-9_-]+$/.exec(pluginConfig['name'])) {
 			this.stopLoad('Invalid name in plugin.json');
-			return;
+			return false;
 		}
 		if (!valid(pluginConfig['version'])) {
 			this.stopLoad('Invalid version in plugin.json');
-			return;
+			return false;
 		}
 
 		// check if the plugin is compatible with the current version of Tscord
 		if (
 			!satisfies(
-				coerce(getTscordVersion()) ?? '',
+				coerce(
+					(packageJson as { tscord: { version: string } }).tscord.version,
+				) ?? '',
 				pluginConfig['tscordVersion'],
 			)
 		) {
-			this.stopLoad(`Incompatible with TSCord v${getTscordVersion()}`);
-			return;
+			this.stopLoad(
+				`Incompatible with TSCord v${(packageJson as { tscord: { version: string } }).tscord.version}`,
+			);
+			return false;
 		}
 
 		if (!existsSync(`${this._path}/main.ts`)) {
 			this.stopLoad(`Missing main entrypoint (main.ts)`);
-			return;
+			return false;
 		}
 
 		// assign common values
@@ -89,6 +92,9 @@ export class Plugin {
 		this._controllers = await this.getControllers();
 		this._services = await this.getServices();
 		this._translations = await this.getTranslations();
+
+		if (this._valid) return true;
+		else return false;
 	}
 
 	private stopLoad(error: string): void {
@@ -119,24 +125,28 @@ export class Plugin {
 		return (await import(`${this._path}/services`)) as Record<string, unknown>;
 	}
 
-	private async getTranslations() {
-		const translations = {} as Record<Locales, Translation>;
+	private async getTranslations(): Promise<Record<Locales, BaseTranslation>> {
+		const translations: Record<Locales, BaseTranslation> = {} as Record<
+			Locales,
+			BaseTranslation
+		>;
 
 		for (const locale of locales) {
-			const path = resolve(`${this._path}/i18n/${locale}.ts`);
+			const path = `${this._path}/i18n/${locale}.ts`;
 			if (!existsSync(path)) {
 				if (locale === generalConfig.defaultLocale) {
 					this.stopLoad(
-						`Missing translation file for default locale ${locale}`,
+						`Missing translation file for default locale '${locale}'`,
 					);
+					return {} as Record<Locales, BaseTranslation>;
 				} else {
-					console.error(
-						`Plugin ${this._name} v${this._version} is missing translations for locale ${locale}`,
+					console.warn(
+						`Plugin ${this._name} v${this._version} is missing translations for locale '${locale}'`,
 					);
 					continue;
 				}
 			}
-			translations[locale] = (await import(path)) as Translation;
+			translations[locale] = (await import(path)) as BaseTranslation;
 		}
 
 		return translations;
@@ -152,10 +162,6 @@ export class Plugin {
 
 	public async importEvents() {
 		await importx(`${this._path}/events/**/*.ts`);
-	}
-
-	public isValid(): boolean {
-		return this._valid;
 	}
 
 	get path() {

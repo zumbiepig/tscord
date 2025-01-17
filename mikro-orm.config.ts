@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import { defineConfig } from '@mikro-orm/core';
 import { env } from 'bun';
 
-import { mikroORMConfig } from './src/configs/database';
+import { mikroORMConfig } from '@/configs';
 
 export default () => {
 	return defineConfig({

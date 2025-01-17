@@ -1,5 +1,6 @@
-import { CommandInteraction } from 'discord.js';
 import { SimpleCommandMessage } from 'discordx';
+
+import type { AllInteractions } from '@/utils/types';
 
 /**
  * Abstraction level to reply to either a slash command or a simple command message.
@@ -7,11 +8,12 @@ import { SimpleCommandMessage } from 'discordx';
  * @param message
  */
 export async function replyToInteraction(
-	interaction: CommandInteraction | SimpleCommandMessage,
+	interaction: AllInteractions,
 	message: string | Record<string, unknown>,
 ) {
-	if (interaction instanceof CommandInteraction)
-		await interaction.followUp(message);
-	else if (interaction instanceof SimpleCommandMessage)
+	if (interaction instanceof SimpleCommandMessage) {
 		await interaction.message.reply(message);
+	} else {
+		await interaction.followUp(message);
+	}
 }

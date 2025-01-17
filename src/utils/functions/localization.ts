@@ -1,5 +1,11 @@
 import { generalConfig } from '@/configs';
-import { L, loadedLocales, type Locales, locales } from '@/i18n';
+import { detectLocale, L, loadedLocales, type Locales, locales } from '@/i18n';
+import { resolveLocale } from '@/utils/functions';
+import type {
+	AllInteractions,
+	SanitizedOptions,
+	TranslationsNestedPaths,
+} from '@/utils/types';
 
 export function getLocalizedInfo(
 	target: 'NAME' | 'DESCRIPTION',
@@ -15,7 +21,7 @@ export function getLocalizedInfo(
 				),
 			])
 			.filter(([_, value]) => value),
-	);
+	) as Record<Locales, string>;
 
 	return Object.keys(localizations).length > 0 ? localizations : undefined;
 }
@@ -33,19 +39,17 @@ export function setOptionsLocalization<
 	localizationSource: TranslationsNestedPaths;
 	nameFallback?: string;
 }) {
-	if (!options[`${target}Localizations`])
-		options[`${target}Localizations`] = getLocalizedInfo(
-			target.toUpperCase() as 'NAME' | 'DESCRIPTION',
-			localizationSource,
-		);
+	const localizedInfo = getLocalizedInfo(
+		target.toUpperCase() as 'NAME' | 'DESCRIPTION',
+		localizationSource,
+	);
+	if (!options[`${target}Localizations`] && localizedInfo)
+		options[`${target}Localizations`] = localizedInfo;
 
 	if (!options[target as keyof typeof options]) {
-		options[target as keyof typeof options] =
-			getLocalizedInfo(
-				target.toUpperCase() as 'NAME' | 'DESCRIPTION',
-				localizationSource,
-			)?.[generalConfig.defaultLocale] ||
-			(target === 'name' ? nameFallback : undefined);
+		options[target as keyof typeof options] = (localizedInfo?.[
+			generalConfig.defaultLocale
+		] ?? (target === 'name' ? nameFallback : undefined)) as K[keyof K];
 	}
 
 	return options;
@@ -94,3 +98,17 @@ export function setFallbackDescription<K extends SanitizedOptions>(
 
 	return sanitizeLocales(options);
 }
+
+function allInteractionsLocaleDetector(interaction: AllInteractions) {
+	return () => {
+		let locale = resolveLocale(interaction);
+
+		if (['en-US', 'en-GB'].includes(locale)) locale = 'en';
+		else if (locale === 'default') locale = generalConfig.defaultLocale;
+
+		return [locale];
+	};
+}
+
+export const getLocaleFromInteraction = (interaction: AllInteractions) =>
+	detectLocale(allInteractionsLocaleDetector(interaction));

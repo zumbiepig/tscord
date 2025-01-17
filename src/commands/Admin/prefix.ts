@@ -1,16 +1,15 @@
 import { Category } from '@discordx/utilities';
 import { PermissionGuard } from '@discordx/utilities';
 import { ApplicationCommandOptionType, CommandInteraction } from 'discord.js';
-import { Guard } from 'discordx';
+import { Discord, Guard } from 'discordx';
 
 import { generalConfig } from '@/configs';
-import { Discord, Injectable, Slash, SlashOption } from '@/utils/decorators';
 import { Guild } from '@/entities';
-import { UnknownReplyError } from '@/errors';
 import { Database } from '@/services';
+import { Injectable, Slash, SlashOption } from '@/utils/decorators';
+import { UnknownReplyError } from '@/utils/errors';
 import { resolveGuild, simpleSuccessEmbed } from '@/utils/functions';
-
-import type { InteractionData } from '../../utils/types/interactions';
+import type { InteractionData } from '@/utils/types';
 
 @Discord()
 @Injectable()

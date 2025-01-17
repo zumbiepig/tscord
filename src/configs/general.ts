@@ -1,6 +1,6 @@
 import { ActivityType } from 'discord.js';
 
-import type { GeneralConfigType } from '../utils/types/configs';
+import type { GeneralConfigType } from '@/utils/types';
 
 export const generalConfig: GeneralConfigType = {
 	name: 'TSCord', // the name of your bot

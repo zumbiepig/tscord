@@ -1,33 +1,22 @@
-import fs from 'node:fs';
-import { dirname } from 'node:path';
-
-import { main } from 'bun';
+import { Glob } from 'bun';
 
 /**
- * recursively get files paths from a directory
- * @param path
+ * Resolve all file paths from a directory from a glob pattern
+ * @param globPattern - see [here](https://bun.sh/docs/api/glob) for valid glob syntax
+ * @param root - root directory to start searching from, relative to import.meta.dir
  */
-export function getFiles(path: string): string[] {
-	if (!fs.existsSync(path)) return [];
-
-	const files = fs.readdirSync(path);
-	const fileList = [];
-
-	for (const file of files) {
-		const filePath = `${path}/${file}`;
-		const stats = fs.statSync(filePath);
-
-		if (stats.isDirectory()) fileList.push(...getFiles(filePath));
-		else fileList.push(filePath);
-	}
-
-	return fileList;
+export async function resolve(
+	globPattern: string,
+	root?: string,
+): Promise<string[]> {
+	return await Array.fromAsync(new Glob(globPattern).scan(root));
 }
 
-export function fileOrDirectoryExists(path: string): boolean {
-	return fs.existsSync(path);
-}
-
-export function getSourceCodeLocation(): string {
-	return dirname(main);
+/**
+ * Resolve all file paths from a directory from a glob pattern synchronously
+ * @param globPattern - see [here](https://bun.sh/docs/api/glob) for valid glob syntax
+ * @param root - root directory to start searching from, relative to import.meta.dir
+ */
+export function resolveSync(globPattern: string, root?: string): string[] {
+	return Array.from(new Glob(globPattern).scanSync(root));
 }

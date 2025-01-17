@@ -57,7 +57,7 @@ export class DatabaseController extends BaseController {
 
 	@Get('/backups')
 	async getBackups() {
-		const backupPath = databaseConfig.backup.path;
+		const backupPath = databaseConfig.path + '/backups';
 		if (!backupPath)
 			throw new InternalServerError(
 				"Backup path not set, couldn't find backups",

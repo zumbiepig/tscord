@@ -1,12 +1,11 @@
 import { Category } from '@discordx/utilities';
 import { CommandInteraction, EmbedBuilder } from 'discord.js';
+import { Discord, Guard } from 'discordx';
 
 import { generalConfig } from '@/configs';
-import { Discord, Slash } from '@/utils/decorators';
-import { Guard } from 'discordx';
+import { Slash } from '@/utils/decorators';
 import { getColor } from '@/utils/functions';
-
-import type { InteractionData } from '../../utils/types/interactions';
+import type { InteractionData } from '@/utils/types';
 
 @Discord()
 @Category('General')

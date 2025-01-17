@@ -1,8 +1,13 @@
 import { CommandInteraction, ContextMenuCommandInteraction } from 'discord.js';
 import { type GuardFunction, SimpleCommandMessage } from 'discordx';
 
-import { getLocaleFromInteraction, L } from '@/i18n';
-import { isDev, replyToInteraction, resolveUser } from '@/utils/functions';
+import { L } from '@/i18n';
+import {
+	getLocaleFromInteraction,
+	isDev,
+	replyToInteraction,
+	resolveUser,
+} from '@/utils/functions';
 
 /**
  * Prevent interaction from running when it is disabled

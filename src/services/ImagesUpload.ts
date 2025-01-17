@@ -1,7 +1,8 @@
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { promisify } from 'node:util';
 
-import axios, { type AxiosResponse } from 'axios';
+import axios from 'axios';
 import chalk from 'chalk';
 import { imageHash as callbackImageHash } from 'image-hash';
 import { ImgurClient } from 'imgur';
@@ -10,11 +11,7 @@ import { Image, ImageRepository } from '@/entities';
 import env from '@/env';
 import { Database, Logger } from '@/services';
 import { Service } from '@/utils/decorators';
-import {
-	base64Encode,
-	fileOrDirectoryExists,
-	getFiles,
-} from '@/utils/functions';
+import { base64Encode, resolve } from '@/utils/functions';
 
 const imageHasher = promisify(callbackImageHash);
 
@@ -53,14 +50,14 @@ export class ImagesUpload {
 	}
 
 	async syncWithDatabase() {
-		if (!fileOrDirectoryExists(this.imageFolderPath))
+		if (!existsSync(this.imageFolderPath))
 			await this.logger.log(
 				"Image folder does not exist, couldn't sync with database",
 				'warn',
 			);
 
 		// get all images inside the assets/images folder
-		const images = getFiles(this.imageFolderPath)
+		const images = (await resolve(this.imageFolderPath + '/**/*'))
 			.filter((file) => this.isValidImageFormat(file))
 			.map((file) => file.replace(`${this.imageFolderPath}/`, ''));
 
@@ -172,7 +169,8 @@ export class ImagesUpload {
 		if (!this.imgurClient) return false;
 
 		const res = await axios.get(imageUrl);
-
-		return !res.request?.path.includes('/removed');
+		return !(
+			res.request as { path: { includes: (_: string) => boolean } } | undefined
+		)?.path.includes('/removed');
 	}
 }

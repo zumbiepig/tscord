@@ -1,10 +1,9 @@
-import { ActivityType } from 'discord.js';
-import { Client } from 'discordx';
+import { Client, Discord } from 'discordx';
 
 import { generalConfig } from '@/configs';
-import { Discord, Injectable, Once, Schedule } from '@/utils/decorators';
 import { Data } from '@/entities';
 import { Database, Logger, Scheduler, Store } from '@/services';
+import { Injectable, On, Schedule } from '@/utils/decorators';
 import { resolveDependency, syncAllGuilds } from '@/utils/functions';
 
 @Discord()
@@ -19,7 +18,7 @@ export default class ReadyEvent {
 
 	private activityIndex = 0;
 
-	@Once('ready')
+	@On('ready')
 	async readyHandler([client]: [Client]) {
 		// make sure all guilds are cached
 		await client.guilds.fetch();
@@ -37,13 +36,13 @@ export default class ReadyEvent {
 		this.scheduler.startAllJobs();
 
 		// log startup
-		await this.logger.logStartingConsole();
+		this.logger.logStartingConsole();
 
 		// synchronize guilds between discord and the database
 		await syncAllGuilds(client);
 
 		// the bot is fully ready
-		this.store.update('ready', (e) => ({ ...e, bot: true }));
+		this.store.update('ready', (state) => ({ ...state, bot: true }));
 	}
 
 	@Schedule('*/15 * * * * *') // cycle activities every 15 seconds

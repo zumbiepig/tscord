@@ -1,5 +1,6 @@
 import { container, type InjectionToken } from 'tsyringe';
 
+import { EventManager } from '@/services';
 import { resolveDependency } from '@/utils/functions';
 
 export function OnCustom(event: string) {
@@ -17,16 +18,15 @@ export function OnCustom(event: string) {
 			);
 		};
 
-		import('@/services')
-			.then(async ({ EventManager }) => {
-				const eventManager = await resolveDependency(EventManager);
-				const callback = (
-					descriptor.value as (...args: unknown[]) => unknown
-				).bind(target);
-				eventManager.register(event, callback);
+		resolveDependency(EventManager)
+			.then((eventManager) => {
+				eventManager.register(
+					event,
+					(descriptor.value as (...args: unknown[]) => unknown).bind(target),
+				);
 			})
 			.catch(() => {
-				throw new Error('Failed to register event');
+				throw new Error(`Failed to register OnCustom event '${event}'`);
 			});
 	};
 }

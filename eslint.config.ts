@@ -18,7 +18,6 @@ export default tseslint.config(
 			'simple-import-sort': simpleImportSort,
 		},
 		rules: {
-			'@typescript-eslint/ban-ts-comment': 'warn',
 			'@typescript-eslint/no-unused-vars': [
 				'error',
 				{

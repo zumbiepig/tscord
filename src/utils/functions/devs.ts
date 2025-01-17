@@ -1,10 +1,17 @@
+import type { UserResolvable } from 'discord.js';
+
 import { generalConfig } from '@/configs';
 
 /**
  * Get a curated list of devs including the owner id
  */
-export function getDevs(): string[] {
-	return [...new Set([...generalConfig.devs, generalConfig.ownerId])];
+export function getDevs(): UserResolvable[] {
+	return [
+		...new Set([
+			...(generalConfig.ownerId ? [generalConfig.ownerId] : []),
+			...(generalConfig.devs ?? []),
+		]),
+	];
 }
 
 /**

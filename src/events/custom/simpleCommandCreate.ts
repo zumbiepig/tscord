@@ -1,9 +1,15 @@
-import { ArgsOf, Client, Guard, SimpleCommandMessage } from 'discordx';
+import {
+	type ArgsOf,
+	Client,
+	Discord,
+	Guard,
+	SimpleCommandMessage,
+} from 'discordx';
 
-import { Discord, Injectable, On, OnCustom } from '@/utils/decorators';
 import { Guild, User } from '@/entities';
 import { Maintenance } from '@/guards';
 import { Database, EventManager, Logger, Stats } from '@/services';
+import { Injectable, On, OnCustom } from '@/utils/decorators';
 import { getPrefixFromMessage, syncUser } from '@/utils/functions';
 
 @Discord()

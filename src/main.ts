@@ -2,10 +2,10 @@ import 'core-js/full/reflect';
 
 import process from 'node:process';
 
-import { resolve } from '@discordx/importer';
 import { RequestContext } from '@mikro-orm/core';
+import { spawn, spawnSync } from 'bun';
 import chalk from 'chalk';
-import chokidar from 'chokidar';
+import { GatewayIntentBits, Partials } from 'discord.js';
 import discordLogs from 'discord-logs';
 import {
 	Client,
@@ -18,37 +18,27 @@ import type { constructor } from 'tsyringe/dist/typings/types';
 
 import { Server } from '@/api/server';
 import { apiConfig, generalConfig } from '@/configs';
-import env from '@/env';
+import env, { validateEnv } from '@/env';
+import {
+	ExtractLocale,
+	Maintenance,
+	NotBot,
+	RequestContextIsolator,
+} from '@/guards';
 import {
 	Database,
 	ErrorHandler,
-	EventManager,
 	ImagesUpload,
 	Logger,
 	PluginsManager,
 	Store,
 } from '@/services';
 import { keptInstances } from '@/utils/decorators';
-import { NoBotTokenError } from '@/utils/errors';
 import { initDataTable, resolveDependency } from '@/utils/functions';
 
-import { clientConfig } from './client';
-
-const importPattern = `${import.meta.dir}/{events,commands}/**/*.ts`;
-
-/**
- * Import files
- * @param path glob pattern
- */
-async function loadFiles(path: string): Promise<void> {
-	const files = await resolve(path);
-	await Promise.all(
-		files.map(async (file) => {
-			const newFileName = file.replace('file://', '');
-			delete require.cache[newFileName];
-			await import(newFileName);
-		}),
-	);
+declare global {
+	// eslint-disable-next-line no-var
+	var client: Client;
 }
 
 /**
@@ -84,9 +74,6 @@ async function reload(client: Client) {
 	// re-register the client instance
 	container.registerInstance(Client, client);
 
-	// reload files
-	await loadFiles(importPattern);
-
 	// rebuild
 	await MetadataStorage.instance.build();
 	await client.initApplicationCommands();
@@ -106,6 +93,8 @@ async function reload(client: Client) {
 async function init() {
 	const logger = await resolveDependency(Logger);
 
+	validateEnv();
+
 	// init error handler
 	await resolveDependency(ErrorHandler);
 
@@ -124,43 +113,58 @@ async function init() {
 
 	// init the client
 	DIService.engine = tsyringeDependencyRegistryEngine.setInjector(container);
-	const client = new Client(clientConfig());
+	globalThis.client = new Client({
+		intents: [
+			GatewayIntentBits.Guilds,
+			GatewayIntentBits.GuildMembers,
+			GatewayIntentBits.GuildMessages,
+			GatewayIntentBits.GuildMessageReactions,
+			GatewayIntentBits.GuildVoiceStates,
+			GatewayIntentBits.GuildPresences,
+			GatewayIntentBits.DirectMessages,
+			GatewayIntentBits.MessageContent,
+		],
+
+		partials: [Partials.Channel, Partials.Message, Partials.Reaction],
+
+		guards: [RequestContextIsolator, NotBot, Maintenance, ExtractLocale],
+
+		simpleCommand: {
+			prefix: generalConfig.simpleCommandsPrefix,
+		},
+
+		silent: !env.isDev,
+		...(env.isDev &&
+			generalConfig.testGuildId && {
+				botGuilds: [generalConfig.testGuildId as string],
+			}),
+	});
 
 	// Load all new events
 	await discordLogs(client, { debug: false });
 	container.registerInstance(Client, client);
 
 	// import all the commands and events
-	await loadFiles(importPattern);
 	await pluginManager.importCommands();
 	await pluginManager.importEvents();
 
 	await RequestContext.create(db.orm.em, async () => {
-		const watcher = env.isDev ? chokidar.watch(importPattern) : null;
-
 		// init the data table if it doesn't exist
 		await initDataTable();
 
 		// init plugins services
-		await pluginManager.initServices();
+		pluginManager.initServices();
 
 		// init the plugin main file
 		await pluginManager.execMains();
 
 		// log in with the bot token
-		if (!env.BOT_TOKEN) throw new NoBotTokenError();
 		client
 			.login(env.BOT_TOKEN)
 			.then(async () => {
 				if (env.isDev) {
-					// reload commands and events when a file changes
-					watcher?.on('change', () => void reload(client));
-
-					// reload commands and events when a file is added
-					watcher?.on('add', () => void reload(client));
-
 					// reload commands and events when a file is deleted
-					watcher?.on('unlink', () => void reload(client));
+					//watcher?.on('unlink', () => void reload(client));
 				}
 
 				// start the api server
@@ -176,24 +180,14 @@ async function init() {
 				}
 
 				const store = container.resolve(Store);
-				store.select('ready').subscribe((ready) => {
+				store.select('ready').subscribe((state) => {
 					// check that all properties that are not null are set to true
 					if (
-						Object.values(ready)
+						Object.values(state)
 							.filter((value) => value !== null)
 							.every((value) => value)
 					) {
-						resolveDependency(EventManager)
-							.then((eventManager) => {
-								eventManager
-									.emit('templateReady') // the template is fully ready!
-									.catch(() => {
-										throw new Error('Failed to emit templateReady');
-									});
-							})
-							.catch(() => {
-								throw new Error('Failed to resolve EventManager');
-							});
+						throw new Error('Bot services were not ready');
 					}
 				});
 			})
@@ -204,4 +198,16 @@ async function init() {
 	});
 }
 
-await init();
+if (env.isDev) {
+	spawn(['bun', '-c', 'run', 'i18n:watch'], { stdout: 'inherit' });
+} else {
+	spawnSync(['bun', '-c', 'run', 'i18n'], { stdout: 'inherit' });
+}
+
+if (!(await resolveDependency(Store)).get('botHasBeenReloaded')) {
+	console.log('Not reloading');
+	await init();
+} else {
+	console.log('Reloading');
+	await reload(globalThis.client);
+}

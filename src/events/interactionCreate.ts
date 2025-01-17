@@ -1,12 +1,13 @@
 import { CommandInteraction } from 'discord.js';
-import { ArgsOf, Client } from 'discordx';
+import { type ArgsOf, Client, Discord, Guard } from 'discordx';
 
 import { generalConfig } from '@/configs';
-import { Discord, Guard, Injectable, On } from '@/utils/decorators';
 import { Guild, User } from '@/entities';
 import { Maintenance } from '@/guards';
 import { Database, Logger, Stats } from '@/services';
+import { Injectable, On } from '@/utils/decorators';
 import { syncUser } from '@/utils/functions';
+import type { AllInteractions } from '@/utils/types';
 
 @Discord()
 @Injectable()
@@ -39,7 +40,7 @@ export default class InteractionCreateEvent {
 
 		// register logs and stats
 		await this.stats.registerInteraction(interaction as AllInteractions);
-		this.logger.logInteraction(interaction as AllInteractions);
+		await this.logger.logInteraction(interaction as AllInteractions);
 
 		client.executeInteraction(interaction);
 	}

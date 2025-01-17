@@ -42,7 +42,7 @@ export class Database {
 		config.entities = [
 			...Object.values(entities),
 			...pluginsManager.getEntities(),
-		];
+		] as keyof typeof config.entities;
 
 		// initialize the ORM using the configuration exported in `mikro-orm.config.ts`
 		this._orm = await MikroORM.init(config);
@@ -92,14 +92,14 @@ export class Database {
 	async backup(snapshotName?: string): Promise<boolean> {
 		const { formatDate } = await import('@/utils/functions');
 
-		if (!databaseConfig.backup.enabled && !snapshotName) return false;
+		if (!databaseConfig.enableBackups && !snapshotName) return false;
 		if (!this.isSQLiteDatabase()) {
 			await this.logger.log("Database is not SQLite, couldn't backup");
 
 			return false;
 		}
 
-		const backupPath = databaseConfig.backup.path;
+		const backupPath = databaseConfig.path + '/backups';
 		if (!backupPath) {
 			await this.logger.log("Backup path not set, couldn't backup", 'error');
 
@@ -147,16 +147,16 @@ export class Database {
 			return false;
 		}
 
-		const backupPath = databaseConfig.backup.path;
+		const backupPath = databaseConfig.path + '/backups';
 		if (!backupPath)
 			await this.logger.log("Backup path not set, couldn't restore", 'error');
 
 		try {
 			console.debug(mikroORMConfig[env.NODE_ENV].dbName);
-			console.debug(`${backupPath}${snapshotName}`);
+			console.debug(backupPath + snapshotName);
 			await restore(
 				mikroORMConfig[env.NODE_ENV].dbName ?? '',
-				`${backupPath}${snapshotName}`,
+				backupPath + snapshotName,
 			);
 
 			await this.refreshConnection();
@@ -174,7 +174,7 @@ export class Database {
 	}
 
 	async getBackupList(): Promise<string[] | null> {
-		const backupPath = databaseConfig.backup.path;
+		const backupPath = databaseConfig.path + '/backups';
 		if (!backupPath) {
 			await this.logger.log(
 				"Backup path not set, couldn't get list of backups",
@@ -205,7 +205,7 @@ export class Database {
 			}
 		}
 
-		const backupPath = databaseConfig.backup.path;
+		const backupPath = databaseConfig.path + '/backups';
 		if (backupPath) {
 			const backupSize = fastFolderSizeSync(backupPath);
 

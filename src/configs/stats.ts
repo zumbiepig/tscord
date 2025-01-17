@@ -1,4 +1,4 @@
-import type { StatsConfigType } from '../utils/types/configs';
+import type { StatsConfigType } from '@/utils/types';
 
 export const statsConfig: StatsConfigType = {
 	interaction: {

@@ -1,6 +1,6 @@
-import { ArgsOf, Client } from 'discordx';
+import { type ArgsOf, Client, Discord } from 'discordx';
 
-import { Discord, On } from '@/utils/decorators';
+import { On } from '@/utils/decorators';
 import { syncGuild } from '@/utils/functions';
 
 @Discord()

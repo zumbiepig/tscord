@@ -5,7 +5,11 @@ import {
 	sanitizeLocales,
 	setOptionsLocalization,
 } from '@/utils/functions';
-import type { SlashChoiceType, TranslationsNestedPaths } from '@/utils/types';
+import type {
+	SanitizedOptions,
+	SlashChoiceType,
+	TranslationsNestedPaths,
+} from '@/utils/types';
 
 /**
  * The slash command option can implement autocompletion for string and number types
@@ -17,15 +21,13 @@ import type { SlashChoiceType, TranslationsNestedPaths } from '@/utils/types';
  *
  * @category Decorator
  */
-export function SlashChoice(
-	...options: string[] | number[] | SlashChoiceType[]
-) {
+export function SlashChoice(...options: SanitizedOptions[]) {
 	for (let i = 0; i < options.length; i++) {
 		let option = options[i];
 
-		if (typeof option !== 'number' && typeof option !== 'string') {
-			let localizationSource: TranslationsNestedPaths | null = null;
-			if (option?.localizationSource)
+		if (option && typeof option !== 'number' && typeof option !== 'string') {
+			let localizationSource: TranslationsNestedPaths | undefined;
+			if (option.localizationSource)
 				localizationSource = constantPreserveDots(
 					option.localizationSource,
 				) as TranslationsNestedPaths;
@@ -44,7 +46,7 @@ export function SlashChoice(
 				});
 			}
 
-			options[i] = sanitizeLocales(option) ?? '';
+			options[i] = sanitizeLocales(option);
 		}
 	}
 

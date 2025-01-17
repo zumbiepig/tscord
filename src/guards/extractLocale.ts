@@ -7,7 +7,8 @@ import {
 } from 'discord.js';
 import { type GuardFunction, SimpleCommandMessage } from 'discordx';
 
-import { getLocaleFromInteraction, L } from '@/i18n';
+import { L } from '@/i18n';
+import { getLocaleFromInteraction } from '@/utils/functions';
 import type { InteractionData } from '@/utils/types';
 
 /**

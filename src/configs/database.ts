@@ -3,24 +3,14 @@ import { Migrator } from '@mikro-orm/migrations';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import { SqliteDriver } from '@mikro-orm/sqlite';
 
-import type {
-	DatabaseConfigType,
-	EnvMikroORMConfigType,
-} from '../utils/types/configs';
-
-// import env from '@/env';
+import type { DatabaseConfigType, MikroORMConfigType } from '@/utils/types';
 
 export const databaseConfig: DatabaseConfigType = {
-	path: './database/', // path to the folder containing the migrations and SQLite database (if used)
-
-	// config for setting up an automated backup of the database (ONLY FOR SQLITE)
-	backup: {
-		enabled: false,
-		path: './database/backups/', // path to the backups folder (should be in the database/ folder)
-	},
+	path: './database', // path to the folder containing the migrations and SQLite database (if used)
+	enableBackups: true, // enabling automated backups of the database (ONLY FOR SQLITE)
 };
 
-const envMikroORMConfig: EnvMikroORMConfigType = {
+const envMikroORMConfig: MikroORMConfigType = {
 	production: {
 		/**
 		 * SQLite
@@ -60,7 +50,7 @@ const envMikroORMConfig: EnvMikroORMConfigType = {
 		/* driver: MariaDbDriver,
 		dbName: env.DATABASE_NAME,
 		host: env.DATABASE_HOST,
-		port: Number(env.DATABASE_PORT),
+		port: env.DATABASE_PORT,
 		user: env.DATABASE_USER,
 		password: env.DATABASE_PASSWORD, */
 
@@ -68,8 +58,8 @@ const envMikroORMConfig: EnvMikroORMConfigType = {
 		debug: false,
 
 		migrations: {
-			path: './database/migrations',
-			emit: 'js',
+			path: databaseConfig.path + '/migrations',
+			emit: 'ts',
 			snapshot: true,
 		},
 
@@ -80,10 +70,7 @@ const envMikroORMConfig: EnvMikroORMConfigType = {
 	},
 };
 
-if (Object.keys(envMikroORMConfig.development).length === 0)
-	envMikroORMConfig.development = envMikroORMConfig.production;
-
-export const mikroORMConfig = envMikroORMConfig as {
-	production: (typeof envMikroORMConfig)['production'];
-	development: (typeof envMikroORMConfig)['development'];
-};
+export const mikroORMConfig =
+	Object.keys(envMikroORMConfig.development).length === 0
+		? { ...envMikroORMConfig, development: envMikroORMConfig.production }
+		: envMikroORMConfig;

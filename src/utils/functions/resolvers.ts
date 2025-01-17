@@ -1,20 +1,18 @@
 import {
 	ButtonInteraction,
 	ChatInputCommandInteraction,
-	CommandInteraction,
-	ContextMenuCommandInteraction,
-	type Interaction,
 	Message,
+	MessageContextMenuCommandInteraction,
 	MessageReaction,
 	ModalSubmitInteraction,
 	type PartialMessageReaction,
 	StringSelectMenuInteraction,
+	UserContextMenuCommandInteraction,
 	VoiceState,
 } from 'discord.js';
 import { SimpleCommandMessage } from 'discordx';
 
-import packageJson from '../../../package.json';
-import type { AllInteractions } from '../types/interactions';
+import type { AllInteractions } from '@/utils/types';
 
 const resolvers = {
 	user: {
@@ -23,10 +21,10 @@ const resolvers = {
 		ChatInputCommandInteraction: (interaction: ChatInputCommandInteraction) =>
 			interaction.user,
 		UserContextMenuCommandInteraction: (
-			interaction: ContextMenuCommandInteraction,
+			interaction: UserContextMenuCommandInteraction,
 		) => interaction.member?.user,
 		MessageContextMenuCommandInteraction: (
-			interaction: ContextMenuCommandInteraction,
+			interaction: MessageContextMenuCommandInteraction,
 		) => interaction.member?.user,
 
 		ButtonInteraction: (interaction: ButtonInteraction) =>
@@ -52,10 +50,10 @@ const resolvers = {
 		ChatInputCommandInteraction: (interaction: ChatInputCommandInteraction) =>
 			interaction.member,
 		UserContextMenuCommandInteraction: (
-			interaction: ContextMenuCommandInteraction,
+			interaction: UserContextMenuCommandInteraction,
 		) => interaction.member,
 		MessageContextMenuCommandInteraction: (
-			interaction: ContextMenuCommandInteraction,
+			interaction: MessageContextMenuCommandInteraction,
 		) => interaction.member,
 
 		ButtonInteraction: (interaction: ButtonInteraction) => interaction.member,
@@ -80,10 +78,10 @@ const resolvers = {
 		ChatInputCommandInteraction: (interaction: ChatInputCommandInteraction) =>
 			interaction.guild,
 		UserContextMenuCommandInteraction: (
-			interaction: ContextMenuCommandInteraction,
+			interaction: UserContextMenuCommandInteraction,
 		) => interaction.guild,
 		MessageContextMenuCommandInteraction: (
-			interaction: ContextMenuCommandInteraction,
+			interaction: MessageContextMenuCommandInteraction,
 		) => interaction.guild,
 
 		ButtonInteraction: (interaction: ButtonInteraction) => interaction.guild,
@@ -101,10 +99,10 @@ const resolvers = {
 		SimpleCommandMessage: (interaction: SimpleCommandMessage) =>
 			interaction.message.channel,
 		UserContextMenuCommandInteraction: (
-			interaction: ContextMenuCommandInteraction,
+			interaction: UserContextMenuCommandInteraction,
 		) => interaction.channel,
 		MessageContextMenuCommandInteraction: (
-			interaction: ContextMenuCommandInteraction,
+			interaction: MessageContextMenuCommandInteraction,
 		) => interaction.channel,
 
 		ButtonInteraction: (interaction: ButtonInteraction) => interaction.channel,
@@ -122,13 +120,13 @@ const resolvers = {
 		ChatInputCommandInteraction: (interaction: ChatInputCommandInteraction) =>
 			interaction.commandName,
 		UserContextMenuCommandInteraction: (
-			interaction: ContextMenuCommandInteraction,
+			interaction: UserContextMenuCommandInteraction,
 		) => interaction.commandName,
 		MessageContextMenuCommandInteraction: (
-			interaction: ContextMenuCommandInteraction,
+			interaction: MessageContextMenuCommandInteraction,
 		) => interaction.commandName,
 
-		fallback: (_: unknown) => '',
+		fallback: (_: unknown) => null,
 	},
 
 	action: {
@@ -146,10 +144,10 @@ const resolvers = {
 		SimpleCommandMessage: (interaction: SimpleCommandMessage) =>
 			interaction.name,
 		UserContextMenuCommandInteraction: (
-			interaction: ContextMenuCommandInteraction,
+			interaction: UserContextMenuCommandInteraction,
 		) => interaction.commandName,
 		MessageContextMenuCommandInteraction: (
-			interaction: ContextMenuCommandInteraction,
+			interaction: MessageContextMenuCommandInteraction,
 		) => interaction.commandName,
 
 		ButtonInteraction: (interaction: ButtonInteraction) => interaction.customId,
@@ -158,7 +156,7 @@ const resolvers = {
 		ModalSubmitInteraction: (interaction: ModalSubmitInteraction) =>
 			interaction.customId,
 
-		fallback: (_: unknown) => '',
+		fallback: (_: unknown) => null,
 	},
 
 	locale: {
@@ -167,10 +165,10 @@ const resolvers = {
 		ChatInputCommandInteraction: (interaction: ChatInputCommandInteraction) =>
 			interaction.locale,
 		UserContextMenuCommandInteraction: (
-			interaction: ContextMenuCommandInteraction,
+			interaction: UserContextMenuCommandInteraction,
 		) => interaction.locale,
 		MessageContextMenuCommandInteraction: (
-			interaction: ContextMenuCommandInteraction,
+			interaction: MessageContextMenuCommandInteraction,
 		) => interaction.locale,
 
 		ButtonInteraction: (interaction: ButtonInteraction) => interaction.locale,
@@ -179,55 +177,34 @@ const resolvers = {
 		ModalSubmitInteraction: (interaction: ModalSubmitInteraction) =>
 			interaction.locale,
 
-		fallback: (_: unknown) => 'en',
+		fallback: (_: unknown) => null,
 	},
 };
 
-export function resolveUser(
-	interaction:
-		| AllInteractions
-		| Interaction
-		| Message
-		| VoiceState
-		| MessageReaction
-		| PartialMessageReaction,
-) {
+export function resolveUser(interaction: AllInteractions) {
 	return (
 		resolvers.user[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.user
-		](interaction) ?? resolvers.user.fallback(interaction)
+		](interaction as keyof typeof interaction) ??
+		resolvers.user.fallback(interaction)
 	);
 }
 
-export function resolveMember(
-	interaction:
-		| AllInteractions
-		| Interaction
-		| Message
-		| VoiceState
-		| MessageReaction
-		| PartialMessageReaction,
-) {
+export function resolveMember(interaction: AllInteractions) {
 	return (
 		resolvers.member[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.member
-		](interaction) ?? resolvers.member.fallback(interaction)
+		](interaction as keyof typeof interaction) ??
+		resolvers.member.fallback(interaction)
 	);
 }
 
-export function resolveGuild(
-	interaction:
-		| AllInteractions
-		| Interaction
-		| Message
-		| VoiceState
-		| MessageReaction
-		| PartialMessageReaction,
-) {
+export function resolveGuild(interaction: AllInteractions) {
 	return (
 		resolvers.guild[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.guild
-		](interaction) ?? resolvers.guild.fallback(interaction)
+		](interaction as keyof typeof interaction) ??
+		resolvers.guild.fallback(interaction)
 	);
 }
 
@@ -235,17 +212,17 @@ export function resolveChannel(interaction: AllInteractions) {
 	return (
 		resolvers.channel[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.channel
-		](interaction) ?? resolvers.channel.fallback(interaction)
+		](interaction as keyof typeof interaction) ??
+		resolvers.channel.fallback(interaction)
 	);
 }
 
-export function resolveCommandName(
-	interaction: CommandInteraction | SimpleCommandMessage,
-) {
+export function resolveCommandName(interaction: AllInteractions) {
 	return (
 		resolvers.commandName[
-			interaction.constructor.name as keyof typeof resolvers.commandName
-		](interaction) || resolvers.commandName.fallback(interaction)
+			getTypeOfInteraction(interaction) as keyof typeof resolvers.commandName
+		](interaction as keyof typeof interaction) ??
+		resolvers.commandName.fallback(interaction)
 	);
 }
 
@@ -253,7 +230,8 @@ export function resolveAction(interaction: AllInteractions) {
 	return (
 		resolvers.action[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.action
-		](interaction) || resolvers.action.fallback(interaction)
+		](interaction as keyof typeof interaction) ??
+		resolvers.action.fallback(interaction)
 	);
 }
 
@@ -261,22 +239,11 @@ export function resolveLocale(interaction: AllInteractions) {
 	return (
 		resolvers.locale[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.locale
-		](interaction) || resolvers.locale.fallback(interaction)
+		](interaction as keyof typeof interaction) ??
+		resolvers.locale.fallback(interaction)
 	);
 }
 
-export function getTypeOfInteraction(
-	interaction:
-		| AllInteractions
-		| Interaction
-		| Message
-		| VoiceState
-		| MessageReaction
-		| PartialMessageReaction,
-): string {
+export function getTypeOfInteraction(interaction: AllInteractions): string {
 	return interaction.constructor.name;
-}
-
-export function getTscordVersion() {
-	return packageJson.tscord.version;
 }

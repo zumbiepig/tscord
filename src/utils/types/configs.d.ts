@@ -628,20 +628,15 @@ interface GeneralConfigType {
 
 interface DatabaseConfigType {
 	path: string;
-
-	backup: {
-		enabled: boolean;
-		path: string;
-	};
+	enableBackups: boolean;
 }
 
-interface EnvMikroORMConfigType {
+interface MikroORMConfigType {
 	production: Options;
 	development: Options;
 }
 
 interface LogsConfigType {
-	debug: boolean;
 	logTailMaxSize: number;
 
 	archive: {
@@ -690,5 +685,4 @@ interface StatsConfigType {
 
 interface APIConfigType {
 	enabled: boolean;
-	port: number;
 }

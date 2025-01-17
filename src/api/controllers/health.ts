@@ -1,12 +1,11 @@
 import { Controller, Get, UseBefore } from '@tsed/common';
 import { Client } from 'discordx';
 
+import { DevAuthenticated } from '@/api/middlewares';
 import { Data } from '@/entities';
 import { Database, Logger, Stats } from '@/services';
 import { BaseController } from '@/utils/classes';
 import { isInMaintenance, resolveDependencies } from '@/utils/functions';
-
-import { DevAuthenticated } from '../middlewares/devAuthenticated';
 
 @Controller('/health')
 export class HealthController extends BaseController {

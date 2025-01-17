@@ -6,10 +6,16 @@ import {
 	EmbedBuilder,
 	User,
 } from 'discord.js';
+import { Discord } from 'discordx';
 
-import { Discord, Injectable, Slash, SlashOption } from '@/utils/decorators';
 import { Stats } from '@/services';
+import { Injectable, Slash, SlashOption } from '@/utils/decorators';
 import { getColor } from '@/utils/functions';
+import type {
+	InteractionData,
+	StatPerInterval,
+	StatsResolverType,
+} from '@/utils/types';
 
 const statsResolver: StatsResolverType = [
 	{
@@ -78,7 +84,7 @@ export default class StatsCommand {
 
 		for (const stat of statsResolver) {
 			const stats = await stat.data(this.stats, days);
-			const link = await this.generateLink(
+			const link = this.generateLink(
 				stats,
 				localize.COMMANDS.STATS.HEADERS[
 					stat.name as keyof (typeof localize)['COMMANDS']['STATS']['HEADERS']
@@ -100,7 +106,7 @@ export default class StatsCommand {
 		).send();
 	}
 
-	async generateLink(stats: StatPerInterval, name: string): Promise<string> {
+	generateLink(stats: StatPerInterval, name: string): string {
 		const obj = {
 			type: 'line',
 			data: {

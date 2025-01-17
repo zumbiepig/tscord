@@ -1,4 +1,11 @@
-import fs from 'node:fs';
+import {
+	appendFileSync,
+	createWriteStream,
+	existsSync,
+	mkdirSync,
+	readdirSync,
+	writeFileSync,
+} from 'node:fs';
 import { unlink } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -25,11 +32,9 @@ import { locales } from '@/i18n';
 import { Pastebin, PluginsManager, Scheduler, Store } from '@/services';
 import { Schedule, Service } from '@/utils/decorators';
 import {
-	fileOrDirectoryExists,
 	formatDate,
 	getTypeOfInteraction,
 	numberAlign,
-	oneLine,
 	resolveAction,
 	resolveChannel,
 	resolveDependency,
@@ -182,12 +187,12 @@ export class Logger {
 		const fileName = `${this.logPath}/${level}.log`;
 
 		// create the folder if it doesn't exist
-		if (!fileOrDirectoryExists(this.logPath)) fs.mkdirSync(this.logPath);
+		if (!existsSync(this.logPath)) mkdirSync(this.logPath);
 
 		// create file if it doesn't exist
-		if (!fileOrDirectoryExists(fileName)) fs.writeFileSync(fileName, '');
+		if (!existsSync(fileName)) writeFileSync(fileName, '');
 
-		fs.appendFileSync(fileName, `${templatedMessage}\n`);
+		appendFileSync(fileName, `${templatedMessage}\n`);
 	}
 
 	/**
@@ -236,15 +241,14 @@ export class Logger {
 		if (!logsConfig.archive.enabled) return;
 
 		const date = dayjs().subtract(1, 'day').format('YYYY-MM-DD');
-		const currentLogsPaths = fs
-			.readdirSync(this.logPath)
-			.filter((file) => file.endsWith('.log'));
-		const output = fs.createWriteStream(
+		const currentLogsPaths = readdirSync(this.logPath).filter((file) =>
+			file.endsWith('.log'),
+		);
+		const output = createWriteStream(
 			`${this.logArchivePath}/logs-${date}.tar.gz`,
 		);
 
-		if (!fileOrDirectoryExists(this.logArchivePath))
-			fs.mkdirSync(this.logArchivePath);
+		if (!existsSync(this.logArchivePath)) mkdirSync(this.logArchivePath);
 
 		const archive = archiver('tar', {
 			gzip: true,
@@ -270,20 +274,20 @@ export class Logger {
 	}
 
 	private deleteCurrentLogs() {
-		const currentLogsPaths = fs
-			.readdirSync(this.logPath)
-			.filter((file) => file.endsWith('.log'));
+		const currentLogsPaths = readdirSync(this.logPath).filter((file) =>
+			file.endsWith('.log'),
+		);
 
 		for (const logPath of currentLogsPaths) {
 			// empty the file
-			fs.writeFileSync(`${this.logPath}/${logPath}`, '');
+			writeFileSync(`${this.logPath}/${logPath}`, '');
 		}
 	}
 
 	private async deleteOldLogArchives() {
-		const archives = fs
-			.readdirSync(this.logArchivePath)
-			.filter((file) => file.endsWith('.tar.gz'));
+		const archives = readdirSync(this.logArchivePath).filter((file) =>
+			file.endsWith('.tar.gz'),
+		);
 
 		for (const archive of archives) {
 			const date = dayjs(archive.split('logs-')[1]?.split('.tar.gz')[0]);
@@ -341,33 +345,8 @@ export class Logger {
 		const guild = resolveGuild(interaction);
 		const user = resolveUser(interaction);
 
-		const message = oneLine`
-            (${type})
-            "${action}"
-            ${channel instanceof TextChannel || channel instanceof ThreadChannel ? `in channel #${channel.name}` : ''}
-            ${guild ? `in guild ${guild.name}` : ''}
-            ${user ? `by ${user.username}#${user.discriminator}` : ''}
-        `;
-
-		const chalkedMessage = oneLine`
-            (${chalk.bold.white(type)})
-            "${chalk.bold.green(action)}"
-            ${
-							channel instanceof TextChannel || channel instanceof ThreadChannel
-								? `${chalk.dim.italic.gray('in channel')} ${chalk.bold.blue(`#${channel.name}`)}`
-								: ''
-						}
-            ${
-							guild
-								? `${chalk.dim.italic.gray('in guild')} ${chalk.bold.blue(guild.name)}`
-								: ''
-						}
-            ${
-							user
-								? `${chalk.dim.italic.gray('by')} ${chalk.bold.blue(`${user.username}#${user.discriminator}`)}`
-								: ''
-						}
-        `;
+		const message = `(${type}) "${action ?? ''}" ${channel instanceof TextChannel || channel instanceof ThreadChannel ? `in channel #${channel.name}` : ''} ${guild ? `in guild ${guild.name}` : ''} ${user ? `by ${user.username}#${user.discriminator}` : ''}`;
+		const chalkedMessage = `(${chalk.bold.white(type)}) "${chalk.bold.green(action)}" ${channel instanceof TextChannel || channel instanceof ThreadChannel ? `${chalk.dim.italic.gray('in channel')} ${chalk.bold.blue(`#${channel.name}`)}` : ''} ${guild ? `${chalk.dim.italic.gray('in guild')} ${chalk.bold.blue(guild.name)}` : ''} ${user ? `${chalk.dim.italic.gray('by')} ${chalk.bold.blue(`${user.username}#${user.discriminator}`)}` : ''}`;
 
 		if (logsConfig.interaction.console) this.console(chalkedMessage);
 		if (logsConfig.interaction.file) this.file(message);
@@ -400,7 +379,7 @@ export class Logger {
 							},
 							{
 								name: 'Action',
-								value: action,
+								value: action ?? 'Unknown',
 								inline: true,
 							},
 							{
@@ -481,16 +460,7 @@ export class Logger {
 			const guild = await client.guilds.fetch(guildId).catch(() => null);
 
 			const message = `(${type}) Guild ${guild ? `${guild.name} (${guildId})` : guildId} ${additionalMessage}`;
-			const chalkedMessage = oneLine`
-                (${chalk.bold.white(type)})
-                ${chalk.dim.italic.gray('Guild')}
-                ${
-									guild
-										? `${chalk.bold.green(guild.name)} (${chalk.bold.blue(guildId)})`
-										: guildId
-								}
-                ${chalk.dim.italic.gray(additionalMessage)}
-            `;
+			const chalkedMessage = `(${chalk.bold.white(type)}) ${chalk.dim.italic.gray('Guild')} ${guild ? `${chalk.bold.green(guild.name)} (${chalk.bold.blue(guildId)})` : guildId} ${chalk.dim.italic.gray(additionalMessage)}`;
 
 			if (logsConfig.guild.console) this.console(chalkedMessage);
 			if (logsConfig.guild.file) this.file(message);
@@ -655,12 +625,12 @@ export class Logger {
 		);
 
 		// entities
-		const entities = fs
-			.readdirSync(path.join(import.meta.dir, '..', 'entities'))
-			.filter(
-				(entity) =>
-					!entity.startsWith('index') && !entity.startsWith('BaseEntity'),
-			);
+		const entities = readdirSync(
+			path.join(import.meta.dir, '..', 'entities'),
+		).filter(
+			(entity) =>
+				!entity.startsWith('index') && !entity.startsWith('BaseEntity'),
+		);
 
 		const pluginsEntitesCount = this.pluginsManager.plugins.reduce(
 			(acc, plugin) => acc + Object.values(plugin.entities).length,
@@ -676,9 +646,9 @@ export class Logger {
 		);
 
 		// services
-		const services = fs
-			.readdirSync(path.join(import.meta.dir, '..', 'services'))
-			.filter((service) => !service.startsWith('index'));
+		const services = readdirSync(
+			path.join(import.meta.dir, '..', 'services'),
+		).filter((service) => !service.startsWith('index'));
 
 		const pluginsServicesCount = this.pluginsManager.plugins.reduce(
 			(acc, plugin) => acc + Object.values(plugin.services).length,
@@ -749,20 +719,17 @@ export class Logger {
 		if (apiConfig.enabled) {
 			this.console(
 				chalk.gray(
-					boxen(
-						` API Server listening on port ${chalk.bold(apiConfig.port)} `,
-						{
-							padding: 0,
-							margin: {
-								top: 1,
-								bottom: 0,
-								left: 1,
-								right: 1,
-							},
-							borderStyle: 'round',
-							dimBorder: true,
+					boxen(` API Server listening on port ${chalk.bold(env.API_PORT)} `, {
+						padding: 0,
+						margin: {
+							top: 1,
+							bottom: 0,
+							left: 1,
+							right: 1,
 						},
-					),
+						borderStyle: 'round',
+						dimBorder: true,
+					}),
 				),
 				'info',
 				true,

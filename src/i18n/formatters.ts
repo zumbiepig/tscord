@@ -5,9 +5,7 @@ import type { Formatters, Locales } from './i18n-types';
 export const initFormatters: FormattersInitializer<Locales, Formatters> = (
 	_locale: Locales,
 ) => {
-	const formatters: Formatters = {
+	return {
 		// add your formatter functions here
-	};
-
-	return formatters;
+	} as Formatters;
 };

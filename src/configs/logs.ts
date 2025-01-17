@@ -1,7 +1,6 @@
-import type { LogsConfigType } from '../utils/types/configs';
+import type { LogsConfigType } from '@/utils/types';
 
 export const logsConfig: LogsConfigType = {
-	debug: false, // set the discordx client debug logs
 	logTailMaxSize: 50, // max size of the last logs kept in memory
 
 	archive: {
