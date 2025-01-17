@@ -1,18 +1,24 @@
-import { Data, defaultData } from '@/entities';
+import { Data } from '@/entities';
 import { Database } from '@/services';
 import { resolveDependency } from '@/utils/functions';
-
-type DataType = keyof typeof defaultData;
+import type { DataType } from '@/utils/types';
 
 /**
- * Initiate the EAV Data table if properties defined in the `defaultData` doesn't exist in it yet.
+ * Initiate the EAV Data table with the default data (dynamic EAV key/value pattern).
  */
 export async function initDataTable() {
-	const db = await resolveDependency(Database);
+	const defaultData: DataType = {
+		maintenance: false,
+		lastMaintenance: Date.now(),
+		lastStartup: Date.now(),
+	};
 
 	for (const key of Object.keys(defaultData)) {
+		const db = await resolveDependency(Database);
 		const dataRepository = db.get(Data);
-
-		await dataRepository.add(key as DataType, defaultData[key as DataType]);
+		await dataRepository.add(
+			key as keyof DataType,
+			defaultData[key as keyof DataType],
+		);
 	}
 }

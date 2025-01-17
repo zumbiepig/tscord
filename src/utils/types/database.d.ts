@@ -7,3 +7,9 @@ interface DatabaseSize {
 
 type DatabaseDriver = SqliteDriver;
 type DatabaseEntityManager = SqlEntityManager;
+
+interface DataType {
+	maintenance: boolean;
+	lastMaintenance: number;
+	lastStartup: number;
+}

@@ -3,7 +3,7 @@ import 'core-js/full/reflect';
 import process from 'node:process';
 
 import { RequestContext } from '@mikro-orm/core';
-import { spawn, spawnSync } from 'bun';
+import { spawn } from 'bun';
 import chalk from 'chalk';
 import { GatewayIntentBits, Partials } from 'discord.js';
 import discordLogs from 'discord-logs';
@@ -40,6 +40,8 @@ declare global {
 	// eslint-disable-next-line no-var
 	var client: Client;
 }
+
+console.log('1');
 
 /**
  * Hot reload
@@ -141,7 +143,7 @@ async function init() {
 	});
 
 	// Load all new events
-	await discordLogs(client, { debug: false });
+	await discordLogs(client, { debug: !env.isDev });
 	container.registerInstance(Client, client);
 
 	// import all the commands and events
@@ -162,11 +164,6 @@ async function init() {
 		client
 			.login(env.BOT_TOKEN)
 			.then(async () => {
-				if (env.isDev) {
-					// reload commands and events when a file is deleted
-					//watcher?.on('unlink', () => void reload(client));
-				}
-
 				// start the api server
 				if (apiConfig.enabled) {
 					const server = await resolveDependency(Server);
@@ -187,7 +184,7 @@ async function init() {
 							.filter((value) => value !== null)
 							.every((value) => value)
 					) {
-						throw new Error('Bot services were not ready');
+						throw new Error('Bot services are not ready when they should be');
 					}
 				});
 			})
@@ -200,8 +197,6 @@ async function init() {
 
 if (env.isDev) {
 	spawn(['bun', '-c', 'run', 'i18n:watch'], { stdout: 'inherit' });
-} else {
-	spawnSync(['bun', '-c', 'run', 'i18n'], { stdout: 'inherit' });
 }
 
 if (!(await resolveDependency(Store)).get('botHasBeenReloaded')) {
