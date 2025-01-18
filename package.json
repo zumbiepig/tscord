@@ -5,6 +5,7 @@
 	"license": "MIT",
 	"repository": "github:barthofu/tscord",
 	"type": "module",
+	"main": "src/main.ts",
 	"module": "src/main.ts",
 	"engines": {
 		"node": ">=22",
@@ -12,7 +13,7 @@
 	},
 	"engineStrict": true,
 	"scripts": {
-		"postinstall": "bun -c run installoop --rootDir=./src/plugins/*",
+		"postinstall": "bun -c run installoop --rootDir=./src/plugins/*; bun -c run i18n",
 		"start": "bun -c run i18n && NODE_ENV=production bun -c run .",
 		"dev": "NODE_ENV=development bun -c --hot --inspect --no-clear-screen run .",
 		"build": "rm -rf ./dist && bun -c build --compile --minify --sourcemap --outfile=dist/tscord-bot ./src/main.ts",
