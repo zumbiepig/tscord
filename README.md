@@ -1,5 +1,5 @@
 <p align="center">
-    <img height="450" src="https://github.com/barthofu/tscord/assets/66025667/7cf87e0f-37e9-46ce-b244-dda6c45941c9"></img>
+    <img height="450" src="https://github.com/user-attachments/assets/29813885-469c-4601-a4e7-3bc0296c3781"></img>
 </p>
 
 <div align="center">
@@ -16,7 +16,7 @@
 
 # What is TSCord
 
-#### **TSCord** is a fully-featured **[discord bot](https://discord.com/developers/docs/intro#bots-and-apps)** _template_ written in [Typescript](https://www.typescriptlang.org/), intended to provide a framework that's easy to use, extend and modify.
+#### **TSCord** is a fully-featured **[discord bot](https://discord.com/developers/docs/quick-start/overview-of-apps)** _template_ written in [Typescript](https://www.typescriptlang.org/), intended to provide a framework that's easy to use, extend and modify.
 
 It uses [`discordx`](https://github.com/discordx-ts/discordx) and [`discord.js v14`](https://github.com/discordjs/discord.js) under the hood to simplify the development of discord bots.
 
@@ -53,7 +53,7 @@ _But TSCord is not only a Discord bot template..._
 
 A ready-to-use fancy dashboard for your TSCord bot
 
-<img src="https://user-images.githubusercontent.com/66025667/191989444-5fa096ec-c74e-423d-9735-615b94bc100f.png"></img>
+<img src="https://github.com/user-attachments/assets/2d0ac860-64d4-4beb-8b3c-d633e04c5ba4"></img>
 
 </td>
 <td align="center">
@@ -62,7 +62,7 @@ A ready-to-use fancy dashboard for your TSCord bot
 
 Customizable static homepage for your TSCord-based bot
 
-https://user-images.githubusercontent.com/66025667/184621486-7340157f-b7fc-44ea-94a9-03d76a99384c.mp4
+https://github.com/user-attachments/assets/d3e4d01a-60a6-4787-9b06-8c6d4aa32c37
 
 </td>
 </tr>
@@ -74,16 +74,16 @@ https://user-images.githubusercontent.com/66025667/184621486-7340157f-b7fc-44ea-
 
 Really useful CLI meant to initialize a new TSCord project, generate files by type or even manage plugins
 
-https://user-images.githubusercontent.com/66025667/196367258-94c77e23-779c-4d9b-8583-a29226435b07.mp4
+https://github.com/user-attachments/assets/c97c172c-dbcb-4717-94dc-c25f6efff459
 
 </td>
 <td align="center">
 
 ### [Plugins](https://github.com/barthofu/tscord-plugins)
 
-Fully extensible thanks to the plugin eco-system
+Fully extensible thanks to the plugin ecosystem
 
-<img width="50%" src="https://user-images.githubusercontent.com/66025667/196372599-022c6254-01a6-4f7c-bd52-06246527a8b9.png"></img>
+<img width="50%" src="https://github.com/user-attachments/assets/bc182248-0d8d-4ace-a230-a0a9f41e45f0"></img>
 
 </td>
 </tr>
@@ -94,7 +94,7 @@ Fully extensible thanks to the plugin eco-system
 
 <div align="center">
     <a href="https://discord.gg/GsYF4xceZZ" target="_blank">
-        <img width="17.5%" src="https://user-images.githubusercontent.com/66025667/196373934-2fad8760-a58d-4b4d-ad64-b069baa71823.png"></img>
+        <img width="17.5%" src="https://github.com/user-attachments/assets/e8a9f890-42b1-447c-b80c-5770ecb5b463"></img>
     </a>
 </div>
 
@@ -114,7 +114,7 @@ Talking about features, here are some of the core features of the template:
   - NSFW only command
   - Message's content match using regex
 - Internal **API** to interact with the bot from external services, with built-in useful endpoints
-- Multiple **databases** support out-of-the-box using [Mikro-ORM](https://mikro-orm.io/)
+- Multiple **databases** support out-of-the-box using [Mikro-ORM](https://github.com/mikro-orm/mikro-orm)
 - **Migrations** system to keep a safe database
 - **Custom events** handlers
 - Advanced **error handler**
@@ -134,7 +134,7 @@ This template is also developer friendly and follow strict design patterns to ea
 - **Linting** and **formatting** thanks to a top-notch ESLint config
 - Typesafe and validated **environment variables**
 - Built-in **debugging** setup for VSCode
-- Support for running with the **[PM2](https://pm2.keymetrics.io/)** process manger
+- Support for running with the **[PM2](https://github.com/Unitech/pm2)** process manger
 - Support for running with **[Docker](https://www.docker.com/)**
 - CI/CD integration with **Github Actions**
 
@@ -146,9 +146,10 @@ _and many more!_
 
 You can also find useful documentations at:
 
-- [discordx documentation](https://discordx.js.org/)
-- [Discord.js Guide](https://discordjs.guide/)
-- [Discord's developer portal](https://discord.com/developers/docs/intro)
+- [Discord's developer portal](https://discord.com/developers/docs)
+- [discord.js documentation](https://discord.js.org/docs)
+- [discord.js Guide](https://discordjs.guide/)
+- [discordx documentation](https://discordx.js.org/docs/discordx/)
 
 ## 📢 Support
 
@@ -156,12 +157,10 @@ If you need support on the template or just want to exchange with us, don't hesi
 
 ## Roadmap
 
-We use Github milestones for
-
-#### [Click here](https://github.com/barthofu/tscord-template/milestones?direction=asc&sort=title&state=open) to access the milestone roadmap
+[Click here](https://github.com/barthofu/tscord/milestones) to access the milestone roadmap.
 
 ## 📑 License
 
 MIT License
 
-Copyright (c) barthofu
+Copyright (c) 2025 Bartholomé Gili
