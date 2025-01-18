@@ -1,5 +1,6 @@
 .env.example
 /database/
+/src/i18n/i18n-*.ts
 
 # Based on https://raw.githubusercontent.com/github/gitignore/main/Node.gitignore
 
