@@ -1,4 +1,5 @@
 import 'core-js/full/reflect';
+import 'reflect-metadata';
 
 import process from 'node:process';
 
