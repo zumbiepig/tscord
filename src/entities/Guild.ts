@@ -20,7 +20,7 @@ export class Guild extends BaseEntity {
 	id!: string;
 
 	@Property({ nullable: true, type: 'string' })
-	prefix: string | null;
+	prefix!: string | null;
 
 	@Property()
 	deleted = false;
@@ -35,7 +35,7 @@ export class Guild extends BaseEntity {
 
 export class GuildRepository extends EntityRepository<Guild> {
 	async updateLastInteract(guildId?: string): Promise<void> {
-		const guild = await this.findOne({ id: guildId });
+		const guild = await this.findOne({ id: guildId ?? '' });
 
 		if (guild) {
 			guild.lastInteract = new Date();

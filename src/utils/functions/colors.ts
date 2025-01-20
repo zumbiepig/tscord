@@ -1,4 +1,4 @@
-import { ColorResolvable } from 'discord.js';
+import type { ColorResolvable } from 'discord.js';
 
 import { colorsConfig } from '@/configs';
 

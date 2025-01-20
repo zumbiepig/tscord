@@ -48,6 +48,7 @@ export class Pastebin {
 	}
 
 	@Schedule('*/30 * * * *')
+	// @ts-expect-error - method has the @Schedule decorator
 	private async autoDelete(): Promise<void> {
 		const pastes = await this.db
 			.get(PastebinEntity)

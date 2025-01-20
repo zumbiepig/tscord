@@ -23,7 +23,7 @@ export function Once(event: string, options?: EventOptions): MethodDecoratorEx {
 	) {
 		const clazz = target as unknown as new () => unknown;
 		const on = DOn.create({
-			botIds: options?.botIds,
+			...(options?.botIds !== undefined && { botIds: options.botIds }),
 			event,
 			once: true,
 			rest: false,

@@ -103,8 +103,8 @@ function allInteractionsLocaleDetector(interaction: AllInteractions) {
 	return () => {
 		let locale = resolveLocale(interaction);
 
-		if (['en-US', 'en-GB'].includes(locale)) locale = 'en';
-		else if (locale === 'default') locale = generalConfig.defaultLocale;
+		if (['en-US', 'en-GB'].includes(locale ?? '')) locale = 'en';
+		else if (locale === null) locale = generalConfig.defaultLocale;
 
 		return [locale];
 	};

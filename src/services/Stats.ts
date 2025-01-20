@@ -80,7 +80,7 @@ export class Stats {
 		};
 
 		// add it to the db
-		await this.register(type, value, additionalData);
+		await this.register(type, value ?? '', additionalData);
 	}
 
 	/**

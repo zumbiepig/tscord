@@ -1,10 +1,9 @@
-import 'core-js/full/reflect';
 import 'reflect-metadata';
+import 'core-js/full/reflect';
 
 import process from 'node:process';
 
 import { RequestContext } from '@mikro-orm/core';
-import { spawn } from 'bun';
 import chalk from 'chalk';
 import { GatewayIntentBits, Partials } from 'discord.js';
 import discordLogs from 'discord-logs';
@@ -194,10 +193,6 @@ async function init() {
 				process.exit(1);
 			});
 	});
-}
-
-if (env.isDev) {
-	spawn(['bun', '-c', 'run', 'i18n:watch'], { stdout: 'inherit' });
 }
 
 if (!(await resolveDependency(Store)).get('botHasBeenReloaded')) {

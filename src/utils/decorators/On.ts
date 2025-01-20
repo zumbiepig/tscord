@@ -26,11 +26,11 @@ export function On(
 	) {
 		const clazz = target as unknown as new () => unknown;
 		const on = DOn.create({
-			botIds: options?.botIds,
+			...(options?.botIds !== undefined && { botIds: options.botIds }),
 			event,
 			once: false,
+			...(options?.priority !== undefined && { priority: options.priority }),
 			rest: false,
-			priority: options?.priority,
 		}).decorate(
 			clazz.constructor,
 			key,

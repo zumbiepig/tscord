@@ -15,7 +15,7 @@ export class Stat {
 	[EntityRepositoryType]?: StatRepository;
 
 	@PrimaryKey()
-	id: number;
+	id!: number;
 
 	@Property()
 	type!: string;

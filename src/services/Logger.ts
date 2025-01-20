@@ -510,7 +510,7 @@ export class Logger {
 	 */
 	async logError(
 		error: Error,
-		type: 'Exception' | 'unhandledRejection',
+		type: 'uncaughtException' | 'unhandledRejection',
 		trace: StackFrame[] = parse(error.stack ?? ''),
 	) {
 		let message = '(ERROR)';
@@ -519,12 +519,12 @@ export class Logger {
 		let chalkedMessage = `(${chalk.bold.white('ERROR')})`;
 
 		if (trace[0]) {
-			message += ` ${type === 'Exception' ? 'Exception' : 'Unhandled rejection'} : ${error.message}\n${trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n')}`;
+			message += ` ${type === 'uncaughtException' ? 'Exception' : 'Unhandled rejection'} : ${error.message}\n${trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n')}`;
 			embedMessage += `\`\`\`\n${trace.map((frame: StackFrame) => `> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n')}\n\`\`\``;
-			embedTitle += `***${type === 'Exception' ? 'Exception' : 'Unhandled rejection'}* : ${error.message}**`;
-			chalkedMessage += ` ${chalk.dim.italic.gray(type === 'Exception' ? 'Exception' : 'Unhandled rejection')} : ${error.message}\n${chalk.dim.italic(trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n'))}`;
+			embedTitle += `***${type === 'uncaughtException' ? 'Exception' : 'Unhandled rejection'}* : ${error.message}**`;
+			chalkedMessage += ` ${chalk.dim.italic.gray(type === 'uncaughtException' ? 'Exception' : 'Unhandled rejection')} : ${error.message}\n${chalk.dim.italic(trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n'))}`;
 		} else {
-			if (type === 'Exception') {
+			if (type === 'uncaughtException') {
 				message += `An exception as occurred in a unknown file\n\t> ${error.message}`;
 				embedMessage += `An exception as occurred in a unknown file\n${error.message}`;
 			} else {

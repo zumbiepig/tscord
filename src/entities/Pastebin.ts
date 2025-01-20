@@ -15,10 +15,10 @@ export class Pastebin {
 	[EntityRepositoryType]?: PastebinRepository;
 
 	@PrimaryKey({ autoincrement: false })
-	id: string;
+	id!: string;
 
 	@Property()
-	editCode: string;
+	editCode!: string;
 
 	@Property()
 	lifetime = -1;

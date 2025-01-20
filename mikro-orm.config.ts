@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import 'core-js/full/reflect';
 
 import { defineConfig } from '@mikro-orm/core';
 import { env } from 'bun';

@@ -29,7 +29,7 @@ export class User extends BaseEntity {
 
 export class UserRepository extends EntityRepository<User> {
 	async updateLastInteract(userId?: string): Promise<void> {
-		const user = await this.findOne({ id: userId });
+		const user = await this.findOne({ id: userId ?? '' });
 
 		if (user) {
 			user.lastInteract = new Date();
