@@ -1,10 +1,12 @@
-import { env } from 'bun';
+import process from 'node:process';
+
 import { cleanEnv, host, port, str } from 'envalid';
 
 import { apiConfig, generalConfig, mikroORMConfig } from '@/configs';
 
-export default cleanEnv(env, {
+export default cleanEnv(process.env, {
 	NODE_ENV: str({ choices: ['production', 'development'] }),
+
 	BOT_TOKEN: str(),
 
 	DATABASE_HOST: host({ default: undefined }),
@@ -21,40 +23,29 @@ export default cleanEnv(env, {
 
 export const validateEnv = function () {
 	const config =
-		mikroORMConfig[
-			env.NODE_ENV === 'development' ? 'development' : 'production'
-		];
+		mikroORMConfig[process.env.NODE_ENV as 'production' | 'development'];
 
-	cleanEnv(env, {
+	cleanEnv(process.env, {
 		NODE_ENV: str({ choices: ['production', 'development'] }),
 
 		BOT_TOKEN: str(),
 
-		DATABASE_HOST: host(
-			!config.dbName && config.port ? { default: undefined } : undefined,
-		),
-		DATABASE_PORT: port(
-			!config.dbName && config.port ? { default: undefined } : undefined,
-		),
-		DATABASE_NAME: str(
-			!config.dbName && config.port ? { default: undefined } : undefined,
-		),
-		DATABASE_USER: str(
-			!config.dbName && config.port ? { default: undefined } : undefined,
-		),
-		DATABASE_PASSWORD: str(
-			!config.dbName && config.port ? { default: undefined } : undefined,
-		),
+		...(!config.dbName &&
+			config.port && {
+				DATABASE_HOST: host(),
+				DATABASE_PORT: port(),
+				DATABASE_NAME: str(),
+				DATABASE_USER: str(),
+				DATABASE_PASSWORD: str(),
+			}),
 
-		API_PORT: port(apiConfig.enabled ? { default: undefined } : undefined),
-		API_ADMIN_TOKEN: str(
-			apiConfig.enabled ? { default: undefined } : undefined,
-		),
+		...(apiConfig.enabled && {
+			API_PORT: port(),
+			API_ADMIN_TOKEN: str(),
+		}),
 
-		IMGUR_CLIENT_ID: str(
-			generalConfig.automaticUploadImagesToImgur
-				? { default: undefined }
-				: undefined,
-		),
+		...(generalConfig.automaticUploadImagesToImgur && {
+			IMGUR_CLIENT_ID: str(),
+		}),
 	});
 };

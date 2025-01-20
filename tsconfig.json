@@ -14,9 +14,6 @@
 
 		"paths": {
 			"@/packageJson": ["./package.json"],
-			"@/packageJson/*": ["./src/plugins/*/package.json"],
-
-			"@/pluginJson/*": ["./src/plugins/*/plugin.json"],
 
 			"@/env": ["./src/env.ts"],
 			"@/env/*": ["./src/plugins/*/env.ts"],

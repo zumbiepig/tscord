@@ -1,8 +1,7 @@
 import { rmdir } from 'node:fs/promises';
 
-import { resolve } from '@discordx/importer';
 import { type AnyEntity, type EntityClass } from '@mikro-orm/core';
-import { Glob } from 'bun';
+import { glob } from 'fast-glob';
 import {
 	type ImportLocaleMapping,
 	storeTranslationsToDisk,
@@ -17,9 +16,9 @@ export class PluginsManager {
 	private _plugins: Plugin[] = [];
 
 	public async loadPlugins(): Promise<void> {
-		const pluginPaths = new Glob('*').scan('./src/plugins');
+		const pluginPaths = await glob('./src/plugins/*');
 
-		for await (const path of pluginPaths) {
+		for (const path of pluginPaths) {
 			const plugin = new Plugin(path);
 			if (await plugin.load()) this._plugins.push(plugin);
 		}
@@ -89,7 +88,7 @@ export class PluginsManager {
 
 		const pluginNames = this._plugins.map((plugin) => plugin.name);
 		for (const locale of locales) {
-			for (const path of await resolve(`./src/i18n/${locale}/*/index.ts`)) {
+			for (const path of await glob(`./src/i18n/${locale}/*/index.ts`)) {
 				const name =
 					new RegExp(`src/i18n/${locale}/(.+)/index.ts$`).exec(path)?.[1] ??
 					undefined;

@@ -7,7 +7,6 @@ export * from './dependency';
 export * from './devs';
 export * from './embeds';
 export * from './error';
-export * from './files';
 export * from './image';
 export * from './interactions';
 export * from './localization';

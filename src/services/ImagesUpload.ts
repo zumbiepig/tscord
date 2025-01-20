@@ -4,6 +4,7 @@ import { promisify } from 'node:util';
 
 import axios from 'axios';
 import chalk from 'chalk';
+import { glob } from 'fast-glob';
 import { imageHash as callbackImageHash } from 'image-hash';
 import { ImgurClient } from 'imgur';
 
@@ -11,7 +12,7 @@ import { Image, ImageRepository } from '@/entities';
 import env from '@/env';
 import { Database, Logger } from '@/services';
 import { Service } from '@/utils/decorators';
-import { base64Encode, resolve } from '@/utils/functions';
+import { base64Encode } from '@/utils/functions';
 
 const imageHasher = promisify(callbackImageHash);
 
@@ -57,7 +58,7 @@ export class ImagesUpload {
 			);
 
 		// get all images inside the assets/images folder
-		const images = (await resolve(this.imageFolderPath + '/**/*'))
+		const images = (await glob(this.imageFolderPath + '/**/*'))
 			.filter((file) => this.isValidImageFormat(file))
 			.map((file) => file.replace(`${this.imageFolderPath}/`, ''));
 
