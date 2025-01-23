@@ -35,12 +35,7 @@ import {
 import { keptInstances } from '@/utils/decorators';
 import { initDataTable, resolveDependency } from '@/utils/functions';
 
-declare global {
-	// eslint-disable-next-line no-var
-	var client: Client;
-}
-
-console.log('1');
+let clientSave: Client | undefined;
 
 /**
  * Hot reload
@@ -114,7 +109,7 @@ async function init() {
 
 	// init the client
 	DIService.engine = tsyringeDependencyRegistryEngine.setInjector(container);
-	globalThis.client = new Client({
+	const client = new Client({
 		intents: [
 			GatewayIntentBits.Guilds,
 			GatewayIntentBits.GuildMembers,
@@ -163,6 +158,8 @@ async function init() {
 		client
 			.login(env.BOT_TOKEN)
 			.then(async () => {
+				clientSave = client;
+
 				// start the api server
 				if (apiConfig.enabled) {
 					const server = await resolveDependency(Server);
@@ -199,5 +196,6 @@ if (!(await resolveDependency(Store)).get('botHasBeenReloaded')) {
 	await init();
 } else {
 	console.log('Reloading');
-	await reload(globalThis.client);
+	if (clientSave) await reload(clientSave);
+	else throw new Error('Error reloading bot');
 }

@@ -1,3 +1,3 @@
-export * from './botOnline';
-export * from './devAuthenticated';
-export * from './log';
+export * from './botOnline.js';
+export * from './devAuthenticated.js';
+export * from './log.js';

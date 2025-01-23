@@ -1,2 +1,2 @@
-export * from './InvalidOptionName';
-export * from './UnknownReply';
+export * from './InvalidOptionName.js';
+export * from './UnknownReply.js';
