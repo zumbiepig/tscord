@@ -6,10 +6,6 @@ import {
 } from '@mikro-orm/core';
 import { EntityRepository } from '@mikro-orm/sqlite';
 
-// ===========================================
-// ================= Entity ==================
-// ===========================================
-
 @Entity({ repository: () => PastebinRepository })
 export class Pastebin {
 	[EntityRepositoryType]?: PastebinRepository;
@@ -26,9 +22,5 @@ export class Pastebin {
 	@Property()
 	createdAt: Date = new Date();
 }
-
-// ===========================================
-// =========== Custom Repository =============
-// ===========================================
 
 export class PastebinRepository extends EntityRepository<Pastebin> {}

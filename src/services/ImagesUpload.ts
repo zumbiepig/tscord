@@ -1,10 +1,12 @@
 import { existsSync } from 'node:fs';
-import path from 'node:path';
+import { basename, dirname, join } from 'node:path';
+import { cwd } from 'node:process';
 import { promisify } from 'node:util';
 
 import axios from 'axios';
 import chalk from 'chalk';
 import { glob } from 'fast-glob';
+import { mkdir } from 'fs/promises';
 import { imageHash as callbackImageHash } from 'image-hash';
 import { ImgurClient } from 'imgur';
 
@@ -18,14 +20,8 @@ const imageHasher = promisify(callbackImageHash);
 
 @Service()
 export class ImagesUpload {
-	private validImageExtensions = ['.png', '.jpg', '.jpeg'];
-	private imageFolderPath = path.join(
-		import.meta.dir,
-		'..',
-		'..',
-		'assets',
-		'images',
-	);
+	private validImageExtensions = ['.png', '.jpg', '.jpeg', '.gif'];
+	private imageFolderPath = join(cwd(), 'assets');
 
 	private imgurClient: ImgurClient | null = env.IMGUR_CLIENT_ID
 		? new ImgurClient({
@@ -51,25 +47,28 @@ export class ImagesUpload {
 	}
 
 	async syncWithDatabase() {
-		if (!existsSync(this.imageFolderPath))
-			await this.logger.log(
-				"Image folder does not exist, couldn't sync with database",
-				'warn',
-			);
+		if (!existsSync(this.imageFolderPath)) await mkdir(this.imageFolderPath);
 
-		// get all images inside the assets/images folder
-		const images = (await glob(this.imageFolderPath + '/**/*'))
-			.filter((file) => this.isValidImageFormat(file))
-			.map((file) => file.replace(`${this.imageFolderPath}/`, ''));
+		// get all images inside the assets folder
+		const images = (await glob('**/*', {cwd: this.imageFolderPath}))
+			.filter((file) => { 
+				if (this.isValidImageFormat(file)) {
+					return true;
+				} else {
+					console.warn(
+						`Image ${chalk.bold.red(file)} has an invalid format. Valid formats: ${this.validImageExtensions.join(', ')}`,
+					);
+					return false;
+				}
+			});
 
-		// remove all images from the database that are not anymore in the filesystem
+		// purge deleted images from the database, reupload expired images to imgur
 		const imagesInDb = await this.imageRepo.findAll();
-
 		for (const image of imagesInDb) {
-			const imagePath = `${image.basePath !== '' ? `${image.basePath ?? ''}/` : ''}${image.fileName}`;
+			const imagePath = join(image.basePath ?? '', image.fileName);
 
-			// delete the image if it is not in the filesystem anymore
 			if (!images.includes(imagePath)) {
+				// delete the image if it is not in the filesystem anymore
 				await this.imageRepo.nativeDelete(image);
 				await this.db.em.flush();
 				await this.deleteImageFromImgur(image);
@@ -82,7 +81,7 @@ export class ImagesUpload {
 		// check if the image is already in the database and that its md5 hash is the same.
 		for (const imagePath of images) {
 			const imageHash = (await imageHasher(
-				`${this.imageFolderPath}/${imagePath}`,
+				join(this.imageFolderPath, imagePath),
 				16,
 				true,
 			)) as string;
@@ -93,11 +92,11 @@ export class ImagesUpload {
 
 			if (!imageInDb) await this.addNewImageToImgur(imagePath, imageHash);
 			else if (
-				imageInDb.basePath !== imagePath.split('/').slice(0, -1).join('/') ||
-				imageInDb.fileName !== imagePath.split('/').slice(-1)[0]
+				imageInDb.basePath !== dirname(imagePath) ||
+				imageInDb.fileName !== basename(imagePath)
 			)
 				console.warn(
-					`Image ${chalk.bold.green(imagePath)} has the same hash as ${chalk.bold.green(imageInDb.basePath ?? '' + '/' + imageInDb.fileName)} so it will skip`,
+					`Image ${chalk.bold.green(imagePath)} has the same hash as ${chalk.bold.green(join(imageInDb.basePath ?? '', imageInDb.fileName))} so it will be skipped`,
 				);
 		}
 	}
@@ -121,11 +120,11 @@ export class ImagesUpload {
 		if (!this.imgurClient) return;
 
 		// upload the image to imgur
-		const base64 = base64Encode(`${this.imageFolderPath}/${imagePath}`);
+		const base64 = await base64Encode(join(this.imageFolderPath, imagePath));
 
 		try {
-			const imageFileName = imagePath.split('/').at(-1) ?? '';
-			const imageBasePath = imagePath.split('/').slice(0, -1).join('/');
+			const imageBasePath = dirname(imagePath);
+			const imageFileName = basename(imagePath);
 
 			const uploadResponse = await this.imgurClient.upload({
 				image: base64,
@@ -144,8 +143,8 @@ export class ImagesUpload {
 
 			// add the image to the database
 			const image = new Image();
-			image.fileName = imageFileName;
 			image.basePath = imageBasePath;
+			image.fileName = imageFileName;
 			image.url = uploadResponse.data.link;
 			image.size = uploadResponse.data.size;
 			image.tags = imageBasePath.split('/');

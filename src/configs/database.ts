@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+
 import { EntityGenerator } from '@mikro-orm/entity-generator';
 import { Migrator } from '@mikro-orm/migrations';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
@@ -16,7 +18,7 @@ const envMikroORMConfig: MikroORMConfigType = {
 		 * SQLite
 		 */
 		driver: SqliteDriver,
-		dbName: `${databaseConfig.path}db.sqlite`,
+		dbName: join(databaseConfig.path, 'db.sqlite'),
 
 		/**
 		 * MongoDB
@@ -58,10 +60,12 @@ const envMikroORMConfig: MikroORMConfigType = {
 		debug: false,
 
 		migrations: {
-			path: databaseConfig.path + '/migrations',
+			path: join(databaseConfig.path, 'migrations'),
 			emit: 'ts',
 			snapshot: true,
 		},
+
+		entities: [join('src', 'entities', '*.ts'), join('src', 'plugins', '*', 'entities', '*.ts')],
 
 		extensions: [Migrator, EntityGenerator],
 	},

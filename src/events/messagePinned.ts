@@ -9,7 +9,7 @@ export default class messagePinnedEvent {
 	async messagePinnedHandler([message]: [Message]) {
 		await new Promise((resolve) => resolve); // placeholder await
 		console.log(
-			`This message from ${message.author.tag} has been pinned : ${message.content}`,
+			`This message from ${message.author.tag} has been pinned: ${message.content}`,
 		);
 	}
 }

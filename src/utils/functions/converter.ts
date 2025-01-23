@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer';
-import fs from 'node:fs';
+import { readFile } from 'node:fs/promises';
 
 /**
  * Change a date timezone to the one defined in the config.
@@ -19,9 +19,9 @@ export function convertTZ(date: Date, tzString: string): Date {
  * Function to encode file data to base64 encoded string
  * @param file - file to encode
  */
-export function base64Encode(file: string) {
+export async function base64Encode(file: string) {
 	// read binary data
-	const bitmap = fs.readFileSync(file);
+	const bitmap = await readFile(file);
 
 	// convert binary data to base64 encoded string
 	return Buffer.from(bitmap).toString('base64');

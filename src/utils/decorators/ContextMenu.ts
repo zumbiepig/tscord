@@ -1,4 +1,5 @@
 import { ContextMenu as ContextMenuX } from 'discordx';
+import { basename } from 'path';
 
 import {
 	constantPreserveDots,
@@ -23,7 +24,7 @@ import type {
  */
 export function ContextMenu(options: ContextMenuOptions) {
 	let localizationSource: TranslationsNestedPaths | null = null;
-	const commandNameFromFile = getCallerFile(1)?.split('/').pop()?.split('.')[0];
+	const commandNameFromFile = (/^(.*)\..*$/.exec(basename(getCallerFile(1)??'')))?.[1];
 
 	if (options.localizationSource)
 		localizationSource = constantPreserveDots(

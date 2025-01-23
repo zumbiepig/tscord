@@ -36,7 +36,7 @@ export default class ReadyEvent {
 		this.scheduler.startAllJobs();
 
 		// log startup
-		this.logger.logStartingConsole();
+		await this.logger.logStartingConsole();
 
 		// synchronize guilds between discord and the database
 		await syncAllGuilds(client);

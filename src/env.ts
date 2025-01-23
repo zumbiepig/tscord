@@ -1,10 +1,12 @@
-import process from 'node:process';
+import 'dotenv';
+
+import {env} from 'node:process';
 
 import { cleanEnv, host, port, str } from 'envalid';
 
 import { apiConfig, generalConfig, mikroORMConfig } from '@/configs';
 
-export default cleanEnv(process.env, {
+export default cleanEnv(env, {
 	NODE_ENV: str({ choices: ['production', 'development'] }),
 
 	BOT_TOKEN: str(),
@@ -23,7 +25,7 @@ export default cleanEnv(process.env, {
 
 export const validateEnv = function () {
 	const config =
-		mikroORMConfig[process.env.NODE_ENV as 'production' | 'development'];
+		mikroORMConfig[env['NODE_ENV'] as 'production' | 'development'];
 
 	cleanEnv(process.env, {
 		NODE_ENV: str({ choices: ['production', 'development'] }),

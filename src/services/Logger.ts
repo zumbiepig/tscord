@@ -1,13 +1,12 @@
+import { createWriteStream, existsSync } from 'node:fs';
 import {
-	appendFileSync,
-	createWriteStream,
-	existsSync,
-	mkdirSync,
-	readdirSync,
-	writeFileSync,
-} from 'node:fs';
-import { unlink } from 'node:fs/promises';
-import path from 'node:path';
+	appendFile,
+	mkdir,
+	readdir,
+	rm,
+} from 'node:fs/promises';
+import { join } from 'node:path';
+import { cwd } from 'node:process';
 
 import archiver from 'archiver';
 import boxen from 'boxen';
@@ -44,17 +43,10 @@ import {
 } from '@/utils/functions';
 import type { AllInteractions, InteractionsConstants } from '@/utils/types';
 
-const defaultConsole = { ...console };
-
 @Service()
 export class Logger {
-	private readonly logPath: string = path.join(
-		import.meta.dir,
-		'..',
-		'..',
-		'logs',
-	);
-	private readonly logArchivePath: string = path.join(this.logPath, 'archives');
+	private readonly logPath: string = join(cwd(), 'logs');
+	private readonly logArchivePath: string = join(this.logPath, 'archives');
 
 	private readonly levels = ['info', 'warn', 'error'] as const;
 	private embedLevelBuilder = {
@@ -124,10 +116,6 @@ export class Logger {
 		}
 	}
 
-	// =================================
-	// ======= Base log function =======
-	// =================================
-
 	private async baseLog(
 		level: (typeof this.levels)[number],
 		...args: string[]
@@ -140,10 +128,6 @@ export class Logger {
 			await this.log(message, level);
 		}
 	}
-
-	// =================================
-	// ======== Output Providers =======
-	// =================================
 
 	/**
 	 * Log a message in the console.
@@ -165,7 +149,7 @@ export class Logger {
 			: `${level} [${chalk.dim.gray(formatDate(new Date()))}] ${message}`;
 		if (level === 'error') templatedMessage = chalk.red(templatedMessage);
 
-		defaultConsole[level](templatedMessage);
+		console[level](templatedMessage);
 
 		// save the last logs tail queue
 		if (this.lastLogsTail.length >= logsConfig.logTailMaxSize)
@@ -179,20 +163,13 @@ export class Logger {
 	 * @param message the message to log
 	 * @param level info (default) | warn | error
 	 */
-	file(message: string, level: (typeof this.levels)[number] = 'info') {
+	async file(message: string, level: (typeof this.levels)[number] = 'info') {
 		if (!validString(message)) return;
 
-		const templatedMessage = `[${formatDate(new Date())}] ${message}`;
-
-		const fileName = `${this.logPath}/${level}.log`;
-
 		// create the folder if it doesn't exist
-		if (!existsSync(this.logPath)) mkdirSync(this.logPath);
+		if (!existsSync(this.logPath)) await mkdir(this.logPath);
 
-		// create file if it doesn't exist
-		if (!existsSync(fileName)) writeFileSync(fileName, '');
-
-		appendFileSync(fileName, `${templatedMessage}\n`);
+		await appendFile(join(this.logPath, `${level}.log`), `[${formatDate(new Date())}] ${message}\n`);
 	}
 
 	/**
@@ -229,10 +206,6 @@ export class Logger {
 		}
 	}
 
-	// =================================
-	// =========== Archive =============
-	// =================================
-
 	/**
 	 * Archive the logs in a zip file each day.
 	 */
@@ -240,69 +213,40 @@ export class Logger {
 	async archiveLogs() {
 		if (!logsConfig.archive.enabled) return;
 
-		const date = dayjs().subtract(1, 'day').format('YYYY-MM-DD');
-		const currentLogsPaths = readdirSync(this.logPath).filter((file) =>
-			file.endsWith('.log'),
-		);
-		const output = createWriteStream(
-			`${this.logArchivePath}/logs-${date}.tar.gz`,
-		);
+		if (!existsSync(this.logPath)) return;
+		if (!existsSync(this.logArchivePath)) await mkdir(this.logArchivePath);
 
-		if (!existsSync(this.logArchivePath)) mkdirSync(this.logArchivePath);
-
-		const archive = archiver('tar', {
-			gzip: true,
-			gzipOptions: {
-				level: 9, // maximum compression
-			},
+		const archive = archiver('zip', {
+			zlib: { level: 9 }
 		});
 
-		archive.pipe(output);
+		archive.pipe(createWriteStream(
+			join(this.logArchivePath, `logs-${dayjs().subtract(1, 'day').format('YYYY-MM-DD')}.zip`),
+		));
 
 		// add files to the archive
-		for (const logPath of currentLogsPaths)
-			archive.file(`${this.logPath}/${logPath}`, { name: logPath });
+		for (const currentLogPath of (await readdir(this.logPath)).filter((file) => file.endsWith('.log'))) {
+			const path = join(this.logPath, currentLogPath);
+			archive.file(path, { name: currentLogPath });
+			await rm(path);
+		}
 
 		// create archive
 		await archive.finalize();
 
-		// delete old logs
-		this.deleteCurrentLogs();
-
 		// retention policy
-		await this.deleteOldLogArchives();
-	}
-
-	private deleteCurrentLogs() {
-		const currentLogsPaths = readdirSync(this.logPath).filter((file) =>
-			file.endsWith('.log'),
-		);
-
-		for (const logPath of currentLogsPaths) {
-			// empty the file
-			writeFileSync(`${this.logPath}/${logPath}`, '');
+		for (const file of await readdir(this.logArchivePath)) {
+			const match = /^logs-(.+).zip$/.exec(file);
+			if (match?.[1]) {
+				const date = dayjs(match[1]);
+				if (date.isBefore(dayjs().subtract(logsConfig.archive.retention, 'day')))
+					await rm(join(this.logArchivePath, file));
+			}
 		}
 	}
-
-	private async deleteOldLogArchives() {
-		const archives = readdirSync(this.logArchivePath).filter((file) =>
-			file.endsWith('.tar.gz'),
-		);
-
-		for (const archive of archives) {
-			const date = dayjs(archive.split('logs-')[1]?.split('.tar.gz')[0]);
-			console.log(date.format('YYYY-MM-DD'));
-			if (date.isBefore(dayjs().subtract(logsConfig.archive.retention, 'day')))
-				await unlink(`${this.logArchivePath}/${archive}`);
-		}
-	}
-
-	// =================================
-	// =========== Shortcut ============
-	// =================================
 
 	/**
-	 * Shortcut function that will log in the console, and optionally in a file or discord channel depending on params.
+	 * Helper function that will log in the console, and optionally in a file or discord channel depending on params.
 	 * @param message message to log
 	 * @param level info (default) | warn | error
 	 * @param saveToFile if true, the message will be saved to a file (default to true)
@@ -320,15 +264,11 @@ export class Logger {
 		this.console(message, level);
 
 		// save log to file
-		if (saveToFile) this.file(message, level);
+		if (saveToFile) await this.file(message, level);
 
 		// send to discord channel
 		if (channelId) await this.discordChannel(channelId, message, level);
 	}
-
-	// =================================
-	// ========= Log Templates =========
-	// =================================
 
 	/**
 	 * Logs any interaction that is not excluded in the config.
@@ -349,7 +289,7 @@ export class Logger {
 		const chalkedMessage = `(${chalk.bold.white(type)}) "${chalk.bold.green(action)}" ${channel instanceof TextChannel || channel instanceof ThreadChannel ? `${chalk.dim.italic.gray('in channel')} ${chalk.bold.blue(`#${channel.name}`)}` : ''} ${guild ? `${chalk.dim.italic.gray('in guild')} ${chalk.bold.blue(guild.name)}` : ''} ${user ? `${chalk.dim.italic.gray('by')} ${chalk.bold.blue(`${user.username}#${user.discriminator}`)}` : ''}`;
 
 		if (logsConfig.interaction.console) this.console(chalkedMessage);
-		if (logsConfig.interaction.file) this.file(message);
+		if (logsConfig.interaction.file) await this.file(message);
 		if (logsConfig.interaction.channel) {
 			await this.discordChannel(logsConfig.interaction.channel, {
 				embeds: [
@@ -419,7 +359,7 @@ export class Logger {
 		const chalkedMessage = `(${chalk.bold.white('NEW_USER')}) ${chalk.bold.green(user.tag)} (${chalk.bold.blue(user.id)}) ${chalk.dim.italic.gray('has been added to the db')}`;
 
 		if (logsConfig.newUser.console) this.console(chalkedMessage);
-		if (logsConfig.newUser.file) this.file(message);
+		if (logsConfig.newUser.file) await this.file(message);
 		if (logsConfig.newUser.channel) {
 			await this.discordChannel(logsConfig.newUser.channel, {
 				embeds: [
@@ -463,7 +403,7 @@ export class Logger {
 			const chalkedMessage = `(${chalk.bold.white(type)}) ${chalk.dim.italic.gray('Guild')} ${guild ? `${chalk.bold.green(guild.name)} (${chalk.bold.blue(guildId)})` : guildId} ${chalk.dim.italic.gray(additionalMessage)}`;
 
 			if (logsConfig.guild.console) this.console(chalkedMessage);
-			if (logsConfig.guild.file) this.file(message);
+			if (logsConfig.guild.file) await this.file(message);
 			if (logsConfig.guild.channel) {
 				await this.discordChannel(logsConfig.guild.channel, {
 					embeds: [
@@ -542,7 +482,7 @@ export class Logger {
 		}
 
 		if (logsConfig.error.console) this.console(chalkedMessage, 'error');
-		if (logsConfig.error.file) this.file(message, 'error');
+		if (logsConfig.error.file) await this.file(message, 'error');
 		if (logsConfig.error.channel && env.isProduction) {
 			await this.discordChannel(
 				logsConfig.error.channel,
@@ -564,10 +504,6 @@ export class Logger {
 		}
 	}
 
-	// =================================
-	// ============= Other =============
-	// =================================
-
 	getLastLogs() {
 		return this.lastLogsTail;
 	}
@@ -576,7 +512,7 @@ export class Logger {
 		this.spinner.start(text);
 	}
 
-	logStartingConsole() {
+	async logStartingConsole() {
 		const symbol = '✓';
 		const tab = '\u200B  \u200B';
 
@@ -625,9 +561,7 @@ export class Logger {
 		);
 
 		// entities
-		const entities = readdirSync(
-			path.join(import.meta.dir, '..', 'entities'),
-		).filter(
+		const entities = (await readdir(join(cwd(), 'src', 'entities'))).filter(
 			(entity) =>
 				!entity.startsWith('index') && !entity.startsWith('BaseEntity'),
 		);
@@ -646,9 +580,9 @@ export class Logger {
 		);
 
 		// services
-		const services = readdirSync(
-			path.join(import.meta.dir, '..', 'services'),
-		).filter((service) => !service.startsWith('index'));
+		const services = (await readdir(join(cwd(), 'src', 'services'))).filter(
+			(service) => !service.startsWith('index'),
+		);
 
 		const pluginsServicesCount = this.pluginsManager.plugins.reduce(
 			(acc, plugin) => acc + Object.values(plugin.services).length,

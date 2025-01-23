@@ -3,7 +3,10 @@ import { isValidCron } from 'cron-validator';
 import { container, type InjectionToken } from 'tsyringe';
 
 import { generalConfig } from '@/configs';
+import { Scheduler } from '@/services';
 import { resolveDependency } from '@/utils/functions';
+
+const scheduler = await resolveDependency(Scheduler);
 
 /**
  * Schedule a job to be executed at a specific time (cron)
@@ -37,13 +40,6 @@ export function Schedule(cronExpression: string, jobName?: string) {
 			target,
 		);
 
-		import('@/services')
-			.then(async (services) => {
-				const scheduler = await resolveDependency(services.Scheduler);
-				scheduler.addJob(jobName ?? propertyKey, job);
-			})
-			.catch(() => {
-				throw new Error('Failed to schedule job');
-			});
+		scheduler.addJob(jobName ?? propertyKey, job);
 	};
 }

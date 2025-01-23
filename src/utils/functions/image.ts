@@ -15,8 +15,8 @@ export async function getImage(imageName: string): Promise<string | null> {
 		$or: [
 			{ fileName: imageName },
 			{ fileName: `${imageName}.png` },
-			{ fileName: `${imageName}.jpg` },
 			{ fileName: `${imageName}.jpeg` },
+			{ fileName: `${imageName}.jpg` },
 			{ fileName: `${imageName}.gif` },
 		],
 	});

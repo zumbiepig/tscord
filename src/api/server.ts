@@ -42,7 +42,7 @@ export class Server {
 	@CreateRequestContext()
 	async start() {
 		const server = await PlatformExpress.bootstrap(Server, {
-			rootDir: import.meta.dir,
+			rootDir: import.meta.dirname,
 			httpPort: env.API_PORT,
 			httpsPort: false,
 			acceptMimes: ['application/json'],

@@ -22,10 +22,6 @@ export default class SimpleCommandCreateEvent {
 		private eventManager: EventManager,
 	) {}
 
-	// =============================
-	// ========= Handler ===========
-	// =============================
-
 	@OnCustom('simpleCommandCreate')
 	async simpleCommandCreateHandler(command: SimpleCommandMessage) {
 		// insert user in db if not exists
@@ -38,10 +34,6 @@ export default class SimpleCommandCreateEvent {
 		await this.stats.registerSimpleCommand(command);
 		await this.logger.logInteraction(command);
 	}
-
-	// =============================
-	// ========== Emitter ==========
-	// =============================
 
 	@On('messageCreate')
 	@Guard(Maintenance)

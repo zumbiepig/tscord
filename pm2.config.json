@@ -2,7 +2,7 @@
 	"apps": [
 		{
 			"name": "TSCord",
-			"script": "bun",
+			"script": "npm",
 			"args": "run start"
 		}
 	]

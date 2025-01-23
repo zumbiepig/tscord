@@ -1,22 +1,24 @@
 {
-	"extends": ["@tsconfig/bun", "@tsconfig/strictest"],
+	"extends": ["@tsconfig/strictest"],
 	"include": ["src/**/*"],
 	"compilerOptions": {
 		"rootDir": "src",
 		"outDir": "dist",
 
-		"noEmit": false,
-		"allowImportingTsExtensions": false,
+		"lib": ["ESNext"],
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleDetection": "force",
+    "moduleResolution": "bundler",
+
+    "verbatimModuleSyntax": true,
 
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
-		"resolveJsonModule": true,
 
 		"paths": {
-			"@/packageJson": ["./package.json"],
-
-			"@/env": ["./src/env.ts"],
-			"@/env/*": ["./src/plugins/*/env.ts"],
+			"@/env": ["./src/env"],
+			"@/env/*": ["./src/plugins/*/env"],
 
 			"@/api/controllers": ["./src/api/controllers"],
 			"@/api/controllers/*": ["./src/plugins/*/api/controllers"],
@@ -24,7 +26,7 @@
 			"@/api/middlewares": ["./src/api/middlewares"],
 			"@/api/middlewares/*": ["./src/plugins/*/api/middlewares"],
 
-			"@/api/server": ["./src/api/server.ts"],
+			"@/api/server": ["./src/api/server"],
 
 			"@/configs": ["./src/configs"],
 			"@/configs/*": ["./src/plugins/*/configs"],

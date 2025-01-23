@@ -14,18 +14,13 @@ export class Log {
 		});
 	}
 
-	use(@Context() { request }: PlatformContext) {
-		// don't log anything if the request has a `logIgnore` query param
-		if (!request.query['logIgnore']) {
-			const { method, url } = request;
+	async use(@Context() { request }: PlatformContext) {
+		const { method, url } = request;
 
-			const message = `(API) ${method} - ${url}`;
-			const chalkedMessage = `(${chalk.bold.white('API')}) ${chalk.bold.green(method)} - ${chalk.bold.blue(url)}`;
+		const message = `(API) ${method} - ${url}`;
+		const chalkedMessage = `(${chalk.bold.white('API')}) ${chalk.bold.green(method)} - ${chalk.bold.blue(url)}`;
 
-			this.logger.console(chalkedMessage);
-			this.logger.file(message);
-		} else {
-			delete request.query['logIgnore'];
-		}
+		this.logger.console(chalkedMessage);
+		await this.logger.file(message);
 	}
 }

@@ -13,10 +13,10 @@ import { Client, Discord } from 'discordx';
 import { Guard } from 'discordx';
 
 import { generalConfig } from '@/configs';
-import packageJson from '@/packageJson';
 import { Stats } from '@/services';
 import { Injectable, Slash } from '@/utils/decorators';
 import { getColor, isValidUrl, timeAgo } from '@/utils/functions';
+import { getPackageDotJson, getTscordVersion } from '@/utils/functions';
 
 dayjs.extend(relativeTime);
 
@@ -97,7 +97,7 @@ export default class InfoCommand {
 		 */
 		fields.push({
 			name: 'Framework/template',
-			value: `[TSCord](https://github.com/barthofu/tscord) (v${(packageJson as { tscord: { version: string } }).tscord.version})`,
+			value: `[TSCord](https://github.com/barthofu/tscord) (v${getTscordVersion()})`,
 			inline: true,
 		});
 
@@ -106,7 +106,7 @@ export default class InfoCommand {
 		 */
 		fields.push({
 			name: 'Libraries',
-			value: `[discord.js](https://discord.js.org/) (v${(packageJson as { dependencies: Record<string, string> }).dependencies['discord.js']?.replace(/[><=~^]/g, '') ?? ''})\n[discordx](https://discordx.js.org/) (v${(packageJson as { dependencies: Record<string, string> }).dependencies['discordx']?.replace(/[><=~^]/g, '') ?? ''})`,
+			value: `[discord.js](https://discord.js.org/) (v${(getPackageDotJson() as { dependencies: Record<string, string> }).dependencies['discord.js']?.replace(/[><=~^]/g, '') ?? ''})\n[discordx](https://discordx.js.org/) (v${(getPackageDotJson() as { dependencies: Record<string, string> }).dependencies['discordx']?.replace(/[><=~^]/g, '') ?? ''})`,
 			inline: true,
 		});
 

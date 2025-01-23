@@ -9,10 +9,6 @@ import { EntityRepository } from '@mikro-orm/sqlite';
 import { BaseEntity } from '@/utils/classes';
 import type { DataType } from '@/utils/types';
 
-// ===========================================
-// ================= Entity ==================
-// ===========================================
-
 @Entity({ repository: () => DataRepository })
 export class Data extends BaseEntity {
 	[EntityRepositoryType]?: DataRepository;
@@ -23,10 +19,6 @@ export class Data extends BaseEntity {
 	@Property()
 	value = '';
 }
-
-// ===========================================
-// =========== Custom Repository =============
-// ===========================================
 
 export class DataRepository extends EntityRepository<Data> {
 	async get<T extends keyof DataType>(key: T): Promise<DataType[T]> {

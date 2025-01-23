@@ -1,4 +1,5 @@
 import { rmdir } from 'node:fs/promises';
+import { join } from 'node:path';
 
 import { type AnyEntity, type EntityClass } from '@mikro-orm/core';
 import { glob } from 'fast-glob';
@@ -88,12 +89,12 @@ export class PluginsManager {
 
 		const pluginNames = this._plugins.map((plugin) => plugin.name);
 		for (const locale of locales) {
-			for (const path of await glob(`./src/i18n/${locale}/*/index.ts`)) {
-				const name =
-					new RegExp(`src/i18n/${locale}/(.+)/index.ts$`).exec(path)?.[1] ??
-					undefined;
+			for (const path of await glob(join('src', 'i18n', locale, '*', 'index.ts'))) {
+				const name = new RegExp(join('src', 'i18n', locale, '(.+)', 'index.ts$')).exec(
+					path,
+				)?.[1];
 				if (name && !pluginNames.includes(name))
-					await rmdir(`./src/i18n/${locale}/${name}`);
+					await rmdir(join('src', 'i18n', locale, name));
 			}
 		}
 

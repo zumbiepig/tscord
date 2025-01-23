@@ -8,10 +8,6 @@ import { EntityRepository } from '@mikro-orm/sqlite';
 
 import { BaseEntity } from '@/utils/classes';
 
-// ===========================================
-// ================= Entity ==================
-// ===========================================
-
 @Entity({ repository: () => UserRepository })
 export class User extends BaseEntity {
 	[EntityRepositoryType]?: UserRepository;
@@ -22,10 +18,6 @@ export class User extends BaseEntity {
 	@Property()
 	lastInteract: Date = new Date();
 }
-
-// ===========================================
-// =========== Custom Repository =============
-// ===========================================
 
 export class UserRepository extends EntityRepository<User> {
 	async updateLastInteract(userId?: string): Promise<void> {

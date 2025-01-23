@@ -1,13 +1,15 @@
 import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
-import { importx } from '@discordx/importer';
 import { type AnyEntity, type EntityClass } from '@mikro-orm/core';
+import { glob } from 'fast-glob';
 import { coerce, satisfies, valid } from 'semver';
 
 import { generalConfig } from '@/configs';
 import { type BaseTranslation, type Locales, locales } from '@/i18n';
-import packageJson from '@/packageJson';
 import { BaseController } from '@/utils/classes';
+import { getTscordVersion } from '@/utils/functions';
 
 export class Plugin {
 	// Common values
@@ -27,65 +29,68 @@ export class Plugin {
 	}
 
 	public async load(): Promise<boolean> {
-		// check if the plugin.json is present
-		if (!existsSync(`${this._path}/plugin.json`)) {
+		// read plugin.json
+		const pluginDotJson = await readFile(
+			join(this._path, 'plugin.json'),
+			'utf-8',
+		).catch(() => null);
+		if (pluginDotJson === null) {
 			this.stopLoad('plugin.json not found');
 			return false;
 		}
 
-		// read plugin.json
-		const pluginConfig = (await import(`${this._path}/plugin.json`)) as Record<
-			string,
-			string
-		>;
+		const pluginConfig = JSON.parse(pluginDotJson) as {
+			name: string;
+			version: string;
+			tscordVersion: string;
+		};
 
-		// check if the plugin.json is valid
-		if (!pluginConfig['name']) {
+		// plugin name
+		if (!pluginConfig.name) {
 			this.stopLoad('Missing name in plugin.json');
 			return false;
 		}
-		if (!pluginConfig['version']) {
-			this.stopLoad('Missing version in plugin.json');
-			return false;
-		}
-		if (!pluginConfig['tscordVersion']) {
-			this.stopLoad('Missing tscordVersion in plugin.json');
-			return false;
-		}
-
-		// check plugin.json values
-		if (!/^[a-zA-Z0-9_-]+$/.exec(pluginConfig['name'])) {
+		if (!/^[a-zA-Z0-9_-]+$/.exec(pluginConfig.name)) {
 			this.stopLoad('Invalid name in plugin.json');
 			return false;
 		}
-		if (!valid(pluginConfig['version'])) {
+
+		// plugin version
+		if (!pluginConfig.version) {
+			this.stopLoad('Missing version in plugin.json');
+			return false;
+		}
+		if (!valid(pluginConfig.version)) {
+			this.stopLoad('Invalid version in plugin.json');
+			return false;
+		}
+
+		// compatible tscord version
+		if (!pluginConfig.tscordVersion) {
+			this.stopLoad('Missing tscordVersion in plugin.json');
+			return false;
+		}
+		if (!valid(pluginConfig.tscordVersion)) {
 			this.stopLoad('Invalid version in plugin.json');
 			return false;
 		}
 
 		// check if the plugin is compatible with the current version of Tscord
 		if (
-			!satisfies(
-				coerce(
-					(packageJson as { tscord: { version: string } }).tscord.version,
-				) ?? '',
-				pluginConfig['tscordVersion'],
-			)
+			!satisfies(coerce(getTscordVersion()) ?? '', pluginConfig.tscordVersion)
 		) {
-			this.stopLoad(
-				`Incompatible with TSCord v${(packageJson as { tscord: { version: string } }).tscord.version}`,
-			);
+			this.stopLoad(`Incompatible with TSCord v${getTscordVersion()}`);
 			return false;
 		}
 
-		if (!existsSync(`${this._path}/main.ts`)) {
+		if (!existsSync(join(this._path, 'main.ts'))) {
 			this.stopLoad(`Missing main entrypoint (main.ts)`);
 			return false;
 		}
 
 		// assign common values
-		this._name = pluginConfig['name'];
-		this._version = pluginConfig['version'];
+		this._name = pluginConfig.name;
+		this._version = pluginConfig.version;
 
 		// Load specific values
 		this._entities = await this.getEntities();
@@ -105,24 +110,21 @@ export class Plugin {
 	}
 
 	private async getControllers() {
-		if (!existsSync(`${this._path}/api/controllers`)) return {};
-		return (await import(`${this._path}/api/controllers`)) as Record<
-			string,
-			typeof BaseController
-		>;
+		const path = join(this._path, 'api', 'controllers');
+		if (!existsSync(path)) return {};
+		return (await import(path)) as Record<string, typeof BaseController>;
 	}
 
 	private async getEntities() {
-		if (!existsSync(`${this._path}/entities`)) return {};
-		return (await import(`${this._path}/entities`)) as Record<
-			string,
-			EntityClass<AnyEntity>
-		>;
+		const path = join(this._path, 'entities');
+		if (!existsSync(path)) return {};
+		return (await import(path)) as Record<string, EntityClass<AnyEntity>>;
 	}
 
 	private async getServices() {
-		if (!existsSync(`${this._path}/services`)) return {};
-		return (await import(`${this._path}/services`)) as Record<string, unknown>;
+		const path = join(this._path, 'services');
+		if (!existsSync(path)) return {};
+		return (await import(path)) as Record<string, unknown>;
 	}
 
 	private async getTranslations(): Promise<Record<Locales, BaseTranslation>> {
@@ -132,7 +134,7 @@ export class Plugin {
 		>;
 
 		for (const locale of locales) {
-			const path = `${this._path}/i18n/${locale}.ts`;
+			const path = join(this._path, 'i18n', `${locale}.ts`);
 			if (!existsSync(path)) {
 				if (locale === generalConfig.defaultLocale) {
 					this.stopLoad(
@@ -153,15 +155,23 @@ export class Plugin {
 	}
 
 	public async execMain() {
-		await import(`${this._path}/main.ts`);
+		await import(join(this._path, 'main.ts'));
 	}
 
 	public async importCommands() {
-		await importx(`${this._path}/commands/**/*.ts`);
+		return Promise.all(
+			(await glob(join(this._path, 'commands', '**', '*.ts'))).map((file) =>
+				import(file),
+			),
+		)
 	}
 
 	public async importEvents() {
-		await importx(`${this._path}/events/**/*.ts`);
+		return Promise.all(
+			(await glob(join(this._path, 'events', '**', '*.ts'))).map((file) =>
+				import(file),
+			),
+		)
 	}
 
 	get path() {

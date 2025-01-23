@@ -2,10 +2,7 @@
 # to optimize the build process time and reduce 
 # the final image size.
 
-# ============================
-# ==== Dependencies stage ====
-# ============================
-
+# Dependencies stage
 FROM node:20.11-alpine as dependencies
 
     WORKDIR /app
@@ -18,10 +15,7 @@ FROM node:20.11-alpine as dependencies
         npm ci --silent && \
         apk del .build-deps
 
-# ======================
-# ===== Build stage ====
-# ======================
-
+# Build stage
 FROM node:20.11-alpine as builder
 
     WORKDIR /app
@@ -41,10 +35,7 @@ FROM node:20.11-alpine as builder
     # build the project
     RUN npm run build
 
-# ========================
-# ===== Prepare stage ====
-# ========================
-
+# Prepare stage
 FROM node:20.11-alpine as prepare
 
     WORKDIR /app
@@ -58,10 +49,7 @@ FROM node:20.11-alpine as prepare
     # purge dev dependencies
     RUN npm prune --omit=dev
 
-# =====================
-# ===== Run stage =====
-# =====================
-
+# Run stage
 FROM node:20.11-alpine as runner
 
     WORKDIR /app

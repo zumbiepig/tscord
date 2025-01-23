@@ -1,4 +1,6 @@
-import fs from 'node:fs';
+import { readdir, stat } from 'node:fs/promises';
+import { join } from 'node:path';
+import { promisify } from 'node:util';
 
 import {
 	type EntityName,
@@ -7,7 +9,7 @@ import {
 	MikroORM,
 	type Options,
 } from '@mikro-orm/core';
-import fastFolderSizeSync from 'fast-folder-size/sync';
+import fastFolderSize from 'fast-folder-size';
 import { backup, restore } from 'saveqlite';
 import { delay, inject } from 'tsyringe';
 
@@ -16,7 +18,7 @@ import * as entities from '@/entities';
 import env from '@/env';
 import { Logger, PluginsManager, Store } from '@/services';
 import { Schedule, Service } from '@/utils/decorators';
-import { resolveDependency } from '@/utils/functions';
+import { formatDate, resolveDependency } from '@/utils/functions';
 import type {
 	DatabaseDriver,
 	DatabaseEntityManager,
@@ -90,31 +92,29 @@ export class Database {
 	 */
 	@Schedule('0 0 * * *')
 	async backup(snapshotName?: string): Promise<boolean> {
-		const { formatDate } = await import('@/utils/functions');
-
 		if (!databaseConfig.enableBackups && !snapshotName) return false;
+
 		if (!this.isSQLiteDatabase()) {
 			await this.logger.log("Database is not SQLite, couldn't backup");
-
 			return false;
 		}
 
-		const backupPath = databaseConfig.path + '/backups';
-		if (!backupPath) {
-			await this.logger.log("Backup path not set, couldn't backup", 'error');
-
+		if (!databaseConfig.path) {
+			await this.logger.log(
+				"Database path not set, couldn't backup database",
+				'error',
+			);
 			return false;
 		}
 
 		if (!snapshotName)
 			snapshotName = `snapshot-${formatDate(new Date(), 'onlyDateFileName')}`;
-		const objectsPath = `${backupPath}objects/` as `${string}/`;
 
 		try {
 			await backup(
 				mikroORMConfig[env.NODE_ENV].dbName ?? '',
 				`${snapshotName}.txt`,
-				objectsPath,
+				`${join(databaseConfig.path, 'backups', 'objects')}/`,
 			);
 
 			return true;
@@ -126,8 +126,10 @@ export class Database {
 						? e.message
 						: 'Unknown error';
 
-			await this.logger.log(`Couldn't backup : ${errorMessage}`, 'error');
-
+			await this.logger.log(
+				`Couldn't backup database: ${errorMessage}`,
+				'error',
+			);
 			return false;
 		}
 	}
@@ -147,16 +149,16 @@ export class Database {
 			return false;
 		}
 
-		const backupPath = databaseConfig.path + '/backups';
-		if (!backupPath)
-			await this.logger.log("Backup path not set, couldn't restore", 'error');
+		if (!databaseConfig.path)
+			await this.logger.log(
+				"Database path not set, couldn't restore backup",
+				'error',
+			);
 
 		try {
-			console.debug(mikroORMConfig[env.NODE_ENV].dbName);
-			console.debug(backupPath + snapshotName);
 			await restore(
 				mikroORMConfig[env.NODE_ENV].dbName ?? '',
-				backupPath + snapshotName,
+				join(databaseConfig.path, 'backups', snapshotName),
 			);
 
 			await this.refreshConnection();
@@ -174,23 +176,21 @@ export class Database {
 	}
 
 	async getBackupList(): Promise<string[] | null> {
-		const backupPath = databaseConfig.path + '/backups';
-		if (!backupPath) {
+		if (!databaseConfig.path) {
 			await this.logger.log(
-				"Backup path not set, couldn't get list of backups",
+				"Database path not set, couldn't get list of backups",
 				'error',
 			);
-
 			return null;
 		}
 
-		const files = fs.readdirSync(backupPath);
-		const backupList = files.filter((file) => file.startsWith('snapshot'));
+		const files = await readdir(join(databaseConfig.path, 'backups'));
+		const backupList = files.filter((file) => /^snapshot-.+\.txt/.exec(file));
 
 		return backupList;
 	}
 
-	getSize(): DatabaseSize {
+	async getSize(): Promise<DatabaseSize> {
 		const size: DatabaseSize = {
 			db: null,
 			backups: null,
@@ -199,18 +199,15 @@ export class Database {
 		if (this.isSQLiteDatabase()) {
 			const dbPath = mikroORMConfig[env.NODE_ENV].dbName;
 			if (dbPath) {
-				const dbSize = fs.statSync(dbPath).size;
-
+				const dbSize = (await stat(dbPath)).size;
 				size.db = dbSize;
 			}
 		}
 
-		const backupPath = databaseConfig.path + '/backups';
-		if (backupPath) {
-			const backupSize = fastFolderSizeSync(backupPath);
-
-			size.backups = backupSize ?? null;
-		}
+		const backupSize = await promisify(fastFolderSize)(
+			join(databaseConfig.path, 'backups'),
+		);
+		size.backups = backupSize ?? null;
 
 		return size;
 	}

@@ -8,10 +8,6 @@ import { EntityRepository } from '@mikro-orm/sqlite';
 
 import { BaseEntity } from '@/utils/classes';
 
-// ===========================================
-// ================= Entity ==================
-// ===========================================
-
 @Entity({ repository: () => ImageRepository })
 export class Image extends BaseEntity {
 	[EntityRepositoryType]?: ImageRepository;
@@ -40,10 +36,6 @@ export class Image extends BaseEntity {
 	@Property()
 	deleteHash!: string;
 }
-
-// ===========================================
-// =========== Custom Repository =============
-// ===========================================
 
 export class ImageRepository extends EntityRepository<Image> {
 	async findByTags(tags: string[], explicit = true): Promise<Image[]> {

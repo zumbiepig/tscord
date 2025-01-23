@@ -74,10 +74,10 @@ export function sanitizeLocales<K extends SanitizedOptions>(option: K) {
 }
 
 export function getLocalizationFromPathString(
-	path: TranslationsNestedPaths,
+	localePath: TranslationsNestedPaths,
 	locale?: Locales,
 ): string {
-	return path.split('.').reduce<unknown>(
+	return localePath.split('.').reduce<unknown>(
 		(obj, key) => {
 			return (obj as Record<string, unknown>)[key] ?? undefined;
 		},
