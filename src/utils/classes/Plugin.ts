@@ -160,18 +160,18 @@ export class Plugin {
 
 	public async importCommands() {
 		return Promise.all(
-			(await glob(join(this._path, 'commands', '**', '*.ts'))).map((file) =>
-				import(file),
+			(await glob(join(this._path, 'commands', '**', '*.ts'))).map(
+				(file) => import(file),
 			),
-		)
+		);
 	}
 
 	public async importEvents() {
 		return Promise.all(
-			(await glob(join(this._path, 'events', '**', '*.ts'))).map((file) =>
-				import(file),
+			(await glob(join(this._path, 'events', '**', '*.ts'))).map(
+				(file) => import(file),
 			),
-		)
+		);
 	}
 
 	get path() {

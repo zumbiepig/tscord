@@ -1,10 +1,5 @@
-import { createWriteStream, existsSync } from 'node:fs';
-import {
-	appendFile,
-	mkdir,
-	readdir,
-	rm,
-} from 'node:fs/promises';
+import { createReadStream, createWriteStream, existsSync } from 'node:fs';
+import { appendFile, mkdir, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { cwd } from 'node:process';
 
@@ -169,7 +164,10 @@ export class Logger {
 		// create the folder if it doesn't exist
 		if (!existsSync(this.logPath)) await mkdir(this.logPath);
 
-		await appendFile(join(this.logPath, `${level}.log`), `[${formatDate(new Date())}] ${message}\n`);
+		await appendFile(
+			join(this.logPath, `${level}.log`),
+			`[${formatDate(new Date())}] ${message}\n`,
+		);
 	}
 
 	/**
@@ -207,7 +205,7 @@ export class Logger {
 	}
 
 	/**
-	 * Archive the logs in a zip file each day.
+	 * Archive the logs in a tar.gz file each day.
 	 */
 	@Schedule('0 0 * * *')
 	async archiveLogs() {
@@ -216,18 +214,28 @@ export class Logger {
 		if (!existsSync(this.logPath)) return;
 		if (!existsSync(this.logArchivePath)) await mkdir(this.logArchivePath);
 
-		const archive = archiver('zip', {
-			zlib: { level: 9 }
+		const archive = archiver('tar', {
+			gzip: true,
+			gzipOptions: {
+				level: 9,
+			},
 		});
 
-		archive.pipe(createWriteStream(
-			join(this.logArchivePath, `logs-${dayjs().subtract(1, 'day').format('YYYY-MM-DD')}.zip`),
-		));
+		archive.pipe(
+			createWriteStream(
+				join(
+					this.logArchivePath,
+					`logs-${dayjs().subtract(1, 'day').format('YYYY-MM-DD')}.tar.gz`,
+				),
+			),
+		);
 
 		// add files to the archive
-		for (const currentLogPath of (await readdir(this.logPath)).filter((file) => file.endsWith('.log'))) {
+		for (const currentLogPath of (await readdir(this.logPath)).filter((file) =>
+			file.endsWith('.log'),
+		)) {
 			const path = join(this.logPath, currentLogPath);
-			archive.file(path, { name: currentLogPath });
+			archive.append(createReadStream(path), { name: currentLogPath });
 			await rm(path);
 		}
 
@@ -236,10 +244,12 @@ export class Logger {
 
 		// retention policy
 		for (const file of await readdir(this.logArchivePath)) {
-			const match = /^logs-(.+).zip$/.exec(file);
+			const match = /^logs-(.+)\.tar\.gz$/.exec(file);
 			if (match?.[1]) {
 				const date = dayjs(match[1]);
-				if (date.isBefore(dayjs().subtract(logsConfig.archive.retention, 'day')))
+				if (
+					date.isBefore(dayjs().subtract(logsConfig.archive.retention, 'day'))
+				)
 					await rm(join(this.logArchivePath, file));
 			}
 		}

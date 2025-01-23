@@ -1,6 +1,6 @@
-import 'dotenv';
+import 'dotenv/config';
 
-import {env} from 'node:process';
+import { env } from 'node:process';
 
 import { cleanEnv, host, port, str } from 'envalid';
 

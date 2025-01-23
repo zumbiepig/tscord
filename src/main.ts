@@ -35,7 +35,7 @@ import {
 import { keptInstances } from '@/utils/decorators';
 import { initDataTable, resolveDependency } from '@/utils/functions';
 
-let clientSave: Client | undefined;
+let botInitialized: boolean | undefined;
 
 /**
  * Hot reload
@@ -137,6 +137,7 @@ async function init() {
 	});
 
 	// Load all new events
+	// @ts-expect-error - discordx/discord.js type overlap
 	await discordLogs(client, { debug: !env.isDev });
 	container.registerInstance(Client, client);
 
@@ -158,7 +159,7 @@ async function init() {
 		client
 			.login(env.BOT_TOKEN)
 			.then(async () => {
-				clientSave = client;
+				botInitialized = true;
 
 				// start the api server
 				if (apiConfig.enabled) {
@@ -191,11 +192,8 @@ async function init() {
 	});
 }
 
-if (!(await resolveDependency(Store)).get('botHasBeenReloaded')) {
-	console.log('Not reloading');
-	await init();
+if (botInitialized) {
+	await reload(await resolveDependency(Client));
 } else {
-	console.log('Reloading');
-	if (clientSave) await reload(clientSave);
-	else throw new Error('Error reloading bot');
+	await init();
 }

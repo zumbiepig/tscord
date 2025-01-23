@@ -89,10 +89,12 @@ export class PluginsManager {
 
 		const pluginNames = this._plugins.map((plugin) => plugin.name);
 		for (const locale of locales) {
-			for (const path of await glob(join('src', 'i18n', locale, '*', 'index.ts'))) {
-				const name = new RegExp(join('src', 'i18n', locale, '(.+)', 'index.ts$')).exec(
-					path,
-				)?.[1];
+			for (const path of await glob(
+				join('src', 'i18n', locale, '*', 'index.ts'),
+			)) {
+				const name = new RegExp(
+					join('src', 'i18n', locale, '(.+)', 'index.ts$'),
+				).exec(path)?.[1];
 				if (name && !pluginNames.includes(name))
 					await rmdir(join('src', 'i18n', locale, name));
 			}

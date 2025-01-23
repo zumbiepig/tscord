@@ -24,7 +24,9 @@ import type {
  */
 export function ContextMenu(options: ContextMenuOptions) {
 	let localizationSource: TranslationsNestedPaths | null = null;
-	const commandNameFromFile = (/^(.*)\..*$/.exec(basename(getCallerFile(1)??'')))?.[1];
+	const commandNameFromFile = /^(.*)\..*$/.exec(
+		basename(getCallerFile(1) ?? ''),
+	)?.[1];
 
 	if (options.localizationSource)
 		localizationSource = constantPreserveDots(

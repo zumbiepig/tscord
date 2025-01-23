@@ -65,7 +65,10 @@ const envMikroORMConfig: MikroORMConfigType = {
 			snapshot: true,
 		},
 
-		entities: [join('src', 'entities', '*.ts'), join('src', 'plugins', '*', 'entities', '*.ts')],
+		entities: [
+			join('src', 'entities', '*.ts'),
+			join('src', 'plugins', '*', 'entities', '*.ts'),
+		],
 
 		extensions: [Migrator, EntityGenerator],
 	},

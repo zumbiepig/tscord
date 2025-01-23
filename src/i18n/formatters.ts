@@ -1,11 +1,13 @@
 import type { FormattersInitializer } from 'typesafe-i18n';
 
-import type { Formatters, Locales } from './i18n-types';
+import type { Formatters, Locales } from './i18n-types.js';
 
 export const initFormatters: FormattersInitializer<Locales, Formatters> = (
 	_locale: Locales,
 ) => {
-	return {
+	const formatters: Formatters = {
 		// add your formatter functions here
-	} as Formatters;
+	};
+
+	return formatters;
 };

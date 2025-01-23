@@ -50,8 +50,8 @@ export class ImagesUpload {
 		if (!existsSync(this.imageFolderPath)) await mkdir(this.imageFolderPath);
 
 		// get all images inside the assets folder
-		const images = (await glob('**/*', {cwd: this.imageFolderPath}))
-			.filter((file) => { 
+		const images = (await glob('**/*', { cwd: this.imageFolderPath })).filter(
+			(file) => {
 				if (this.isValidImageFormat(file)) {
 					return true;
 				} else {
@@ -60,7 +60,8 @@ export class ImagesUpload {
 					);
 					return false;
 				}
-			});
+			},
+		);
 
 		// purge deleted images from the database, reupload expired images to imgur
 		const imagesInDb = await this.imageRepo.findAll();

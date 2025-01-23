@@ -1,11 +1,11 @@
-import dayjs from 'dayjs';
-import dayjsTimeZone from 'dayjs/plugin/timezone';
-import dayjsUTC from 'dayjs/plugin/utc';
+import dayjs from 'dayjs/esm';
+import dayjsTimeZone from 'dayjs/esm/plugin/timezone';
+import dayjsUTC from 'dayjs/esm/plugin/utc';
 
 import { generalConfig } from '@/configs';
 
-dayjs.extend(dayjsUTC);
 dayjs.extend(dayjsTimeZone);
+dayjs.extend(dayjsUTC);
 
 dayjs.tz.setDefault(generalConfig.timezone);
 
