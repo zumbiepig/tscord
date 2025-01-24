@@ -95,7 +95,7 @@ export class Database {
 		if (!databaseConfig.enableBackups && !snapshotName) return false;
 
 		if (!this.isSQLiteDatabase()) {
-			await this.logger.log("Database is not SQLite, couldn't backup");
+			await this.logger.log('warn', "Database is not SQLite, couldn't backup");
 			return false;
 		}
 
@@ -125,10 +125,9 @@ export class Database {
 					: e instanceof Error
 						? e.message
 						: 'Unknown error';
-
 			await this.logger.log(
-				`Couldn't backup database: ${errorMessage}`,
 				'error',
+				`Couldn't backup database: ${errorMessage}`,
 			);
 			return false;
 		}
@@ -142,17 +141,16 @@ export class Database {
 	async restore(snapshotName: string): Promise<boolean> {
 		if (!this.isSQLiteDatabase()) {
 			await this.logger.log(
-				"Database is not SQLite, couldn't restore",
 				'error',
+				"Database is not SQLite, couldn't restore",
 			);
-
 			return false;
 		}
 
 		if (!databaseConfig.path)
 			await this.logger.log(
-				"Database path not set, couldn't restore backup",
 				'error',
+				"Database path not set, couldn't restore backup",
 			);
 
 		try {
@@ -160,17 +158,13 @@ export class Database {
 				mikroORMConfig[env.NODE_ENV].dbName ?? '',
 				join(databaseConfig.path, 'backups', snapshotName),
 			);
-
 			await this.refreshConnection();
-
 			return true;
-		} catch (error) {
-			console.log(error);
+		} catch {
 			await this.logger.log(
-				"Snapshot file not found, couldn't restore",
 				'error',
+				"Snapshot file not found, couldn't restore",
 			);
-
 			return false;
 		}
 	}
@@ -178,8 +172,8 @@ export class Database {
 	async getBackupList(): Promise<string[] | null> {
 		if (!databaseConfig.path) {
 			await this.logger.log(
-				"Database path not set, couldn't get list of backups",
 				'error',
+				"Database path not set, couldn't get list of backups",
 			);
 			return null;
 		}

@@ -35,7 +35,7 @@ export class Plugin {
 			'utf-8',
 		).catch(() => null);
 		if (pluginDotJson === null) {
-			this.stopLoad('plugin.json not found');
+			await this.stopLoad('plugin.json not found');
 			return false;
 		}
 
@@ -47,31 +47,31 @@ export class Plugin {
 
 		// plugin name
 		if (!pluginConfig.name) {
-			this.stopLoad('Missing name in plugin.json');
+			await this.stopLoad('Missing name in plugin.json');
 			return false;
 		}
 		if (!/^[a-zA-Z0-9_-]+$/.exec(pluginConfig.name)) {
-			this.stopLoad('Invalid name in plugin.json');
+			await this.stopLoad('Invalid name in plugin.json');
 			return false;
 		}
 
 		// plugin version
 		if (!pluginConfig.version) {
-			this.stopLoad('Missing version in plugin.json');
+			await this.stopLoad('Missing version in plugin.json');
 			return false;
 		}
 		if (!valid(pluginConfig.version)) {
-			this.stopLoad('Invalid version in plugin.json');
+			await this.stopLoad('Invalid version in plugin.json');
 			return false;
 		}
 
 		// compatible tscord version
 		if (!pluginConfig.tscordVersion) {
-			this.stopLoad('Missing tscordVersion in plugin.json');
+			await this.stopLoad('Missing tscordVersion in plugin.json');
 			return false;
 		}
 		if (!valid(pluginConfig.tscordVersion)) {
-			this.stopLoad('Invalid version in plugin.json');
+			await this.stopLoad('Invalid version in plugin.json');
 			return false;
 		}
 
@@ -79,12 +79,12 @@ export class Plugin {
 		if (
 			!satisfies(coerce(getTscordVersion()) ?? '', pluginConfig.tscordVersion)
 		) {
-			this.stopLoad(`Incompatible with TSCord v${getTscordVersion()}`);
+			await this.stopLoad(`Incompatible with TSCord v${getTscordVersion()}`);
 			return false;
 		}
 
 		if (!existsSync(join(this._path, 'main.ts'))) {
-			this.stopLoad(`Missing main entrypoint (main.ts)`);
+			await this.stopLoad(`Missing main entrypoint (main.ts)`);
 			return false;
 		}
 
@@ -102,11 +102,9 @@ export class Plugin {
 		else return false;
 	}
 
-	private stopLoad(error: string): void {
+	private async stopLoad(error: string) {
 		this._valid = false;
-		console.error(
-			`Plugin ${this._name ? this._name : this._path} ${this._version ? `v${this._version}` : ''} is not valid: ${error}`,
-		);
+		await this.logger.log('error', `Plugin ${this._name ? this._name : this._path} ${this._version ? `v${this._version}` : ''} is not valid: ${error}`);
 	}
 
 	private async getControllers() {
@@ -137,14 +135,12 @@ export class Plugin {
 			const path = join(this._path, 'i18n', `${locale}.ts`);
 			if (!existsSync(path)) {
 				if (locale === generalConfig.defaultLocale) {
-					this.stopLoad(
+					await this.stopLoad(
 						`Missing translation file for default locale '${locale}'`,
 					);
 					return {} as Record<Locales, BaseTranslation>;
 				} else {
-					console.warn(
-						`Plugin ${this._name} v${this._version} is missing translations for locale '${locale}'`,
-					);
+					await this.logger.log('warn', `Plugin ${this._name} v${this._version} is missing translations for locale '${locale}'`)
 					continue;
 				}
 			}

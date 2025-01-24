@@ -90,8 +90,6 @@ async function init() {
 	// validate env values
 	validateEnv();
 
-	const logger = await resolveDependency(Logger);
-
 	// init error handler
 	await resolveDependency(ErrorHandler);
 
@@ -101,6 +99,7 @@ async function init() {
 	await pluginManager.syncTranslations();
 
 	// start spinner
+	const logger = await resolveDependency(Logger);
 	logger.startSpinner('Starting...');
 
 	// init the database
@@ -185,8 +184,8 @@ async function init() {
 					}
 				});
 			})
-			.catch((err: unknown) => {
-				console.error(err);
+			.catch(async (err: unknown) => {
+				await logger.log('error', (err as Error).message);
 				process.exit(1);
 			});
 	});

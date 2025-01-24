@@ -23,11 +23,10 @@ export class EventManager {
 			try {
 				await callback(...args);
 			} catch (error) {
-				console.error(error);
 				if (error instanceof Error)
 					await this.logger.log(
+				'error',
 						`[EventError - ${eventName}] ${error.toString()}`,
-						'error',
 					);
 			}
 		}

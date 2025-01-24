@@ -50,18 +50,19 @@ export class ImagesUpload {
 		if (!existsSync(this.imageFolderPath)) await mkdir(this.imageFolderPath);
 
 		// get all images inside the assets folder
-		const images = (await glob('**/*', { cwd: this.imageFolderPath })).filter(
-			(file) => {
-				if (this.isValidImageFormat(file)) {
-					return true;
-				} else {
-					console.warn(
-						`Image ${chalk.bold.red(file)} has an invalid format. Valid formats: ${this.validImageExtensions.join(', ')}`,
-					);
-					return false;
-				}
-			},
-		);
+		const files = await glob('**/*', { cwd: this.imageFolderPath })
+		const images = [];
+		for (const file of files) {
+			if (this.isValidImageFormat(file)) {
+				images.push(file);
+			} else {
+				await this.logger.log(
+					'warn',
+					`Image ${file} has an invalid format. Valid formats: ${this.validImageExtensions.join(', ')}`,
+					`Image ${chalk.bold.red(file)} has an invalid format. Valid formats: ${chalk.bold(this.validImageExtensions.join(', '))}`,
+				);
+			}
+		}
 
 		// purge deleted images from the database, reupload expired images to imgur
 		const imagesInDb = await this.imageRepo.findAll();
@@ -96,9 +97,11 @@ export class ImagesUpload {
 				imageInDb.basePath !== dirname(imagePath) ||
 				imageInDb.fileName !== basename(imagePath)
 			)
-				console.warn(
-					`Image ${chalk.bold.green(imagePath)} has the same hash as ${chalk.bold.green(join(imageInDb.basePath ?? '', imageInDb.fileName))} so it will be skipped`,
-				);
+			await this.logger.log(
+				'warn',
+				`Image ${imagePath} has the same hash as ${join(imageInDb.basePath ?? '', imageInDb.fileName)} so it will be skipped`,
+				`Image ${chalk.bold.green(imagePath)} has the same hash as ${chalk.bold.green(join(imageInDb.basePath ?? '', imageInDb.fileName))} so it will be skipped`
+			);
 		}
 	}
 
