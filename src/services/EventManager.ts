@@ -23,10 +23,9 @@ export class EventManager {
 			try {
 				await callback(...args);
 			} catch (error) {
-				if (error instanceof Error)
 					await this.logger.log(
 				'error',
-						`[EventError - ${eventName}] ${error.toString()}`,
+						`[EventError - ${eventName}] ${error instanceof Error ? error.message : String(error)}`,
 					);
 			}
 		}

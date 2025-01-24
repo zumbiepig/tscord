@@ -27,6 +27,7 @@ import {
 import {
 	Database,
 	ErrorHandler,
+	EventManager,
 	ImagesUpload,
 	Logger,
 	PluginsManager,
@@ -84,6 +85,7 @@ async function reload(client: Client) {
 	await db.initialize();
 
 	await logger.log('info', 'Hot reloaded', chalk.whiteBright('Hot reloaded'));
+	console.log('\n');
 }
 
 async function init() {
@@ -155,9 +157,8 @@ async function init() {
 		await pluginManager.execMains();
 
 		// log in with the bot token
-		client
-			.login(env.BOT_TOKEN)
-			.then(async () => {
+		await client.login(env.BOT_TOKEN);
+
 				botInitialized = true;
 
 				// start the api server
@@ -172,6 +173,7 @@ async function init() {
 					await imagesUpload.syncWithDatabase();
 				}
 
+				const eventManager = await resolveDependency(EventManager);
 				const store = container.resolve(Store);
 				store.select('ready').subscribe((state) => {
 					// check that all properties that are not null are set to true
@@ -180,14 +182,9 @@ async function init() {
 							.filter((value) => value !== null)
 							.every((value) => value)
 					) {
-						throw new Error('Bot services are not ready when they should be');
+						void eventManager.emit('templateReady') // the template is fully ready!
 					}
 				});
-			})
-			.catch(async (err: unknown) => {
-				await logger.log('error', (err as Error).message);
-				process.exit(1);
-			});
 	});
 }
 

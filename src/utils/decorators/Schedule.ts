@@ -4,6 +4,7 @@ import { container, type InjectionToken } from 'tsyringe';
 
 import { generalConfig } from '@/configs';
 import { Scheduler } from '@/services';
+import { InvalidCronError } from '@/utils/errors';
 import { resolveDependency } from '@/utils/functions';
 
 const scheduler = await resolveDependency(Scheduler);
@@ -15,7 +16,7 @@ const scheduler = await resolveDependency(Scheduler);
  */
 export function Schedule(cronExpression: string, jobName?: string) {
 	if (!isValidCron(cronExpression, { alias: true, seconds: true }))
-		throw new Error(`Invalid cron expression: ${cronExpression}`);
+		throw new InvalidCronError(cronExpression);
 
 	return (
 		target: unknown,

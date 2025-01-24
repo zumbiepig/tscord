@@ -8,10 +8,13 @@ import { coerce, satisfies, valid } from 'semver';
 
 import { generalConfig } from '@/configs';
 import { type BaseTranslation, type Locales, locales } from '@/i18n';
+import { Logger } from '@/services';
 import { BaseController } from '@/utils/classes';
-import { getTscordVersion } from '@/utils/functions';
+import { getTscordVersion, resolveDependency } from '@/utils/functions';
 
 export class Plugin {
+	private logger!: Logger;
+
 	// Common values
 	private _path: string;
 	private _name!: string;
@@ -29,6 +32,8 @@ export class Plugin {
 	}
 
 	public async load(): Promise<boolean> {
+		this.logger = await resolveDependency(Logger);
+
 		// read plugin.json
 		const pluginDotJson = await readFile(
 			join(this._path, 'plugin.json'),
@@ -98,8 +103,7 @@ export class Plugin {
 		this._services = await this.getServices();
 		this._translations = await this.getTranslations();
 
-		if (this._valid) return true;
-		else return false;
+		return this._valid;
 	}
 
 	private async stopLoad(error: string) {

@@ -135,8 +135,9 @@ export class Logger {
 		const formattedDate = formatDate(date, 'onlyDateFileName');
 		const formattedTime = formatDate(date, 'logs');
 		const formattedLevel = upper(level);
-		const logMessage = `[${formattedTime}] [${formattedLevel}] ${message}`;
-		const chalkedLogMessage = `[${chalk.dim(formattedTime)}] [${formattedLevel}] ${chalkedMessage ?? message}`;
+		const trimmedMessage = message.trim();
+		const logMessage = `[${formattedTime}] [${formattedLevel}] ${trimmedMessage}`;
+		const chalkedLogMessage = `[${chalk.dim(formattedTime)}] [${formattedLevel}] ${chalkedMessage?.trim() ?? trimmedMessage}`;
 
 		// log to console
 		if (logLocation.console) {
@@ -345,8 +346,8 @@ export class Logger {
 	 * @param type NEW_GUILD | DELETE_GUILD | RECOVER_GUILD
 	 */
 	public async logGuild(
-		guildId: Snowflake,
 		type: 'NEW_GUILD' | 'DELETE_GUILD' | 'RECOVER_GUILD',
+		guildId: Snowflake,
 	) {
 		const guild = await this.client.guilds.fetch(guildId).catch(() => null);
 		const additionalMessage =
@@ -394,30 +395,32 @@ export class Logger {
 	/**
 	 * Logs errors.
 	 * @param error
-	 * @param type uncaughtException, unhandledRejection
+	 * @param type uncaughtException | unhandledRejection
 	 * @param trace
 	 */
 	public async logError(
-		error: Error,
 		type: 'uncaughtException' | 'unhandledRejection',
+		error: Error,
 		trace: StackFrame[] = parse(error.stack ?? ''),
 	) {
 		let message = '(ERROR)';
-		let embedMessage = '';
-		let embedTitle = '';
 		let chalkedMessage = `(${chalk.bold.white('ERROR')})`;
+		let embedTitle = '';
+		let embedMessage = '';
 
 		if (trace[0]) {
 			message += ` ${type === 'uncaughtException' ? 'Exception' : 'Unhandled rejection'} : ${error.message}\n${trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n')}`;
-			embedMessage += `\`\`\`\n${trace.map((frame: StackFrame) => `> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n')}\n\`\`\``;
-			embedTitle += `***${type === 'uncaughtException' ? 'Exception' : 'Unhandled rejection'}* : ${error.message}**`;
 			chalkedMessage += ` ${chalk.dim.italic.gray(type === 'uncaughtException' ? 'Exception' : 'Unhandled rejection')} : ${error.message}\n${chalk.dim.italic(trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n'))}`;
+			embedTitle += `***${type === 'uncaughtException' ? 'Exception' : 'Unhandled rejection'}* : ${error.message}**`;
+			embedMessage += `\`\`\`\n${trace.map((frame: StackFrame) => `> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n')}\n\`\`\``;
 		} else {
 			if (type === 'uncaughtException') {
 				message += `An exception as occurred in a unknown file\n\t> ${error.message}`;
+				chalkedMessage += `An exception as occurred in a unknown file\n\t> ${error.message}`;
 				embedMessage += `An exception as occurred in a unknown file\n${error.message}`;
 			} else {
 				message += `An unhandled rejection as occurred in a unknown file\n\t> ${error}`;
+				chalkedMessage += `An unhandled rejection as occurred in a unknown file\n\t> ${error}`;
 				embedMessage += `An unhandled rejection as occurred in a unknown file\n${error}`;
 			}
 		}
@@ -426,7 +429,7 @@ export class Logger {
 			const paste = await this.pastebin.createPaste(
 				`${embedTitle}\n${embedMessage}`,
 			);
-			await this.log('debug', 'Message was too long, uploaded error to pastebin: ' + (paste?.getLink() ?? ''));
+			await this.log('debug', 'Error embed was too long, uploaded error to pastebin: ' + (paste?.getLink() ?? ''));
 			embedMessage = `[Pastebin of the error](https://rentry.co/${paste?.getLink() ?? ''})`;
 		}
 
@@ -456,11 +459,13 @@ export class Logger {
 	public async logStartingConsole() {
 		this.spinner.stop();
 
+		console.log('\n');
 		await this.log(
 			'info',
-			'\n━━━━━━━━━━ Started! ━━━━━━━━━━\n',
-			chalk.dim.gray('\n━━━━━━━━━━ Started! ━━━━━━━━━━\n'),
+			'━━━━━━━━━━ Started! ━━━━━━━━━━',
+			chalk.dim.gray('━━━━━━━━━━ Started! ━━━━━━━━━━'),
 		);
+		console.log('\n');
 
 		// commands
 		const slashCommands = MetadataStorage.instance.applicationCommandSlashes;

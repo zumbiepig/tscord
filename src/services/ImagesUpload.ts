@@ -111,8 +111,8 @@ export class ImagesUpload {
 		await this.imgurClient.deleteImage(image.deleteHash);
 
 		await this.logger.log(
-			`Image ${image.fileName} deleted from database because it is not in the filesystem anymore`,
 			'info',
+			`Image ${image.fileName} deleted from database because it is not in the filesystem anymore`,
 		);
 	}
 
@@ -138,8 +138,8 @@ export class ImagesUpload {
 
 			if (!uploadResponse.success) {
 				await this.logger.log(
-					`Error uploading image ${imageFileName} to imgur: ${uploadResponse.status.toString()} ${JSON.stringify(uploadResponse.data)}`,
 					'error',
+					`Error uploading image ${imageFileName} to imgur: ${uploadResponse.status.toString()} ${JSON.stringify(uploadResponse.data)}`,
 				);
 
 				return;
@@ -158,13 +158,14 @@ export class ImagesUpload {
 
 			// log the success
 			await this.logger.log(
-				`Image ${chalk.bold.green(imagePath)} uploaded to imgur`,
 				'info',
+				`Image ${imagePath} uploaded to imgur`,
+				`Image ${chalk.bold.green(imagePath)} uploaded to imgur`,
 			);
 		} catch (error) {
 			await this.logger.log(
-				error instanceof Error ? error.message : String(error),
 				'error',
+				error instanceof Error ? error.message : String(error),
 			);
 		}
 	}

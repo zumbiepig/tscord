@@ -1,4 +1,4 @@
-import { User as DUser } from 'discord.js';
+import { User as DUser, type Snowflake } from 'discord.js';
 import { Client } from 'discordx';
 
 import { Guild, User } from '@/entities';
@@ -39,7 +39,7 @@ export async function syncUser(user: DUser) {
  * @param guildId
  * @param client
  */
-export async function syncGuild(guildId: string, client: Client) {
+export async function syncGuild(guildId: Snowflake, client: Client) {
 	const [db, stats, logger] = await resolveDependencies([
 		Database,
 		Stats,

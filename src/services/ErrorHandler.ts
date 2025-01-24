@@ -12,18 +12,18 @@ export class ErrorHandler {
 			if (origin === 'unhandledRejection') {
 				return;
 			} else if (error instanceof BaseError) {
-				error.handle();
+				void error.handle();
 			} else {
-				void this.logger.logError(error, 'uncaughtException');
+				void this.logger.logError('uncaughtException', error);
 			}
 		});
 
 		// catch all unhandled rejections (promise)
 		process.on('unhandledRejection', (error: Error, _: Promise<never>) => {
 			if (error instanceof BaseError) {
-				error.handle();
+				void error.handle();
 			} else {
-				void this.logger.logError(error, 'unhandledRejection');
+				void this.logger.logError('unhandledRejection', error);
 			}
 		});
 	}

@@ -124,7 +124,7 @@ export class Database {
 					? e
 					: e instanceof Error
 						? e.message
-						: 'Unknown error';
+						: String(e);
 			await this.logger.log(
 				'error',
 				`Couldn't backup database: ${errorMessage}`,

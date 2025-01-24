@@ -20,11 +20,11 @@ import type {
  * @param options - slash options
  * ___
  *
- * [View Documentation](https://discord-ts.js.org/docs/decorators/commands/slash)
+ * [View Documentation](https://discordx.js.org/docs/decorators/commands/slash)
  *
  * @category Decorator
  */
-export function Slash(options?: ApplicationCommandOptions | string) {
+export function Slash(options?: ApplicationCommandOptions) {
 	if (!options) options = {};
 	else if (typeof options === 'string') options = { name: options };
 

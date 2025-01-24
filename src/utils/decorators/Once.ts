@@ -11,7 +11,7 @@ import {
  * @param options - event parameters
  * ___
  *
- * [View Documentation](https://discord-ts.js.org/docs/decorators/general/on)
+ * [View Documentation](https://discordx.js.org/docs/decorators/general/on)
  *
  * @category Decorator
  */

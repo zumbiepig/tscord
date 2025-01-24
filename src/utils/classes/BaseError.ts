@@ -1,7 +1,22 @@
 import process from 'node:process';
 
+import { Logger } from '@/services';
+import { resolveDependencies } from '@/utils/functions';
+
 export abstract class BaseError extends Error {
-	abstract handle(): void | Promise<void>;
+	protected logger!: Logger;
+
+	constructor(message?: string) {
+		super(message);
+
+		void resolveDependencies([Logger]).then(([logger]) => {
+			this.logger = logger;
+		});
+	}
+
+	async handle() {
+		await this.logger.log('error', this.message);
+	};
 
 	kill() {
 		process.exit(1);
