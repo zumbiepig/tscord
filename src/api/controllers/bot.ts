@@ -25,27 +25,23 @@ import { generalConfig } from '@/configs';
 import { Guild, User } from '@/entities';
 import { Database } from '@/services';
 import { BaseController } from '@/utils/classes';
+import { Injectable } from '@/utils/decorators';
 import {
 	getDevs,
 	isDev,
 	isInMaintenance,
-	resolveDependencies,
 	setMaintenance,
 } from '@/utils/functions';
 
 @Controller('/bot')
 @UseBefore(BotOnline, DevAuthenticated)
+@Injectable()
 export class BotController extends BaseController {
-	private client!: Client;
-	private db!: Database;
-
-	constructor() {
+	constructor(
+		private client: Client,
+		private db: Database,
+	) {
 		super();
-
-		void resolveDependencies([Client, Database]).then(([client, db]) => {
-			this.client = client;
-			this.db = db;
-		});
 	}
 
 	@Get('/info')

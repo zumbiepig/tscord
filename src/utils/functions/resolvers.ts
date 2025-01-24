@@ -22,20 +22,20 @@ const resolvers = {
 			interaction.user,
 		UserContextMenuCommandInteraction: (
 			interaction: UserContextMenuCommandInteraction,
-		) => interaction.member?.user,
+		) => interaction.member?.user ?? null,
 		MessageContextMenuCommandInteraction: (
 			interaction: MessageContextMenuCommandInteraction,
-		) => interaction.member?.user,
+		) => interaction.member?.user ?? null,
 
 		ButtonInteraction: (interaction: ButtonInteraction) =>
-			interaction.member?.user,
+			interaction.member?.user ?? null,
 		StringSelectMenuInteraction: (interaction: StringSelectMenuInteraction) =>
-			interaction.member?.user,
+			interaction.member?.user ?? null,
 		ModalSubmitInteraction: (interaction: ModalSubmitInteraction) =>
-			interaction.member?.user,
+			interaction.member?.user ?? null,
 
 		Message: (interaction: Message) => interaction.author,
-		VoiceState: (interaction: VoiceState) => interaction.member?.user,
+		VoiceState: (interaction: VoiceState) => interaction.member?.user ?? null,
 		MessageReaction: (interaction: MessageReaction) =>
 			interaction.message.author,
 		PartialMessageReaction: (interaction: PartialMessageReaction) =>
@@ -153,7 +153,7 @@ const resolvers = {
 
 	locale: {
 		SimpleCommandMessage: (interaction: SimpleCommandMessage) =>
-			interaction.message.guild?.preferredLocale,
+			interaction.message.guild?.preferredLocale ?? null,
 		ChatInputCommandInteraction: (interaction: ChatInputCommandInteraction) =>
 			interaction.locale,
 		UserContextMenuCommandInteraction: (

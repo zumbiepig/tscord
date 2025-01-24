@@ -1,7 +1,7 @@
 import process from 'node:process';
 
 import { EntityRepository } from '@mikro-orm/core';
-import { constant } from 'case';
+import Case from 'case';
 import { Client, SimpleCommandMessage } from 'discordx';
 import osu from 'node-os-utils';
 import pidusage from 'pidusage';
@@ -67,7 +67,7 @@ export class Stats {
 	 */
 	async registerInteraction(interaction: AllInteractions) {
 		// we extract data from the interaction
-		const type = constant(
+		const type = Case.constant(
 			getTypeOfInteraction(interaction),
 		) as InteractionsConstants;
 		if (statsConfig.interaction.exclude.includes(type)) return;
@@ -268,13 +268,13 @@ export class Stats {
 
 		for (let i = 0; i < days; i++) {
 			const date = now.subtract(i, 'day');
-		const statsFound = await this.statsRepo.find({
-			type,
-			createdAt: {
-				$gte: date.startOf('day').toDate(),
-				$lte: date.endOf('day').toDate(),
-			},
-		});
+			const statsFound = await this.statsRepo.find({
+				type,
+				createdAt: {
+					$gte: date.startOf('day').toDate(),
+					$lte: date.endOf('day').toDate(),
+				},
+			});
 
 			stats.push({
 				date: formatDate(date, 'onlyDate'),

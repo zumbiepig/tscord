@@ -13,7 +13,7 @@ import { Guard } from 'discordx';
 import { generalConfig } from '@/configs';
 import { Stats } from '@/services';
 import { Injectable, Slash } from '@/utils/decorators';
-import { dayjsTimezone, getColor, isValidUrl, timeAgoString } from '@/utils/functions';
+import { dayjsTimezone, getColor, isValidUrl } from '@/utils/functions';
 import { getPackageDotJson, getTscordVersion } from '@/utils/functions';
 
 const links = [

@@ -99,16 +99,13 @@ export function setFallbackDescription<K extends SanitizedOptions>(
 	return sanitizeLocales(options);
 }
 
-function allInteractionsLocaleDetector(interaction: AllInteractions) {
-	return () => {
-		let locale = resolveLocale(interaction);
+export const getLocaleFromInteraction = (interaction: AllInteractions) => {
+	return detectLocale(() => {
+		let locale: string =
+			resolveLocale(interaction) ?? generalConfig.defaultLocale;
 
-		if (['en-US', 'en-GB'].includes(locale ?? '')) locale = 'en';
-		else if (locale === null) locale = generalConfig.defaultLocale;
+		if (['en-US', 'en-GB'].includes(locale)) locale = 'en';
 
 		return [locale];
-	};
-}
-
-export const getLocaleFromInteraction = (interaction: AllInteractions) =>
-	detectLocale(allInteractionsLocaleDetector(interaction));
+	});
+};

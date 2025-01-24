@@ -1,4 +1,4 @@
-import { User as DUser, type Snowflake } from 'discord.js';
+import { type Snowflake, User as DUser } from 'discord.js';
 import { Client } from 'discordx';
 
 import { Guild, User } from '@/entities';

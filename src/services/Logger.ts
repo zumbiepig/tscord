@@ -5,15 +5,15 @@ import { cwd } from 'node:process';
 
 import archiver from 'archiver';
 import boxen from 'boxen';
-import { constant } from 'case';
-import { upper } from 'case';
+import Case from 'case';
 import chalk from 'chalk';
 import {
 	type BaseMessageOptions,
 	type Snowflake,
 	TextChannel,
 	ThreadChannel,
-	User} from 'discord.js';
+	User,
+} from 'discord.js';
 import { Client, MetadataStorage } from 'discordx';
 import ora from 'ora';
 import { parse, type StackFrame } from 'stacktrace-parser';
@@ -134,7 +134,7 @@ export class Logger {
 		const date = dayjsTimezone();
 		const formattedDate = formatDate(date, 'onlyDateFileName');
 		const formattedTime = formatDate(date, 'logs');
-		const formattedLevel = upper(level);
+		const formattedLevel = Case.upper(level);
 		const trimmedMessage = message.trim();
 		const logMessage = `[${formattedTime}] [${formattedLevel}] ${trimmedMessage}`;
 		const chalkedLogMessage = `[${chalk.dim(formattedTime)}] [${formattedLevel}] ${chalkedMessage?.trim() ?? trimmedMessage}`;
@@ -169,12 +169,24 @@ export class Logger {
 		// send to discord channel
 		if (logLocation.channelId) {
 			if (this.client.token) {
-				const channel = await this.client.channels.fetch(logLocation.channelId).catch(() => null);
-				if (channel && (channel instanceof TextChannel || channel instanceof ThreadChannel)) {
+				const channel = await this.client.channels
+					.fetch(logLocation.channelId)
+					.catch(() => null);
+				if (
+					channel &&
+					(channel instanceof TextChannel || channel instanceof ThreadChannel)
+				) {
 					return await channel
-						.send(logLocation.discordEmbed ? logLocation.discordEmbed : this.embedLevelBuilder[level](logMessage))
+						.send(
+							logLocation.discordEmbed
+								? logLocation.discordEmbed
+								: this.embedLevelBuilder[level](logMessage),
+						)
 						.catch(async (error: unknown) => {
-							await this.log('error', `Couldn't log to Discord channel: ${error as string}`);
+							await this.log(
+								'error',
+								`Couldn't log to Discord channel: ${error as string}`,
+							);
 						});
 				}
 			}
@@ -229,7 +241,9 @@ export class Logger {
 			const match = /^logs-(.+)\.tar\.gz$/.exec(file);
 			if (match?.[1]) {
 				if (timeAgo(match[1], 'day') > logsConfig.archive.retentionDays) {
-					await this.log('info',`Deleting log archive ${file} older than ${logsConfig.archive.retentionDays.toString()} days`,
+					await this.log(
+						'info',
+						`Deleting log archive ${file} older than ${logsConfig.archive.retentionDays.toString()} days`,
 						`Deleting log archive ${chalk.bold.red(file)} older than ${chalk.bold.red(logsConfig.archive.retentionDays.toString())} days`,
 					);
 					await rm(join(this.logArchivePath, file));
@@ -243,7 +257,7 @@ export class Logger {
 	 * @param interaction
 	 */
 	public async logInteraction(interaction: AllInteractions) {
-		const type = constant(
+		const type = Case.constant(
 			getTypeOfInteraction(interaction),
 		) as InteractionsConstants;
 		if (logsConfig.interaction.exclude.includes(type)) return;
@@ -256,62 +270,65 @@ export class Logger {
 		const message = `(${type}) "${action ?? ''}" ${channel instanceof TextChannel || channel instanceof ThreadChannel ? `in channel #${channel.name}` : ''} ${guild ? `in guild ${guild.name}` : ''} ${user ? `by ${user.username}#${user.discriminator}` : ''}`;
 		const chalkedMessage = `(${chalk.bold.white(type)}) "${chalk.bold.green(action)}" ${channel instanceof TextChannel || channel instanceof ThreadChannel ? `${chalk.dim.italic.gray('in channel')} ${chalk.bold.blue(`#${channel.name}`)}` : ''} ${guild ? `${chalk.dim.italic.gray('in guild')} ${chalk.bold.blue(guild.name)}` : ''} ${user ? `${chalk.dim.italic.gray('by')} ${chalk.bold.blue(`${user.username}#${user.discriminator}`)}` : ''}`;
 
-		await this.log('info', message, chalkedMessage, { ...logsConfig.interaction, discordEmbed: {
-			embeds: [
-				{
-					author: {
-						name: user
-							? `${user.username}#${user.discriminator}`
-							: 'Unknown user',
-						icon_url: user?.avatar
-							? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`
-							: '',
+		await this.log('info', message, chalkedMessage, {
+			...logsConfig.interaction,
+			discordEmbed: {
+				embeds: [
+					{
+						author: {
+							name: user
+								? `${user.username}#${user.discriminator}`
+								: 'Unknown user',
+							icon_url: user?.avatar
+								? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`
+								: '',
+						},
+						title: `Interaction`,
+						thumbnail: {
+							url: guild?.iconURL({ forceStatic: true }) ?? '',
+						},
+						fields: [
+							{
+								name: 'Type',
+								value: this.interactionTypeReadable[type],
+								inline: true,
+							},
+							{
+								name: '\u200B',
+								value: '\u200B',
+								inline: true,
+							},
+							{
+								name: 'Action',
+								value: action ?? 'Unknown',
+								inline: true,
+							},
+							{
+								name: 'Guild',
+								value: guild ? guild.name : 'Unknown',
+								inline: true,
+							},
+							{
+								name: '\u200B',
+								value: '\u200B',
+								inline: true,
+							},
+							{
+								name: 'Channel',
+								value:
+									channel instanceof TextChannel ||
+									channel instanceof ThreadChannel
+										? `#${channel.name}`
+										: 'Unknown',
+								inline: true,
+							},
+						],
+						color: 0xdb5c21,
+						timestamp: dayjsTimezone().toISOString(),
 					},
-					title: `Interaction`,
-					thumbnail: {
-						url: guild?.iconURL({ forceStatic: true }) ?? '',
-					},
-					fields: [
-						{
-							name: 'Type',
-							value: this.interactionTypeReadable[type],
-							inline: true,
-						},
-						{
-							name: '\u200B',
-							value: '\u200B',
-							inline: true,
-						},
-						{
-							name: 'Action',
-							value: action ?? 'Unknown',
-							inline: true,
-						},
-						{
-							name: 'Guild',
-							value: guild ? guild.name : 'Unknown',
-							inline: true,
-						},
-						{
-							name: '\u200B',
-							value: '\u200B',
-							inline: true,
-						},
-						{
-							name: 'Channel',
-							value:
-								channel instanceof TextChannel ||
-								channel instanceof ThreadChannel
-									? `#${channel.name}`
-									: 'Unknown',
-							inline: true,
-						},
-					],
-					color: 0xdb5c21,
-					timestamp: dayjsTimezone().toISOString(),
-				},
-			],
-		} });
+				],
+			},
+		});
 	}
 
 	/**
@@ -322,22 +339,25 @@ export class Logger {
 		const message = `(NEW_USER) ${user.tag} (${user.id}) has been added to the db`;
 		const chalkedMessage = `(${chalk.bold.white('NEW_USER')}) ${chalk.bold.green(user.tag)} (${chalk.bold.blue(user.id)}) ${chalk.dim.italic.gray('has been added to the db')}`;
 
-		await this.log('info', message, chalkedMessage, {...logsConfig.newUser, discordEmbed: {
-			embeds: [
-				{
-					title: 'New user',
-					description: `**${user.tag}**`,
-					thumbnail: {
-						url: user.displayAvatarURL({ forceStatic: false }),
+		await this.log('info', message, chalkedMessage, {
+			...logsConfig.newUser,
+			discordEmbed: {
+				embeds: [
+					{
+						title: 'New user',
+						description: `**${user.tag}**`,
+						thumbnail: {
+							url: user.displayAvatarURL({ forceStatic: false }),
+						},
+						color: 0x83dd80,
+						timestamp: dayjsTimezone().toISOString(),
+						footer: {
+							text: user.id,
+						},
 					},
-					color: 0x83dd80,
-					timestamp: dayjsTimezone().toISOString(),
-					footer: {
-						text: user.id,
-					},
-				},
-			],
-		}});
+				],
+			},
+		});
 	}
 
 	/**
@@ -356,10 +376,12 @@ export class Logger {
 				: type === 'DELETE_GUILD'
 					? 'has been deleted'
 					: 'has been recovered';
-			const message = `(${type}) Guild ${guild ? `${guild.name} (${guildId})` : guildId} ${additionalMessage}`;
-			const chalkedMessage = `(${chalk.bold.white(type)}) ${chalk.dim.italic.gray('Guild')} ${guild ? `${chalk.bold.green(guild.name)} (${chalk.bold.blue(guildId)})` : guildId} ${chalk.dim.italic.gray(additionalMessage)}`;
+		const message = `(${type}) Guild ${guild ? `${guild.name} (${guildId})` : guildId} ${additionalMessage}`;
+		const chalkedMessage = `(${chalk.bold.white(type)}) ${chalk.dim.italic.gray('Guild')} ${guild ? `${chalk.bold.green(guild.name)} (${chalk.bold.blue(guildId)})` : guildId} ${chalk.dim.italic.gray(additionalMessage)}`;
 
-			await this.log('info', message, chalkedMessage, { ...logsConfig.guild, discordEmbed: {
+		await this.log('info', message, chalkedMessage, {
+			...logsConfig.guild,
+			discordEmbed: {
 				embeds: [
 					{
 						title:
@@ -389,7 +411,8 @@ export class Logger {
 						timestamp: dayjsTimezone().toISOString(),
 					},
 				],
-			}});
+			},
+		});
 	}
 
 	/**
@@ -429,23 +452,30 @@ export class Logger {
 			const paste = await this.pastebin.createPaste(
 				`${embedTitle}\n${embedMessage}`,
 			);
-			await this.log('debug', 'Error embed was too long, uploaded error to pastebin: ' + (paste?.getLink() ?? ''));
+			await this.log(
+				'debug',
+				'Error embed was too long, uploaded error to pastebin: ' +
+					(paste?.getLink() ?? ''),
+			);
 			embedMessage = `[Pastebin of the error](https://rentry.co/${paste?.getLink() ?? ''})`;
 		}
 
-		await this.log('error', message, chalkedMessage, {...logsConfig.error, discordEmbed: {
-			embeds: [
-				{
-					title:
-						embedTitle.length > 256
-							? `${embedTitle.substring(0, 252)}...`
-							: embedTitle,
-					description: embedMessage,
-					color: 0x7c1715,
-					timestamp: dayjsTimezone().toISOString(),
-				},
-			],
-		}});
+		await this.log('error', message, chalkedMessage, {
+			...logsConfig.error,
+			discordEmbed: {
+				embeds: [
+					{
+						title:
+							embedTitle.length > 256
+								? `${embedTitle.substring(0, 252)}...`
+								: embedTitle,
+						description: embedMessage,
+						color: 0x7c1715,
+						timestamp: dayjsTimezone().toISOString(),
+					},
+				],
+			},
+		});
 	}
 
 	public getLastLogs() {
@@ -588,17 +618,20 @@ export class Logger {
 		if (apiConfig.enabled) {
 			await this.log(
 				'info',
-				boxen(` API Server listening on port ${env.API_PORT?.toString() ?? ''} `, {
-					padding: 0,
-					margin: {
-						top: 1,
-						bottom: 0,
-						left: 1,
-						right: 1,
+				boxen(
+					` API Server listening on port ${env.API_PORT?.toString() ?? ''} `,
+					{
+						padding: 0,
+						margin: {
+							top: 1,
+							bottom: 0,
+							left: 1,
+							right: 1,
+						},
+						borderStyle: 'round',
+						dimBorder: true,
 					},
-					borderStyle: 'round',
-					dimBorder: true,
-				}),
+				),
 				chalk.gray(
 					boxen(` API Server listening on port ${chalk.bold(env.API_PORT)} `, {
 						padding: 0,

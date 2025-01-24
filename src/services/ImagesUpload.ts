@@ -5,7 +5,7 @@ import { promisify } from 'node:util';
 
 import axios from 'axios';
 import chalk from 'chalk';
-import { glob } from 'fast-glob';
+import fastGlob from 'fast-glob';
 import { mkdir } from 'fs/promises';
 import { imageHash as callbackImageHash } from 'image-hash';
 import { ImgurClient } from 'imgur';
@@ -50,7 +50,9 @@ export class ImagesUpload {
 		if (!existsSync(this.imageFolderPath)) await mkdir(this.imageFolderPath);
 
 		// get all images inside the assets folder
-		const files = await glob('**/*', { cwd: this.imageFolderPath })
+		const files = await fastGlob(join('**', '*'), {
+			cwd: this.imageFolderPath,
+		});
 		const images = [];
 		for (const file of files) {
 			if (this.isValidImageFormat(file)) {
@@ -97,11 +99,11 @@ export class ImagesUpload {
 				imageInDb.basePath !== dirname(imagePath) ||
 				imageInDb.fileName !== basename(imagePath)
 			)
-			await this.logger.log(
-				'warn',
-				`Image ${imagePath} has the same hash as ${join(imageInDb.basePath ?? '', imageInDb.fileName)} so it will be skipped`,
-				`Image ${chalk.bold.green(imagePath)} has the same hash as ${chalk.bold.green(join(imageInDb.basePath ?? '', imageInDb.fileName))} so it will be skipped`
-			);
+				await this.logger.log(
+					'warn',
+					`Image ${imagePath} has the same hash as ${join(imageInDb.basePath ?? '', imageInDb.fileName)} so it will be skipped`,
+					`Image ${chalk.bold.green(imagePath)} has the same hash as ${chalk.bold.green(join(imageInDb.basePath ?? '', imageInDb.fileName))} so it will be skipped`,
+				);
 		}
 	}
 

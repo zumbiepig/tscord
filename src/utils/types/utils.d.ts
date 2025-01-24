@@ -1,7 +1,8 @@
 export type Modify<T, R> = Omit<T, keyof R> & R;
 
 export type OmitPick<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-export type WithOptional<T, K extends keyof T> = OmitPick<T, K> & Partial<Pick<T, K>>;
+export type WithOptional<T, K extends keyof T> = OmitPick<T, K> &
+	Partial<Pick<T, K>>;
 export type WithRequiredProperty<Type, Key extends keyof Type> = Type & {
 	[Property in Key]-?: Type[Property];
 };

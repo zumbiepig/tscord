@@ -4,24 +4,20 @@ import DiscordOauth2 from 'discord-oauth2';
 
 import env from '@/env';
 import { Store } from '@/services';
-import { isDev, resolveDependencies } from '@/utils/functions';
+import { Injectable } from '@/utils/decorators';
+import { isDev } from '@/utils/functions';
 
 const discordOauth2 = new DiscordOauth2();
 
-const timeout = 10 * 60 * 1000;
+const timeout = 10 * 60 * 1000; // 10 minutes
 
 // const fmaTokenRegex = /mfa\.[\w-]{84}/
 // const nonFmaTokenRegex = /[\w-]{24}\.[\w-]{6}\.[\w-]{27}/
 
 @Middleware()
+@Injectable()
 export class DevAuthenticated {
-	private store!: Store;
-
-	constructor() {
-		void resolveDependencies([Store]).then(([store]) => {
-			this.store = store;
-		});
-	}
+	constructor(private store: Store) {}
 
 	async use(@Context() { request }: PlatformContext) {
 		// if we are in development mode, we don't need to check the token

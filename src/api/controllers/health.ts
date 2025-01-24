@@ -5,26 +5,19 @@ import { DevAuthenticated } from '@/api/middlewares';
 import { Data } from '@/entities';
 import { Database, Logger, Stats } from '@/services';
 import { BaseController } from '@/utils/classes';
-import { isInMaintenance, resolveDependencies } from '@/utils/functions';
+import { Injectable } from '@/utils/decorators';
+import { isInMaintenance } from '@/utils/functions';
 
 @Controller('/health')
+@Injectable()
 export class HealthController extends BaseController {
-	private client!: Client;
-	private db!: Database;
-	private stats!: Stats;
-	private logger!: Logger;
-
-	constructor() {
+	constructor(
+		private client: Client,
+		private db: Database,
+		private stats: Stats,
+		private logger: Logger,
+	) {
 		super();
-
-		void resolveDependencies([Client, Database, Stats, Logger]).then(
-			([client, db, stats, logger]) => {
-				this.client = client;
-				this.db = db;
-				this.stats = stats;
-				this.logger = logger;
-			},
-		);
 	}
 
 	@Get('/check')

@@ -1,6 +1,6 @@
 import { Property } from '@mikro-orm/core';
 
-import { dayjsTimezone } from '../functions/date.js';
+import { dayjsTimezone } from '@/utils/functions';
 
 export abstract class BaseEntity {
 	@Property()

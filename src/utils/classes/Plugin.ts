@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { type AnyEntity, type EntityClass } from '@mikro-orm/core';
-import { glob } from 'fast-glob';
+import fastGlob from 'fast-glob';
 import { coerce, satisfies, valid } from 'semver';
 
 import { generalConfig } from '@/configs';
@@ -108,7 +108,10 @@ export class Plugin {
 
 	private async stopLoad(error: string) {
 		this._valid = false;
-		await this.logger.log('error', `Plugin ${this._name ? this._name : this._path} ${this._version ? `v${this._version}` : ''} is not valid: ${error}`);
+		await this.logger.log(
+			'error',
+			`Plugin ${this._name ? this._name : this._path} ${this._version ? `v${this._version}` : ''} is not valid: ${error}`,
+		);
 	}
 
 	private async getControllers() {
@@ -144,7 +147,10 @@ export class Plugin {
 					);
 					return {} as Record<Locales, BaseTranslation>;
 				} else {
-					await this.logger.log('warn', `Plugin ${this._name} v${this._version} is missing translations for locale '${locale}'`)
+					await this.logger.log(
+						'warn',
+						`Plugin ${this._name} v${this._version} is missing translations for locale '${locale}'`,
+					);
 					continue;
 				}
 			}
@@ -160,7 +166,7 @@ export class Plugin {
 
 	public async importCommands() {
 		return Promise.all(
-			(await glob(join(this._path, 'commands', '**', '*.ts'))).map(
+			(await fastGlob(join(this._path, 'commands', '**', '*.ts'))).map(
 				(file) => import(file),
 			),
 		);
@@ -168,7 +174,7 @@ export class Plugin {
 
 	public async importEvents() {
 		return Promise.all(
-			(await glob(join(this._path, 'events', '**', '*.ts'))).map(
+			(await fastGlob(join(this._path, 'events', '**', '*.ts'))).map(
 				(file) => import(file),
 			),
 		);

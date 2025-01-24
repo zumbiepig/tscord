@@ -18,7 +18,11 @@ import * as entities from '@/entities';
 import env from '@/env';
 import { Logger, PluginsManager, Store } from '@/services';
 import { Schedule, Service } from '@/utils/decorators';
-import { dayjsTimezone, formatDate, resolveDependency } from '@/utils/functions';
+import {
+	dayjsTimezone,
+	formatDate,
+	resolveDependency,
+} from '@/utils/functions';
 import type {
 	DatabaseDriver,
 	DatabaseEntityManager,
@@ -120,11 +124,7 @@ export class Database {
 			return true;
 		} catch (e) {
 			const errorMessage =
-				typeof e === 'string'
-					? e
-					: e instanceof Error
-						? e.message
-						: String(e);
+				typeof e === 'string' ? e : e instanceof Error ? e.message : String(e);
 			await this.logger.log(
 				'error',
 				`Couldn't backup database: ${errorMessage}`,

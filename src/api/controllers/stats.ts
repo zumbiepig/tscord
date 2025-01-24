@@ -3,19 +3,14 @@ import { Controller, Get, QueryParams, UseBefore } from '@tsed/common';
 import { DevAuthenticated } from '@/api/middlewares';
 import { Stats } from '@/services';
 import { BaseController } from '@/utils/classes';
-import { resolveDependencies } from '@/utils/functions';
+import { Injectable } from '@/utils/decorators';
 
 @Controller('/stats')
 @UseBefore(DevAuthenticated)
+@Injectable()
 export class StatsController extends BaseController {
-	private stats!: Stats;
-
-	constructor() {
+	constructor(private stats: Stats) {
 		super();
-
-		void resolveDependencies([Stats]).then(([stats]) => {
-			this.stats = stats;
-		});
 	}
 
 	@Get('/totals')

@@ -1,7 +1,5 @@
 import 'reflect-metadata';
 
-import process from 'node:process';
-
 import { RequestContext } from '@mikro-orm/core';
 import chalk from 'chalk';
 import { GatewayIntentBits, Partials } from 'discord.js';
@@ -78,8 +76,8 @@ async function reload(client: Client) {
 
 	// re-init services
 
-	const pluginManager = await resolveDependency(PluginsManager);
-	await pluginManager.loadPlugins();
+	const pluginsManager = await resolveDependency(PluginsManager);
+	await pluginsManager.loadPlugins();
 
 	const db = await resolveDependency(Database);
 	await db.initialize();
@@ -96,9 +94,9 @@ async function init() {
 	await resolveDependency(ErrorHandler);
 
 	// init plugins
-	const pluginManager = await resolveDependency(PluginsManager);
-	await pluginManager.loadPlugins();
-	await pluginManager.syncTranslations();
+	const pluginsManager = await resolveDependency(PluginsManager);
+	await pluginsManager.loadPlugins();
+	await pluginsManager.syncTranslations();
 
 	// start spinner
 	const logger = await resolveDependency(Logger);
@@ -143,48 +141,48 @@ async function init() {
 	container.registerInstance(Client, client);
 
 	// import all the commands and events
-	await pluginManager.importCommands();
-	await pluginManager.importEvents();
+	await pluginsManager.importCommands();
+	await pluginsManager.importEvents();
 
 	await RequestContext.create(db.orm.em, async () => {
 		// init the data table if it doesn't exist
 		await initDataTable();
 
 		// init plugins services
-		pluginManager.initServices();
+		pluginsManager.initServices();
 
 		// init the plugin main file
-		await pluginManager.execMains();
+		await pluginsManager.execMains();
 
 		// log in with the bot token
 		await client.login(env.BOT_TOKEN);
 
-				botInitialized = true;
+		botInitialized = true;
 
-				// start the api server
-				if (apiConfig.enabled) {
-					const server = await resolveDependency(Server);
-					await server.start();
-				}
+		// start the api server
+		if (apiConfig.enabled) {
+			const server = await resolveDependency(Server);
+			await server.start();
+		}
 
-				// upload images to imgur if configured
-				if (generalConfig.automaticUploadImagesToImgur) {
-					const imagesUpload = await resolveDependency(ImagesUpload);
-					await imagesUpload.syncWithDatabase();
-				}
+		// upload images to imgur if configured
+		if (generalConfig.automaticUploadImagesToImgur) {
+			const imagesUpload = await resolveDependency(ImagesUpload);
+			await imagesUpload.syncWithDatabase();
+		}
 
-				const eventManager = await resolveDependency(EventManager);
-				const store = container.resolve(Store);
-				store.select('ready').subscribe((state) => {
-					// check that all properties that are not null are set to true
-					if (
-						Object.values(state)
-							.filter((value) => value !== null)
-							.every((value) => value)
-					) {
-						void eventManager.emit('templateReady') // the template is fully ready!
-					}
-				});
+		const eventManager = await resolveDependency(EventManager);
+		const store = container.resolve(Store);
+		store.select('ready').subscribe((state) => {
+			// check that all properties that are not null are set to true
+			if (
+				Object.values(state)
+					.filter((value) => value !== null)
+					.every((value) => value)
+			) {
+				void eventManager.emit('templateReady'); // the template is fully ready!
+			}
+		});
 	});
 }
 

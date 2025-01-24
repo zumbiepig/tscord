@@ -7,20 +7,14 @@ import { databaseConfig } from '@/configs';
 import { Database } from '@/services';
 import { BaseController } from '@/utils/classes';
 import { Injectable } from '@/utils/decorators';
-import { dayjsTimezone, formatDate, resolveDependencies } from '@/utils/functions';
+import { dayjsTimezone, formatDate } from '@/utils/functions';
 
 @Controller('/database')
 @UseBefore(DevAuthenticated)
 @Injectable()
 export class DatabaseController extends BaseController {
-	private db!: Database;
-
-	constructor() {
+	constructor(private db: Database) {
 		super();
-
-		void resolveDependencies([Database]).then(([db]) => {
-			this.db = db;
-		});
 	}
 
 	@Post('/backup')

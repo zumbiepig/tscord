@@ -7,7 +7,7 @@ import {
 	PlatformApplication,
 } from '@tsed/common';
 import { PlatformExpress } from '@tsed/platform-express';
-import { json, urlencoded } from 'body-parser';
+import { json, urlencoded } from 'express';
 
 import * as controllers from '@/api/controllers';
 import { Log } from '@/api/middlewares';

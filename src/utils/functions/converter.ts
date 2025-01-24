@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFile } from 'node:fs/promises';
 
 /**
  * Function to encode file data to base64 encoded string

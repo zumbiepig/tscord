@@ -3,7 +3,7 @@ import { Paste, RentryClient } from 'rentry-pastebin';
 import { Pastebin as PastebinEntity } from '@/entities';
 import { Database } from '@/services';
 import { Schedule, Service } from '@/utils/decorators';
-import { daysAgo } from '@/utils/functions';
+import { timeAgo } from '@/utils/functions';
 
 @Service()
 export class Pastebin {
@@ -55,7 +55,7 @@ export class Pastebin {
 			.find({ lifetime: { $gt: 0 } });
 
 		pastes
-			.filter((paste) => daysAgo(paste.createdAt) > paste.lifetime)
+			.filter((paste) => timeAgo(paste.createdAt, 'day') > paste.lifetime)
 			.forEach((paste) => {
 				this.client.deletePaste(paste.id, paste.editCode);
 			});

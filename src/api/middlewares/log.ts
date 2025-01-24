@@ -2,17 +2,12 @@ import { Context, Middleware, PlatformContext } from '@tsed/common';
 import chalk from 'chalk';
 
 import { Logger } from '@/services';
-import { resolveDependencies } from '@/utils/functions';
+import { Injectable } from '@/utils/decorators';
 
 @Middleware()
+@Injectable()
 export class Log {
-	private logger!: Logger;
-
-	constructor() {
-		void resolveDependencies([Logger]).then(([logger]) => {
-			this.logger = logger;
-		});
-	}
+	constructor(private logger: Logger) {}
 
 	async use(@Context() { request }: PlatformContext) {
 		const { method, url } = request;

@@ -4,9 +4,11 @@ import type {
 	NotEmpty as NotEmptyX,
 	SlashChoiceType as SlashChoiceTypeX,
 	SlashGroupOptions as SlashGroupOptionsX,
+	SlashOptionOptions as SlashOptionOptionsX,
 } from 'discordx';
 
 import type { Translations } from '@/i18n';
+import type { Modify, NestedPaths, WithOptional } from '@/utils/types';
 
 export declare enum AdditionalLocaleString {
 	English = 'en',

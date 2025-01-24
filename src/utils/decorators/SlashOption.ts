@@ -1,11 +1,11 @@
-import { of } from 'case';
+import Case from 'case';
 import {
 	SlashOption as SlashOptionX,
 	type SlashOptionOptions as SlashOptionOptionsX,
 	type VerifyName,
 } from 'discordx';
 
-import { InvalidOptionName } from '@/utils/errors';
+import { InvalidOptionNameError } from '@/utils/errors';
 import {
 	constantPreserveDots,
 	sanitizeLocales,
@@ -51,15 +51,15 @@ export function SlashOption(options: SlashOptionOptions) {
 
 	options = sanitizeLocales(options);
 
-	if (!isValidOptionName(options['name'] as string))
-		throw new InvalidOptionName(options['name'] as string);
+	if (!isValidOptionName(options.name))
+		throw new InvalidOptionNameError(options.name);
 	if (options.nameLocalizations) {
 		for (const name of Object.values(options.nameLocalizations)) {
-			if (!isValidOptionName(name)) throw new InvalidOptionName(name);
+			if (!isValidOptionName(name)) throw new InvalidOptionNameError(name);
 		}
 	}
 
-	if (!options['description']) options = setFallbackDescription(options);
+	if (!options.description) options = setFallbackDescription(options);
 
 	return SlashOptionX(
 		options as SlashOptionOptionsX<VerifyName<string>, string>,
@@ -67,5 +67,5 @@ export function SlashOption(options: SlashOptionOptions) {
 }
 
 function isValidOptionName(name: string) {
-	return ['lower', 'snake'].includes(of(name)) && !name.includes(' ');
+	return ['lower', 'snake'].includes(Case.of(name)) && !name.includes(' ');
 }

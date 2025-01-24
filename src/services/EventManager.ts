@@ -23,10 +23,10 @@ export class EventManager {
 			try {
 				await callback(...args);
 			} catch (error) {
-					await this.logger.log(
-				'error',
-						`[EventError - ${eventName}] ${error instanceof Error ? error.message : String(error)}`,
-					);
+				await this.logger.log(
+					'error',
+					`[EventError - ${eventName}] ${error instanceof Error ? error.message : String(error)}`,
+				);
 			}
 		}
 	}

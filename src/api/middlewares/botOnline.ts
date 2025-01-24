@@ -2,17 +2,12 @@ import { Middleware } from '@tsed/common';
 import { InternalServerError } from '@tsed/exceptions';
 import { Client } from 'discordx';
 
-import { resolveDependencies } from '@/utils/functions';
+import { Injectable } from '@/utils/decorators';
 
 @Middleware()
+@Injectable()
 export class BotOnline {
-	private client!: Client;
-
-	constructor() {
-		void resolveDependencies([Client]).then(([client]) => {
-			this.client = client;
-		});
-	}
+	constructor(private client: Client) {}
 
 	use() {
 		if (this.client.user?.presence.status === 'offline')
