@@ -131,15 +131,7 @@ const resolvers = {
 
 	action: {
 		ChatInputCommandInteraction: (interaction: ChatInputCommandInteraction) => {
-			return (
-				interaction.commandName +
-				(interaction.options.getSubcommandGroup(false)
-					? ` ${interaction.options.getSubcommandGroup(false) ?? ''}`
-					: '') +
-				(interaction.options.getSubcommand(false)
-					? ` ${interaction.options.getSubcommand(false) ?? ''}`
-					: '')
-			);
+			return `${interaction.commandName} ${interaction.options.getSubcommandGroup(false) ?? ''} ${interaction.options.getSubcommand(false) ?? ''}`;
 		},
 		SimpleCommandMessage: (interaction: SimpleCommandMessage) =>
 			interaction.name,
@@ -161,7 +153,7 @@ const resolvers = {
 
 	locale: {
 		SimpleCommandMessage: (interaction: SimpleCommandMessage) =>
-			interaction.message.guild?.preferredLocale ?? 'default',
+			interaction.message.guild?.preferredLocale,
 		ChatInputCommandInteraction: (interaction: ChatInputCommandInteraction) =>
 			interaction.locale,
 		UserContextMenuCommandInteraction: (

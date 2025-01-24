@@ -7,6 +7,7 @@ import {
 import { EntityRepository } from '@mikro-orm/sqlite';
 
 import { BaseEntity } from '@/utils/classes';
+import { dayjsTimezone } from '@/utils/functions';
 
 @Entity({ repository: () => GuildRepository })
 export class Guild extends BaseEntity {
@@ -22,7 +23,7 @@ export class Guild extends BaseEntity {
 	deleted = false;
 
 	@Property()
-	lastInteract: Date = new Date();
+	lastInteract: Date = dayjsTimezone().toDate();
 }
 
 export class GuildRepository extends EntityRepository<Guild> {
@@ -30,7 +31,7 @@ export class GuildRepository extends EntityRepository<Guild> {
 		const guild = await this.findOne({ id: guildId ?? '' });
 
 		if (guild) {
-			guild.lastInteract = new Date();
+			guild.lastInteract = dayjsTimezone().toDate();
 			await this.em.flush();
 		}
 	}

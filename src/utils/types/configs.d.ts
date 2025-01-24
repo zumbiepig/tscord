@@ -1,10 +1,9 @@
 import type { Options } from '@mikro-orm/core';
-import type { ActivitiesOptions, PresenceStatusData } from 'discord.js';
-import type { GuildResolvable, UserResolvable } from 'discord.js';
+import type { Snowflake } from 'discord.js';
 
 import type { Locales } from '@/i18n';
 
-interface GeneralConfigType {
+export interface GeneralConfigType {
 	name: string;
 	description: string;
 
@@ -611,9 +610,9 @@ interface GeneralConfigType {
 	simpleCommandsPrefix: string;
 	automaticDeferring: boolean;
 
-	ownerId?: UserResolvable;
-	devs?: UserResolvable[];
-	testGuildId?: GuildResolvable;
+	ownerId?: Snowflake;
+	devs?: Snowflake[];
+	testGuildId?: Snowflake;
 
 	activities: ActivitiesOptions[] & { status: PresenceStatusData }[];
 
@@ -626,63 +625,47 @@ interface GeneralConfigType {
 	};
 }
 
-interface DatabaseConfigType {
+export interface DatabaseConfigType {
 	path: string;
 	enableBackups: boolean;
 }
 
-interface MikroORMConfigType {
+export interface MikroORMConfigType {
 	production: Options;
 	development: Options;
 }
 
-interface LogsConfigType {
+interface LogsConfigCategoryType {
+	file: boolean;
+	console: boolean;
+	channelId: Snowflake | null;
+}
+
+export interface LogsConfigType {
 	logTailMaxSize: number;
 
 	archive: {
 		enabled: boolean;
-		retention: number;
+		retentionDays: number;
 	};
 
-	interaction: {
-		file: boolean;
-		console: boolean;
-		channel: string | null;
+	interaction: LogsConfigCategoryType & { exclude: InteractionsConstants[] };
 
-		exclude: InteractionsConstants[];
-	};
+	simpleCommand: LogsConfigCategoryType;
 
-	simpleCommand: {
-		file: boolean;
-		console: boolean;
-		channel: string | null;
-	};
+	newUser: LogsConfigCategoryType;
 
-	newUser: {
-		file: boolean;
-		console: boolean;
-		channel: string | null;
-	};
+	guild: LogsConfigCategoryType;
 
-	guild: {
-		file: boolean;
-		console: boolean;
-		channel: string | null;
-	};
-
-	error: {
-		file: boolean;
-		console: boolean;
-		channel: string | null;
-	};
+	error: LogsConfigCategoryType;
 }
 
-interface StatsConfigType {
+export interface StatsConfigType {
 	interaction: {
 		exclude: InteractionsConstants[];
 	};
 }
 
-interface APIConfigType {
+export interface APIConfigType {
 	enabled: boolean;
 }

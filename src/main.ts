@@ -83,13 +83,14 @@ async function reload(client: Client) {
 	const db = await resolveDependency(Database);
 	await db.initialize();
 
-	await logger.log(chalk.whiteBright('Hot reloaded\n'));
+	await logger.log('info', 'Hot reloaded', chalk.whiteBright('Hot reloaded'));
 }
 
 async function init() {
-	const logger = await resolveDependency(Logger);
-
+	// validate env values
 	validateEnv();
+
+	const logger = await resolveDependency(Logger);
 
 	// init error handler
 	await resolveDependency(ErrorHandler);
@@ -99,8 +100,7 @@ async function init() {
 	await pluginManager.loadPlugins();
 	await pluginManager.syncTranslations();
 
-	// strart spinner
-	console.log('\n');
+	// start spinner
 	logger.startSpinner('Starting...');
 
 	// init the database
@@ -132,7 +132,7 @@ async function init() {
 		silent: !env.isDev,
 		...(env.isDev &&
 			generalConfig.testGuildId && {
-				botGuilds: [generalConfig.testGuildId as string],
+				botGuilds: [generalConfig.testGuildId],
 			}),
 	});
 

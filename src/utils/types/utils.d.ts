@@ -1,16 +1,16 @@
-type Modify<T, R> = Omit<T, keyof R> & R;
+export type Modify<T, R> = Omit<T, keyof R> & R;
 
-type OmitPick<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-type WithOptional<T, K extends keyof T> = OmitPick<T, K> & Partial<Pick<T, K>>;
-type WithRequiredProperty<Type, Key extends keyof Type> = Type & {
+export type OmitPick<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+export type WithOptional<T, K extends keyof T> = OmitPick<T, K> & Partial<Pick<T, K>>;
+export type WithRequiredProperty<Type, Key extends keyof Type> = Type & {
 	[Property in Key]-?: Type[Property];
 };
 
-type Primitive = string | number | symbol;
+export type Primitive = string | number | symbol;
 
-type GenericObject = Record<Primitive, unknown>;
+export type GenericObject = Record<Primitive, unknown>;
 
-type Join<
+export type Join<
 	L extends Primitive | undefined,
 	R extends Primitive | undefined,
 > = L extends string | number
@@ -21,7 +21,7 @@ type Join<
 		? R
 		: undefined;
 
-type Union<
+export type Union<
 	L extends Primitive | undefined,
 	R extends Primitive | undefined,
 > = L extends undefined
@@ -36,10 +36,10 @@ type Union<
  * NestedPaths
  * Get all the possible paths of an object
  * @example
- * type Keys = NestedPaths<{ a: { b: { c: string } }>
+ * export type Keys = NestedPaths<{ a: { b: { c: string } }>
  * // 'a' | 'a.b' | 'a.b.c'
  */
-type NestedPaths<
+export type NestedPaths<
 	T extends GenericObject,
 	Prev extends Primitive | undefined = undefined,
 	Path extends Primitive | undefined = undefined,
@@ -51,12 +51,12 @@ type NestedPaths<
 
 /**
  * TypeFromPath
- * Get the type of the element specified by the path
+ * Get the export type of the element specified by the path
  * @example
- * type TypeOfAB = TypeFromPath<{ a: { b: { c: string } }, 'a.b'>
+ * export type TypeOfAB = TypeFromPath<{ a: { b: { c: string } }, 'a.b'>
  * // { c: string }
  */
-type TypeFromPath<
+export type TypeFromPath<
 	T extends GenericObject,
 	Path extends string, // Or, if you prefer, NestedPaths<T>
 > = {

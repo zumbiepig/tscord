@@ -1,6 +1,4 @@
 import { Category } from '@discordx/utilities';
-import dayjs from 'dayjs/esm';
-import relativeTime from 'dayjs/esm/plugin/relativeTime';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -15,10 +13,8 @@ import { Guard } from 'discordx';
 import { generalConfig } from '@/configs';
 import { Stats } from '@/services';
 import { Injectable, Slash } from '@/utils/decorators';
-import { getColor, isValidUrl, timeAgo } from '@/utils/functions';
+import { dayjsTimezone, getColor, isValidUrl, timeAgoString } from '@/utils/functions';
 import { getPackageDotJson, getTscordVersion } from '@/utils/functions';
-
-dayjs.extend(relativeTime);
 
 const links = [
 	...(generalConfig.links?.botInvite
@@ -77,7 +73,7 @@ export default class InfoCommand {
 		if (client.uptime) {
 			fields.push({
 				name: 'Uptime',
-				value: timeAgo(new Date(Date.now() - client.uptime)),
+				value: dayjsTimezone().subtract(client.uptime).fromNow(true),
 				inline: true,
 			});
 		}

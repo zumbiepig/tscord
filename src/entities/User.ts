@@ -7,6 +7,7 @@ import {
 import { EntityRepository } from '@mikro-orm/sqlite';
 
 import { BaseEntity } from '@/utils/classes';
+import { dayjsTimezone } from '@/utils/functions';
 
 @Entity({ repository: () => UserRepository })
 export class User extends BaseEntity {
@@ -16,7 +17,7 @@ export class User extends BaseEntity {
 	id!: string;
 
 	@Property()
-	lastInteract: Date = new Date();
+	lastInteract: Date = dayjsTimezone().toDate();
 }
 
 export class UserRepository extends EntityRepository<User> {
@@ -24,7 +25,7 @@ export class UserRepository extends EntityRepository<User> {
 		const user = await this.findOne({ id: userId ?? '' });
 
 		if (user) {
-			user.lastInteract = new Date();
+			user.lastInteract = dayjsTimezone().toDate();
 			await this.em.flush();
 		}
 	}

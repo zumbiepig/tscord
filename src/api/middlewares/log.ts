@@ -20,6 +20,7 @@ export class Log {
 		const message = `(API) ${method} - ${url}`;
 		const chalkedMessage = `(${chalk.bold.white('API')}) ${chalk.bold.green(method)} - ${chalk.bold.blue(url)}`;
 
+		this.logger.log();
 		this.logger.console(chalkedMessage);
 		await this.logger.file(message);
 	}

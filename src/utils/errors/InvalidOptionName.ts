@@ -17,8 +17,8 @@ export class InvalidOptionName extends BaseError {
 		});
 	}
 
-	override handle() {
-		this.logger.console(this.message, 'error');
+	override async handle() {
+		await this.logger.log('error', this.message);
 		this.kill();
 	}
 }

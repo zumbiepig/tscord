@@ -1,14 +1,14 @@
 import type { SqlEntityManager, SqliteDriver } from '@mikro-orm/sqlite';
 
-interface DatabaseSize {
+export interface DatabaseSize {
 	db: number | null;
 	backups: number | null;
 }
 
-type DatabaseDriver = SqliteDriver;
-type DatabaseEntityManager = SqlEntityManager;
+export type DatabaseDriver = SqliteDriver;
+export type DatabaseEntityManager = SqlEntityManager;
 
-interface DataType {
+export interface DataType {
 	maintenance: boolean;
 	lastMaintenance: number;
 	lastStartup: number;

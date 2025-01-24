@@ -1,3 +1,4 @@
+import { dayjsTimezone } from '@/utils/functions';
 import {
 	Entity,
 	EntityRepositoryType,
@@ -20,7 +21,7 @@ export class Pastebin {
 	lifetime = -1;
 
 	@Property()
-	createdAt: Date = new Date();
+	createdAt: Date = dayjsTimezone().toDate();
 }
 
 export class PastebinRepository extends EntityRepository<Pastebin> {}

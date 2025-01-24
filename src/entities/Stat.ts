@@ -1,3 +1,4 @@
+import { dayjsTimezone } from '@/utils/functions';
 import {
 	Entity,
 	EntityRepositoryType,
@@ -23,7 +24,7 @@ export class Stat {
 	additionalData?: unknown;
 
 	@Property()
-	createdAt: Date = new Date();
+	createdAt: Date = dayjsTimezone().toDate();
 }
 
 export class StatRepository extends EntityRepository<Stat> {}

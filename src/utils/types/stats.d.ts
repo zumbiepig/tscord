@@ -1,11 +1,11 @@
 import type { Stats } from '@/services';
 
-type StatPerInterval = {
+export type StatPerInterval = {
 	date: string;
 	count: number;
 }[];
 
-type StatsResolverType = {
+export type StatsResolverType = {
 	name: string;
 	data: (statsHelper: Stats, days: number) => Promise<StatPerInterval>;
 }[];

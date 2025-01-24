@@ -10,18 +10,18 @@ import type { DApplicationCommand, SimpleCommandMessage } from 'discordx';
 
 import type { Locales, TranslationFunctions } from '@/i18n';
 
-type EmittedInteractions =
+export type EmittedInteractions =
 	| CommandInteraction
 	| SimpleCommandMessage
 	| ContextMenuCommandInteraction;
-type OnTheFlyInteractions =
+export type OnTheFlyInteractions =
 	| ButtonInteraction
 	| StringSelectMenuInteraction
 	| ModalSubmitInteraction;
 
-type AllInteractions = EmittedInteractions | OnTheFlyInteractions;
+export type AllInteractions = EmittedInteractions | OnTheFlyInteractions;
 
-type InteractionsConstants =
+export type InteractionsConstants =
 	| 'CHAT_INPUT_COMMAND_INTERACTION'
 	| 'SIMPLE_COMMAND_MESSAGE'
 	| 'CONTEXT_MENU_INTERACTION'
@@ -30,9 +30,9 @@ type InteractionsConstants =
 	| 'STRING_SELECT_MENU_INTERACTION'
 	| 'MODAL_SUBMIT_INTERACTION';
 
-type CommandCategory = DApplicationCommand & ICategory;
+export type CommandCategory = DApplicationCommand & ICategory;
 
-interface InteractionData {
+export interface InteractionData {
 	sanitizedLocale: Locales;
 	localize: TranslationFunctions;
 }

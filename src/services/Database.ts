@@ -18,7 +18,7 @@ import * as entities from '@/entities';
 import env from '@/env';
 import { Logger, PluginsManager, Store } from '@/services';
 import { Schedule, Service } from '@/utils/decorators';
-import { formatDate, resolveDependency } from '@/utils/functions';
+import { dayjsTimezone, formatDate, resolveDependency } from '@/utils/functions';
 import type {
 	DatabaseDriver,
 	DatabaseEntityManager,
@@ -101,14 +101,14 @@ export class Database {
 
 		if (!databaseConfig.path) {
 			await this.logger.log(
-				"Database path not set, couldn't backup database",
 				'error',
+				"Database path not set, couldn't backup database",
 			);
 			return false;
 		}
 
 		if (!snapshotName)
-			snapshotName = `snapshot-${formatDate(new Date(), 'onlyDateFileName')}`;
+			snapshotName = `snapshot-${formatDate(dayjsTimezone().toDate(), 'onlyDateFileName')}`;
 
 		try {
 			await backup(
@@ -165,7 +165,7 @@ export class Database {
 
 			return true;
 		} catch (error) {
-			console.debug(error);
+			console.log(error);
 			await this.logger.log(
 				"Snapshot file not found, couldn't restore",
 				'error',

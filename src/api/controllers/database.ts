@@ -7,7 +7,7 @@ import { databaseConfig } from '@/configs';
 import { Database } from '@/services';
 import { BaseController } from '@/utils/classes';
 import { Injectable } from '@/utils/decorators';
-import { formatDate, resolveDependencies } from '@/utils/functions';
+import { dayjsTimezone, formatDate, resolveDependencies } from '@/utils/functions';
 
 @Controller('/database')
 @UseBefore(DevAuthenticated)
@@ -25,7 +25,7 @@ export class DatabaseController extends BaseController {
 
 	@Post('/backup')
 	async generateBackup() {
-		const snapshotName = `snapshot-${formatDate(new Date(), 'onlyDateFileName')}-manual-${Date.now().toString()}`;
+		const snapshotName = `snapshot-${formatDate(dayjsTimezone(), 'onlyDateFileName')}-manual-${Date.now().toString()}`;
 		const success = await this.db.backup(snapshotName);
 
 		if (success) {

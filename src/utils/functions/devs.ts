@@ -1,11 +1,11 @@
-import type { UserResolvable } from 'discord.js';
+import type { Snowflake } from 'discord.js';
 
 import { generalConfig } from '@/configs';
 
 /**
  * Get a curated list of devs including the owner id
  */
-export function getDevs(): UserResolvable[] {
+export function getDevs(): Snowflake[] {
 	return [
 		...new Set([
 			...(generalConfig.ownerId ? [generalConfig.ownerId] : []),

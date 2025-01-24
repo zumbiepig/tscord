@@ -1,35 +1,55 @@
-import dayjs from 'dayjs/esm';
-import dayjsTimeZone from 'dayjs/esm/plugin/timezone';
-import dayjsUTC from 'dayjs/esm/plugin/utc';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime.js';
+import timezone from 'dayjs/plugin/timezone.js';
+import utc from 'dayjs/plugin/utc.js';
 
 import { generalConfig } from '@/configs';
 
-dayjs.extend(dayjsTimeZone);
-dayjs.extend(dayjsUTC);
+dayjs.extend(relativeTime);
+dayjs.extend(timezone);
+dayjs.extend(utc);
 
 dayjs.tz.setDefault(generalConfig.timezone);
 
-export const datejs = dayjs.tz;
+export const dayjsTimezone = dayjs.tz;
 
 const dateMasks = {
 	default: 'DD/MM/YYYY - HH:mm:ss',
 	onlyDate: 'DD/MM/YYYY',
 	onlyDateFileName: 'YYYY-MM-DD',
+	logs: 'YYYY-MM-DD HH:mm:ss',
 };
 
 /**
- * Format a date object to a templated string using the [date-and-time](https://www.npmjs.com/package/date-and-time) library.
+ * Format a date object to a templated string using the [dayjs](https://www.npmjs.com/package/dayjs) library.
  * @param date
  * @param mask - template for the date format
  * @returns formatted date
  */
 export function formatDate(
-	date: Date,
+	date?: dayjs.ConfigType,
 	mask: keyof typeof dateMasks = 'default',
 ) {
-	return datejs(date).format(dateMasks[mask]);
+	return dayjsTimezone(date).format(dateMasks[mask]);
 }
 
-export function timeAgo(date: Date) {
-	return dayjs(date).fromNow();
+export function timeAgo(
+	date?: dayjs.ConfigType,
+	unit?: dayjs.QUnitType | dayjs.OpUnitType,
+	float?: boolean,
+): number {
+	return dayjsTimezone().diff(date, unit, float);
+}
+
+/**
+ * Change a Date to a different timezone.
+ * @param date
+ * @param timezone
+ */
+export function convertTZ(date: Date, timezone: typeof generalConfig.timezone): Date {
+	return new Date(
+		date.toLocaleString(generalConfig.defaultLocale, {
+			timeZone: timezone,
+		}),
+	);
 }

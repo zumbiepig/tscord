@@ -14,7 +14,8 @@
 	"scripts": {
 		"postinstall": "installoop --rootDir=./src/plugins/* && npm run i18n",
 		"start": "npm run i18n && cross-env NODE_ENV=production node .",
-		"dev": "npm run i18n && cross-env NODE_ENV=development tsx watch src/main.ts",
+		"dev": "npm-run-all --parallel i18n:watch dev:dev",
+		"dev:dev": "cross-env NODE_ENV=development tsx watch src/main.ts",
 		"build": "rimraf ./dist && tsc && tsc-alias",
 		"lint": "npm-run-all --parallel lint:lint typecheck",
 		"lint:lint": "eslint .",

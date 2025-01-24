@@ -8,39 +8,39 @@ import type {
 
 import type { Translations } from '@/i18n';
 
-declare enum AdditionalLocaleString {
+export declare enum AdditionalLocaleString {
 	English = 'en',
 }
 
-type TranslationsNestedPaths = NestedPaths<Translations>;
+export type TranslationsNestedPaths = NestedPaths<Translations>;
 
-type LocalizationMap = Partial<
+export type LocalizationMap = Partial<
 	Record<`${Locale | AdditionalLocaleString}`, string>
 >;
 
-interface SanitizedOptions {
+export interface SanitizedOptions {
 	descriptionLocalizations?: LocalizationMap;
 	nameLocalizations?: LocalizationMap;
 	localizationSource?: TranslationsNestedPaths;
 }
 
-type Sanitization<K> = Modify<K, SanitizedOptions>;
+export type Sanitization<K> = Modify<K, SanitizedOptions>;
 
-type ApplicationCommandOptions = Sanitization<
+export type ApplicationCommandOptions = Sanitization<
 	WithOptional<ApplicationCommandOptionsX<string, string>, 'description'>
 >;
 
-type SlashGroupOptions = Sanitization<
+export type SlashGroupOptions = Sanitization<
 	WithOptional<SlashGroupOptionsX<string, string, string>, 'description'>
 >;
 
-type SlashOptionOptions = Sanitization<
+export type SlashOptionOptions = Sanitization<
 	WithOptional<SlashOptionOptionsX<string, string>, 'description'>
 >;
 
-type SlashChoiceType = Modify<SlashChoiceTypeX, SanitizedOptions>;
+export type SlashChoiceType = Modify<SlashChoiceTypeX, SanitizedOptions>;
 
-type ContextMenuOptions = Modify<
+export type ContextMenuOptions = Modify<
 	Modify<
 		Omit<
 			ApplicationCommandOptionsX<NotEmptyX<string>, string>,

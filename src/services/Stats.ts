@@ -12,7 +12,7 @@ import { Guild, Stat, User } from '@/entities';
 import { Database } from '@/services';
 import { Schedule, Service } from '@/utils/decorators';
 import {
-	datejs,
+	dayjsTimezone,
 	formatDate,
 	getTypeOfInteraction,
 	resolveAction,
@@ -263,16 +263,22 @@ export class Stats {
 		type: string,
 		days: number,
 	): Promise<StatPerInterval> {
-		const now = Date.now();
 		const stats: StatPerInterval = [];
+		const now = dayjsTimezone();
 
 		for (let i = 0; i < days; i++) {
-			const date = new Date(now - i * 24 * 60 * 60 * 1000);
-			const statCount = await this.getCountForGivenDay(type, date);
+			const date = now.subtract(i, 'day');
+		const statsFound = await this.statsRepo.find({
+			type,
+			createdAt: {
+				$gte: date.startOf('day').toDate(),
+				$lte: date.endOf('day').toDate(),
+			},
+		});
 
 			stats.push({
 				date: formatDate(date, 'onlyDate'),
-				count: statCount,
+				count: statsFound.length,
 			});
 		}
 
@@ -326,26 +332,6 @@ export class Stats {
 		}));
 
 		return sumStats;
-	}
-
-	/**
-	 * Returns the total count of row for a given type at a given day.
-	 * @param type
-	 * @param date - day to get the stats for (any time of the day will work as it extract the very beginning and the very ending of the day as the two limits)
-	 */
-	async getCountForGivenDay(type: string, date: Date): Promise<number> {
-		const start = datejs(date).startOf('day').toDate();
-		const end = datejs(date).endOf('day').toDate();
-
-		const stats = await this.statsRepo.find({
-			type,
-			createdAt: {
-				$gte: start,
-				$lte: end,
-			},
-		});
-
-		return stats.length;
 	}
 
 	/**

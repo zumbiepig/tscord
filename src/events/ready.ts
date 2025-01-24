@@ -4,7 +4,7 @@ import { generalConfig } from '@/configs';
 import { Data } from '@/entities';
 import { Database, Logger, Scheduler, Store } from '@/services';
 import { Injectable, On, Schedule } from '@/utils/decorators';
-import { resolveDependency, syncAllGuilds } from '@/utils/functions';
+import { syncAllGuilds } from '@/utils/functions';
 
 @Discord()
 @Injectable()
@@ -14,6 +14,7 @@ export default class ReadyEvent {
 		private logger: Logger,
 		private scheduler: Scheduler,
 		private store: Store,
+		private client: Client,
 	) {}
 
 	private activityIndex = 0;
@@ -27,7 +28,7 @@ export default class ReadyEvent {
 		await client.initApplicationCommands();
 
 		// change activity
-		await this.changeActivity();
+		this.changeActivity();
 
 		// update last startup time in the database
 		await this.db.get(Data).set('lastStartup', Date.now());
@@ -46,14 +47,12 @@ export default class ReadyEvent {
 	}
 
 	@Schedule('*/15 * * * * *') // cycle activities every 15 seconds
-	async changeActivity() {
-		const client = await resolveDependency(Client);
-
+	changeActivity() {
 		if (generalConfig.activities.length > 0) {
 			const activity = generalConfig.activities[this.activityIndex];
 
 			if (activity) {
-				client.user?.setPresence({
+				this.client.user?.setPresence({
 					status: activity.status,
 					activities: [
 						{

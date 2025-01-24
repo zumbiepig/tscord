@@ -1,4 +1,4 @@
-interface State {
+export interface State {
 	authorizedAPITokens: string[];
 	botHasBeenReloaded: boolean;
 	ready: {
