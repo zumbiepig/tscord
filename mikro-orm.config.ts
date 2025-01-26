@@ -3,7 +3,7 @@ import 'reflect-metadata'
 
 import process from 'node:process'
 
-import { defineConfig, Options } from '@mikro-orm/core'
+import { DatabaseDriver, defineConfig, Options } from '@mikro-orm/core'
 
 import * as entities from '@/entities'
 import { PluginsManager } from '@/services'

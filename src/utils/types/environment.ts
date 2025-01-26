@@ -27,6 +27,7 @@ export const env = cleanEnv(process.env, {
 
 export function checkEnvironmentVariables() {
 	const config = mikroORMConfig[env.NODE_ENV]
+
 	// @ts-expect-error
 	const isSqliteDatabase = !!config.dbName && !config.port
 	if (!isSqliteDatabase) {
