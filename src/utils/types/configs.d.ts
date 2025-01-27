@@ -1,14 +1,18 @@
 import type { Options } from '@mikro-orm/core';
-import type { Snowflake } from 'discord.js';
+import type {
+	ActivitiesOptions,
+	Locale,
+	PresenceStatusData,
+	Snowflake,
+} from 'discord.js';
 
-import type { Locales } from '@/i18n';
 import type { InteractionsConstants } from '@/utils/types';
 
 export interface GeneralConfigType {
 	name: string;
 	description: string;
 
-	defaultLocale: Locales;
+	defaultLocale: `${Locale}`;
 	timezone:
 		| 'Africa/Abidjan'
 		| 'Africa/Accra'

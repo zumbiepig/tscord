@@ -7,7 +7,7 @@ import { generalConfig } from '@/configs';
 import { Guild } from '@/entities';
 import { Database } from '@/services';
 import { Injectable, Slash, SlashOption } from '@/utils/decorators';
-import { UnknownReplyError } from '@/utils/errors';
+import { ReplyUnknownErrorError } from '@/utils/errors';
 import { resolveGuild, simpleSuccessEmbed } from '@/utils/functions';
 import type { InteractionData } from '@/utils/types';
 
@@ -42,7 +42,7 @@ export default class PrefixCommand {
 				}),
 			);
 		} else {
-			throw new UnknownReplyError(interaction);
+			throw new ReplyUnknownErrorError(interaction);
 		}
 	}
 }

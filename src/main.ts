@@ -173,14 +173,15 @@ async function init() {
 
 		const eventManager = await resolveDependency(EventManager);
 		const store = container.resolve(Store);
+		// subscribe to all changes to the 'ready' state
 		store.select('ready').subscribe((state) => {
-			// check that all properties that are not null are set to true
+			// check that all properties that not disabled are ready
 			if (
 				Object.values(state)
 					.filter((value) => value !== null)
 					.every((value) => value)
 			) {
-				void eventManager.emit('templateReady'); // the template is fully ready!
+				void eventManager.emit('fullyReady'); // the template is fully ready!
 			}
 		});
 	});

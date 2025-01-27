@@ -5,9 +5,6 @@ import { container, type InjectionToken } from 'tsyringe';
 import { generalConfig } from '@/configs';
 import { Scheduler } from '@/services';
 import { InvalidCronError } from '@/utils/errors';
-import { resolveDependency } from '@/utils/functions';
-
-const scheduler = await resolveDependency(Scheduler);
 
 /**
  * Schedule a job to be executed at a specific time (cron)
@@ -41,6 +38,7 @@ export function Schedule(cronExpression: string, jobName?: string) {
 			target,
 		);
 
+		const scheduler = container.resolve(Scheduler);
 		scheduler.addJob(jobName ?? propertyKey, job);
 	};
 }

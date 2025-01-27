@@ -8,6 +8,7 @@ export default tseslint.config(
 	...tseslint.configs.strictTypeChecked,
 	...tseslint.configs.stylisticTypeChecked,
 	{
+		ignores: ['dist/'],
 		languageOptions: {
 			parserOptions: {
 				projectService: {
