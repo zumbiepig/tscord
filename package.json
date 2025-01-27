@@ -36,11 +36,11 @@
 		"@mikro-orm/migrations": "^6.4.4",
 		"@mikro-orm/sql-highlighter": "^1.0.1",
 		"@mikro-orm/sqlite": "^6.4.4",
-		"@tsed/common": "^8.4.4",
+		"@tsed/common": "^8.4.5",
 		"@tsed/exceptions": "^8.4.4",
-		"@tsed/platform-express": "^8.4.4",
+		"@tsed/platform-express": "^8.4.5",
 		"@tsed/schema": "^8.4.4",
-		"@tsed/swagger": "^8.4.4",
+		"@tsed/swagger": "^8.4.5",
 		"archiver": "^7.0.1",
 		"axios": "^1.7.9",
 		"better-sqlite3": "^11.8.1",
@@ -57,7 +57,7 @@
 		"dotenv": "^16.4.7",
 		"envalid": "^8.0.0",
 		"express": "^4.21.2",
-		"fast-folder-size": "^2.3.0",
+		"fast-folder-size": "^2.4.0",
 		"fast-glob": "^3.3.3",
 		"image-hash": "^5.3.2",
 		"imgur": "^2.4.2",
@@ -93,7 +93,7 @@
 		"tsc-alias": "^1.8.10",
 		"tsx": "^4.19.2",
 		"typescript": "^5.7.3",
-		"typescript-eslint": "^8.21.0"
+		"typescript-eslint": "^8.22.0"
 	},
 	"tscord": {
 		"version": "2.6"

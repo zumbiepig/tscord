@@ -10,6 +10,8 @@
 ![Repo size](https://img.shields.io/github/repo-size/barthofu/tscord?colorB=4b38ff&colorA=4b38ff&style=flat)
 ![Stars count](https://img.shields.io/github/stars/barthofu/tscord?colorB=4b38ff&colorA=4b38ff&style=flat)
 
+[![Crowdin](https://badges.crowdin.net/tscord/localized.svg)](https://crowdin.com/project/tscord)
+
 <table>
   <tr>
     <td align="center">
