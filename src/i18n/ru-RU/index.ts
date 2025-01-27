@@ -1,67 +1,67 @@
 import type { BaseTranslation } from '../i18n-types.js';
 export default ({
   GUARDS: {
-    DISABLED_COMMAND: 'This command is currently disabled.',
-    MAINTENANCE: 'This bot is currently in maintenance mode.',
-    GUILD_ONLY: 'This command can only be used in a server.',
-    NSFW: 'This command can only be used in a NSFW channel.'
+    DISABLED_COMMAND: "Эта команда на данный момент не доступна.",
+    MAINTENANCE: "Бот закрыт на техническое обслуживание.",
+    GUILD_ONLY: "Эту команду можно использовать только на сервере.",
+    NSFW: "Эта команда доступна только в чатах 18+."
   },
   ERRORS: {
-    UNKNOWN: 'An unknown error occurred.'
+    UNKNOWN: "Произошла непонятная ошибка."
   },
   SHARED: {
-    NO_COMMAND_DESCRIPTION: 'No description provided.'
+    NO_COMMAND_DESCRIPTION: "Описание отсутствует."
   },
   COMMANDS: {
     INVITE: {
-      DESCRIPTION: 'Invite the bot to your server!',
+      DESCRIPTION: "Пригласить бота на свой сервер!",
       EMBED: {
-        TITLE: 'Invite me on your server!',
-        DESCRIPTION: '[Click here]({link}) to invite me!'
+        TITLE: "Хочешь видеть меня у себя на сервере?",
+        DESCRIPTION: "[Жми здесь]({link}) чтобы добавить бота!"
       }
     },
     PREFIX: {
       NAME: 'prefix',
-      DESCRIPTION: 'Change the prefix of the bot.',
+      DESCRIPTION: "Изменить префикс для бота.",
       OPTIONS: {
         PREFIX: {
           NAME: 'new_prefix',
-          DESCRIPTION: 'The new prefix of the bot.'
+          DESCRIPTION: "Новый префикс для бота."
         }
       },
       EMBED: {
-        DESCRIPTION: 'Prefix changed to `{prefix:string}`.'
+        DESCRIPTION: "Префикс бота изменен на `{prefix}`."
       }
     },
     MAINTENANCE: {
-      DESCRIPTION: 'Set the maintenance mode of the bot.',
+      DESCRIPTION: "Установить режим технического обслуживания бота.",
       EMBED: {
-        DESCRIPTION: 'Maintenance mode set to `{state:string}`.'
+        DESCRIPTION: "Режим Технического Обслуживания установлен на `{state}`."
       }
     },
     STATS: {
-      DESCRIPTION: 'Get some stats about the bot.',
+      DESCRIPTION: "Получить статистику по боту.",
       HEADERS: {
-        COMMANDS: 'Commands',
-        GUILDS: 'Guild',
-        ACTIVE_USERS: 'Active Users',
-        USERS: 'Users'
+        COMMANDS: "Команды",
+        GUILDS: "Сервера",
+        ACTIVE_USERS: "Активные пользователи",
+        USERS: "Пользователи"
       }
     },
     HELP: {
-      DESCRIPTION: 'Get global help about the bot and its commands',
+      DESCRIPTION: "Глобальная справка по боту и его командам",
       EMBED: {
-        TITLE: 'Help panel',
-        CATEGORY_TITLE: '{category:string} Commands'
+        TITLE: "Панель помощи",
+        CATEGORY_TITLE: "{category} команды"
       },
       SELECT_MENU: {
-        TITLE: 'Select a category',
-        CATEGORY_DESCRIPTION: '{category:string} commands'
+        TITLE: "Выбери категорию",
+        CATEGORY_DESCRIPTION: "{category} команды"
       }
     },
     PING: {
-      DESCRIPTION: 'Pong!',
-      MESSAGE: '{member:string} Pong! The message round-trip took {time:number}ms.{heartbeat:string}'
+      DESCRIPTION: "Тук-тук!",
+      MESSAGE: "{member} Что нужно? Было потрачено {time} милисекунд на генерацию ответа. {heartbeat}"
     }
   }
 } as BaseTranslation);
