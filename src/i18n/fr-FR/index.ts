@@ -30,38 +30,38 @@ export default ({
         }
       },
       EMBED: {
-        DESCRIPTION: 'Prefix changed to `{prefix:string}`.'
+        DESCRIPTION: "Prefix changé en `{prefix}`."
       }
     },
     MAINTENANCE: {
-      DESCRIPTION: 'Set the maintenance mode of the bot.',
+      DESCRIPTION: "Met le mode maintenance du bot.",
       EMBED: {
-        DESCRIPTION: 'Maintenance mode set to `{state:string}`.'
+        DESCRIPTION: "Le mode maintenance a été définie à `{state}`."
       }
     },
     STATS: {
-      DESCRIPTION: 'Get some stats about the bot.',
+      DESCRIPTION: "Obtiens des statistiques sur le bot.",
       HEADERS: {
-        COMMANDS: 'Commands',
-        GUILDS: 'Guild',
-        ACTIVE_USERS: 'Active Users',
-        USERS: 'Users'
+        COMMANDS: "Commandes",
+        GUILDS: "Serveurs",
+        ACTIVE_USERS: "Utilisateurs actifs",
+        USERS: "Utilisateurs"
       }
     },
     HELP: {
-      DESCRIPTION: 'Get global help about the bot and its commands',
+      DESCRIPTION: "Obtenez de l'aide globale sur le bot et ses commandes",
       EMBED: {
-        TITLE: 'Help panel',
-        CATEGORY_TITLE: '{category:string} Commands'
+        TITLE: "Pannel d'aide",
+        CATEGORY_TITLE: "Commandes de {category}"
       },
       SELECT_MENU: {
-        TITLE: 'Select a category',
-        CATEGORY_DESCRIPTION: '{category:string} commands'
+        TITLE: "Sélectionnez une catégorie",
+        CATEGORY_DESCRIPTION: "Commandes de {category}"
       }
     },
     PING: {
       DESCRIPTION: 'Pong!',
-      MESSAGE: '{member:string} Pong! The message round-trip took {time:number}ms.{heartbeat:string}'
+      MESSAGE: "{member} Pong! Le temps de réponse de la réponse était {time}ms.{heartbeat}"
     }
   }
 } as BaseTranslation);
