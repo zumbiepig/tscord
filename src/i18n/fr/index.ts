@@ -1,67 +1,67 @@
 import type { BaseTranslation } from '../i18n-types.js';
 export default ({
   GUARDS: {
-    DISABLED_COMMAND: 'This command is currently disabled.',
-    MAINTENANCE: 'This bot is currently in maintenance mode.',
-    GUILD_ONLY: 'This command can only be used in a server.',
-    NSFW: 'This command can only be used in a NSFW channel.'
+    DISABLED_COMMAND: "Cette commande est désactivée.",
+    MAINTENANCE: "Ce bot est en mode maintenance.",
+    GUILD_ONLY: "Cette commande ne peut être utilisée qu'en serveur.",
+    NSFW: "Cette commande ne peut être utilisée que dans un salon NSFW."
   },
   ERRORS: {
-    UNKNOWN: 'An unknown error occurred.'
+    UNKNOWN: "Une erreur est survenue."
   },
   SHARED: {
-    NO_COMMAND_DESCRIPTION: 'No description provided.'
+    NO_COMMAND_DESCRIPTION: "Aucune description fournie."
   },
   COMMANDS: {
     INVITE: {
-      DESCRIPTION: 'Invite the bot to your server!',
+      DESCRIPTION: "Invitez le bot sur votre serveur!",
       EMBED: {
-        TITLE: 'Invite me on your server!',
-        DESCRIPTION: '[Click here]({link}) to invite me!'
+        TITLE: "Invite moi sur ton serveur!",
+        DESCRIPTION: "[Clique ici]({link}) pour m'inviter!"
       }
     },
     PREFIX: {
-      NAME: 'prefix',
-      DESCRIPTION: 'Change the prefix of the bot.',
+      NAME: "prefixe",
+      DESCRIPTION: "Change le préfix du bot.",
       OPTIONS: {
         PREFIX: {
-          NAME: 'new_prefix',
-          DESCRIPTION: 'The new prefix of the bot.'
+          NAME: "nouveau_prefix",
+          DESCRIPTION: "Le nouveau préfix du bot."
         }
       },
       EMBED: {
-        DESCRIPTION: 'Prefix changed to `{prefix:string}`.'
+        DESCRIPTION: "Prefix changé en `{prefix}`."
       }
     },
     MAINTENANCE: {
-      DESCRIPTION: 'Set the maintenance mode of the bot.',
+      DESCRIPTION: "Met le mode maintenance du bot.",
       EMBED: {
-        DESCRIPTION: 'Maintenance mode set to `{state:string}`.'
+        DESCRIPTION: "Le mode maintenance a été définie à `{state}`."
       }
     },
     STATS: {
-      DESCRIPTION: 'Get some stats about the bot.',
+      DESCRIPTION: "Obtiens des statistiques sur le bot.",
       HEADERS: {
-        COMMANDS: 'Commands',
-        GUILDS: 'Guild',
-        ACTIVE_USERS: 'Active Users',
-        USERS: 'Users'
+        COMMANDS: "Commandes",
+        GUILDS: "Serveurs",
+        ACTIVE_USERS: "Utilisateurs actifs",
+        USERS: "Utilisateurs"
       }
     },
     HELP: {
-      DESCRIPTION: 'Get global help about the bot and its commands',
+      DESCRIPTION: "Obtenez de l'aide globale sur le bot et ses commandes",
       EMBED: {
-        TITLE: 'Help panel',
-        CATEGORY_TITLE: '{category:string} Commands'
+        TITLE: "Pannel d'aide",
+        CATEGORY_TITLE: "Commandes de {category}"
       },
       SELECT_MENU: {
-        TITLE: 'Select a category',
-        CATEGORY_DESCRIPTION: '{category:string} commands'
+        TITLE: "Sélectionnez une catégorie",
+        CATEGORY_DESCRIPTION: "Commandes de {category}"
       }
     },
     PING: {
       DESCRIPTION: 'Pong!',
-      MESSAGE: '{member:string} Pong! The message round-trip took {time:number}ms.{heartbeat:string}'
+      MESSAGE: "{member} Pong! Le temps de réponse de la réponse était {time}ms.{heartbeat}"
     }
   }
 } as BaseTranslation);
