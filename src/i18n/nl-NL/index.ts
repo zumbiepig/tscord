@@ -1,67 +1,67 @@
 import type { Translation } from '../i18n-types.js';
 export default ({
   GUARDS: {
-    DISABLED_COMMAND: 'Cette commande est désactivée.',
-    MAINTENANCE: 'Ce bot est en mode maintenance.',
-    GUILD_ONLY: "Cette commande ne peut être utilisée qu'en serveur.",
-    NSFW: 'Cette commande ne peut être utilisée que dans un salon NSFW.'
+    DISABLED_COMMAND: 'Эта команда на данный момент не доступна.',
+    MAINTENANCE: 'Бот закрыт на техническое обслуживание.',
+    GUILD_ONLY: 'Эту команду можно использовать только на сервере.',
+    NSFW: 'Эта команда доступна только в чатах 18+.'
   },
   ERRORS: {
-    UNKNOWN: 'Une erreur est survenue.'
+    UNKNOWN: 'Произошла непонятная ошибка.'
   },
   SHARED: {
-    NO_COMMAND_DESCRIPTION: 'Aucune description fournie.'
+    NO_COMMAND_DESCRIPTION: 'Описание отсутствует.'
   },
   COMMANDS: {
     INVITE: {
-      DESCRIPTION: 'Invitez le bot sur votre serveur!',
+      DESCRIPTION: 'Пригласить бота на свой сервер!',
       EMBED: {
-        TITLE: 'Invite moi sur ton serveur!',
-        DESCRIPTION: "[Clique ici]({link}) pour m'inviter!"
+        TITLE: 'Хочешь видеть меня у себя на сервере?',
+        DESCRIPTION: '[Жми здесь]({link}) чтобы добавить бота!'
       }
     },
     PREFIX: {
-      NAME: 'prefixe',
-      DESCRIPTION: 'Change le préfix du bot.',
+      NAME: 'prefix',
+      DESCRIPTION: 'Изменить префикс для бота.',
       OPTIONS: {
         PREFIX: {
-          NAME: 'nouveau_prefix',
-          DESCRIPTION: 'Le nouveau préfix du bot.'
+          NAME: 'new_prefix',
+          DESCRIPTION: 'Новый префикс для бота.'
         }
       },
       EMBED: {
-        DESCRIPTION: 'Prefix changé en `{prefix}`.'
+        DESCRIPTION: 'Префикс бота изменен на `{prefix}`.'
       }
     },
     MAINTENANCE: {
-      DESCRIPTION: 'Met le mode maintenance du bot.',
+      DESCRIPTION: 'Установить режим технического обслуживания бота.',
       EMBED: {
-        DESCRIPTION: 'Le mode maintenance a été définie à `{state}`.'
+        DESCRIPTION: 'Режим Технического Обслуживания установлен на `{state}`.'
       }
     },
     STATS: {
-      DESCRIPTION: 'Obtiens des statistiques sur le bot.',
+      DESCRIPTION: 'Получить статистику по боту.',
       HEADERS: {
-        COMMANDS: 'Commandes',
-        GUILDS: 'Serveurs',
-        ACTIVE_USERS: 'Utilisateurs actifs',
-        USERS: 'Utilisateurs'
+        COMMANDS: 'Команды',
+        GUILDS: 'Сервера',
+        ACTIVE_USERS: 'Активные пользователи',
+        USERS: 'Пользователи'
       }
     },
     HELP: {
-      DESCRIPTION: "Obtenez de l'aide globale sur le bot et ses commandes",
+      DESCRIPTION: 'Глобальная справка по боту и его командам',
       EMBED: {
-        TITLE: "Pannel d'aide",
-        CATEGORY_TITLE: 'Commandes de {category}'
+        TITLE: 'Панель помощи',
+        CATEGORY_TITLE: '{category} команды'
       },
       SELECT_MENU: {
-        TITLE: 'Sélectionnez une catégorie',
-        CATEGORY_DESCRIPTION: 'Commandes de {category}'
+        TITLE: 'Выбери категорию',
+        CATEGORY_DESCRIPTION: '{category} команды'
       }
     },
     PING: {
-      DESCRIPTION: 'Pong!',
-      MESSAGE: '{member} Pong! Le temps de réponse de la réponse était {time}ms.{heartbeat}'
+      DESCRIPTION: 'Тук-тук!',
+      MESSAGE: '{member} Что нужно? Было потрачено {time} милисекунд на генерацию ответа. {heartbeat}'
     }
   }
 } as Translation);
