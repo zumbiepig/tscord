@@ -1,9 +1,13 @@
 files:
   - source: /src/i18n/en-US/index.ts
     translation: /src/i18n/%two_letters_code%/index.ts
+    languages_mapping:
+      two_letters_code:
+        en-GB: en-GB
+        en-US: en-US
   - source: /src/plugins/**/i18n/en-US/index.ts
     translation: /src/plugins/**/i18n/%two_letters_code%/index.ts
-  - languages_mapping:
+    languages_mapping:
       two_letters_code:
         en-GB: en-GB
         en-US: en-US
