@@ -1,0 +1,60 @@
+{
+  'project_id': 758053,
+  'api_token_env': 'CROWDIN_API_TOKEN',
+  'base_path': '.',
+  'base_url': 'https://api.crowdin.com',
+
+  'preserve_hierarchy': true,
+
+  'pull_request_title': 'crowdin[bot]: New Crowdin updates',
+  'pull_request_labels': ['crowdin'],
+  'commit_message': 'crowdin[bot]: New translations for %original_file_name% (%language%)\n[ci skip]',
+  'append_commit_message': false,
+
+  'files':
+    [
+      {
+        'source': '/src/i18n/en-US/index.ts',
+        'translation': '/src/i18n/%locale%/index.ts',
+        'update_option': 'update_as_unapproved',
+        'languages_mapping':
+          {
+            'locale':
+              {
+                'id': 'id',
+                'da': 'da',
+                'de': 'de',
+                'en-GB': 'en-GB',
+                'en-US': 'en-US',
+                'es-ES': 'es-ES',
+                'es-419': 'es-419',
+                'fr': 'fr',
+                'hr': 'hr',
+                'it': 'it',
+                'lt': 'lt',
+                'hu': 'hu',
+                'nl': 'nl',
+                'no': 'no',
+                'pl': 'pl',
+                'pt-BR': 'pt-BR',
+                'ro': 'ro',
+                'fi': 'fi',
+                'sv-SE': 'sv-SE',
+                'vi': 'vi',
+                'tr': 'tr',
+                'cs': 'cs',
+                'el': 'el',
+                'bg': 'bg',
+                'ru': 'ru',
+                'uk': 'uk',
+                'hi': 'hi',
+                'th': 'th',
+                'zh-CN': 'zh-CN',
+                'ja': 'ja',
+                'zh-TW': 'zh-TW',
+                'ko': 'ko',
+              },
+          },
+      },
+    ],
+}
