@@ -1,21 +1,14 @@
-{
-  "commit_message": "[crowdin]",
-  "files": [
-    {
-      "source": "/src/i18n/en-US/index.ts",
-      "translation": "/src/i18n/%two_letters_code%/index.ts",
-      "languages_mapping": {
-        "two_letters_code": {
-          "en-GB": "en-GB",
-          "en-US": "en-US",
-          "es-ES": "es-ES",
-          "es-419": "es-419",
-          "pt-BR": "pt-BR",
-          "sv-SE": "sv-SE",
-          "zh-CN": "zh-CN",
-          "zh-TW": "zh-TW"
-        }
-      }
-    }
-  ]
-}
+commit_message: '[crowdin]'
+files:
+  - source: /src/i18n/en-US/index.ts
+    translation: /src/i18n/%two_letters_code%/index.ts
+    languages_mapping:
+      two_letters_code:
+        en-GB: en-GB
+        en-US: en-US
+        es-ES: es-ES
+        es-419: es-419
+        pt-BR: pt-BR
+        sv-SE: sv-SE
+        zh-CN: zh-CN
+        zh-TW: zh-TW
