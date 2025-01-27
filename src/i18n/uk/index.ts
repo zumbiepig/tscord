@@ -42,26 +42,26 @@ export default ({
     STATS: {
       DESCRIPTION: "Подивитись статистику бота.",
       HEADERS: {
-        COMMANDS: 'Commands',
+        COMMANDS: "Команди",
         GUILDS: "Гільдії",
-        ACTIVE_USERS: 'Active Users',
-        USERS: 'Users'
+        ACTIVE_USERS: "Активні користувачі",
+        USERS: "Користувачі"
       }
     },
     HELP: {
-      DESCRIPTION: 'Get global help about the bot and its commands',
+      DESCRIPTION: "Загальна допомога по боту та його командам",
       EMBED: {
-        TITLE: 'Help panel',
-        CATEGORY_TITLE: '{category:string} Commands'
+        TITLE: "Панель допомоги",
+        CATEGORY_TITLE: "{category} команди"
       },
       SELECT_MENU: {
         TITLE: "Вибери категорію",
-        CATEGORY_DESCRIPTION: '{category:string} commands'
+        CATEGORY_DESCRIPTION: "{category} команди"
       }
     },
     PING: {
-      DESCRIPTION: 'Pong!',
-      MESSAGE: '{member:string} Pong! The message round-trip took {time:number}ms.{heartbeat:string}'
+      DESCRIPTION: "Перевірка зв'язку!",
+      MESSAGE: "{member} Чути добре! Генерація повідомлення зайняла {time} мілісекунд. {heartbeat}"
     }
   }
 } as BaseTranslation);
