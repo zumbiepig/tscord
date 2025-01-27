@@ -2,7 +2,7 @@ pull_request_title: 'crowdin[bot]: New Crowdin updates'
 pull_request_labels:
   - crowdin
 commit_message: 'crowdin[bot]: New translations for %language%'
-append_commit_message: false
+append_commit_message: 
 pull_request_assignees:
   - barthofu
 files:
