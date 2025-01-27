@@ -1,3 +1,3 @@
 files:
   - source: /src/i18n/en-US/index.ts
-    translation: /src/i18n/%locale%/index.ts
+    translation: /src/i18n/%two_letters_code%/index.ts
