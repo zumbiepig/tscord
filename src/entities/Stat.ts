@@ -1,4 +1,3 @@
-import { dayjsTimezone } from '@/utils/functions';
 import {
 	Entity,
 	EntityRepositoryType,
@@ -6,6 +5,8 @@ import {
 	Property,
 } from '@mikro-orm/core';
 import { EntityRepository } from '@mikro-orm/sqlite';
+
+import { dayjsTimezone } from '@/utils/functions';
 
 @Entity({ repository: () => StatRepository })
 export class Stat {

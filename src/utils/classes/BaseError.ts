@@ -1,22 +1,12 @@
 import process from 'node:process';
 
-import { inject } from 'tsyringe';
-
 import { Logger } from '@/services';
-import { Injectable } from '@/utils/decorators';
+import { resolveDependency } from '@/utils/functions';
 
-@Injectable()
-// should be abstract but tsyringe doesn't support abstract classes
 export class BaseError extends Error {
-	constructor(
-		message?: string,
-		@inject(Logger) protected logger?: Logger,
-	) {
-		super(message);
-	}
-
 	async handle() {
-		await this.logger?.log('error', this.message);
+		const logger = await resolveDependency(Logger);
+		await logger.log('error', this.message);
 	}
 
 	kill() {

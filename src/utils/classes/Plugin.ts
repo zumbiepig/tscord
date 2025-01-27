@@ -7,14 +7,18 @@ import fastGlob from 'fast-glob';
 import { coerce, satisfies, valid } from 'semver';
 
 import { generalConfig } from '@/configs';
-import { type BaseTranslation, type Locales, locales } from '@/i18n';
+import {
+	type BaseTranslation,
+	type Locales,
+	locales as i18nLocales,
+} from '@/i18n';
 import { Logger } from '@/services';
 import { BaseController } from '@/utils/classes';
+import { AutoInjectable } from '@/utils/decorators';
 import { getTscordVersion, resolveDependency } from '@/utils/functions';
 
+@AutoInjectable()
 export class Plugin {
-	private logger!: Logger;
-
 	// Common values
 	private _path: string;
 	private _name!: string;
@@ -27,7 +31,10 @@ export class Plugin {
 	private _services!: Record<string, unknown>;
 	private _translations!: Record<Locales, BaseTranslation>;
 
-	constructor(path: string) {
+	constructor(
+		path: string,
+		private logger?: Logger,
+	) {
 		this._path = path;
 	}
 
@@ -108,7 +115,7 @@ export class Plugin {
 
 	private async stopLoad(error: string) {
 		this._valid = false;
-		await this.logger.log(
+		await this.logger?.log(
 			'error',
 			`Plugin ${this._name ? this._name : this._path} ${this._version ? `v${this._version}` : ''} is not valid: ${error}`,
 		);
@@ -138,7 +145,7 @@ export class Plugin {
 			BaseTranslation
 		>;
 
-		for (const locale of locales) {
+		for (const locale of i18nLocales) {
 			const path = join(this._path, 'i18n', `${locale}.ts`);
 			if (!existsSync(path)) {
 				if (locale === generalConfig.defaultLocale) {
@@ -147,7 +154,7 @@ export class Plugin {
 					);
 					return {} as Record<Locales, BaseTranslation>;
 				} else {
-					await this.logger.log(
+					await this.logger?.log(
 						'warn',
 						`Plugin ${this._name} v${this._version} is missing translations for locale '${locale}'`,
 					);

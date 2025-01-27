@@ -4,7 +4,7 @@ import { L } from '@/i18n';
 import { BaseError } from '@/utils/classes';
 import { getLocaleFromInteraction, simpleErrorEmbed } from '@/utils/functions';
 
-export class UnknownReplyError extends BaseError {
+export class ReplyUnknownErrorError extends BaseError {
 	private interaction: CommandInteraction;
 
 	constructor(interaction: CommandInteraction, message?: string) {
