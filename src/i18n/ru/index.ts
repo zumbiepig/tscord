@@ -4,7 +4,7 @@ export default {
 		DISABLED_COMMAND: 'Эта команда на данный момент не доступна.',
 		MAINTENANCE: 'Бот закрыт на техническое обслуживание.',
 		GUILD_ONLY: 'Эту команду можно использовать только на сервере.',
-		NSFW: 'This command can only be used in a NSFW channel.',
+		NSFW: 'Эта команда доступна только в чатах 18+.',
 	},
 	ERRORS: {
 		UNKNOWN: 'Произошла непонятная ошибка.',
@@ -62,7 +62,7 @@ export default {
 		PING: {
 			DESCRIPTION: 'Тук-тук!',
 			MESSAGE:
-				'{member} Что нужно? Было потрачено {time} милисекунд на генерацию ответа. {heartbeat}',
+				'{member}, Что нужно? Было потрачено {time} милисекунд на генерацию ответа. {heartbeat}',
 		},
 	},
 } as BaseTranslation;
