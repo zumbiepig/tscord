@@ -1,0 +1,28 @@
+name: Sync with Crowdin
+
+on:
+  push:
+    branches: [ main, version/2.6 ]
+  schedule:
+    - cron: '0 * * * *'
+
+jobs:
+  synchronize-with-crowdin:
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: crowdin/github-action@v2
+        with:
+          upload_translations: true
+          auto_approve_imported: true
+          download_sources: true
+          download_translations: true
+          export_only_approved: true
+          localization_branch_name: crowdin/${{ github.ref_name }}
+          github_user_name: crowdin[bot]
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CROWDIN_PROJECT_ID: ${{ vars.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
