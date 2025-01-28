@@ -60,9 +60,9 @@ export default {
 			},
 		},
 		PING: {
-			DESCRIPTION: 'Pong!',
+			DESCRIPTION: "Перевірка зв'язку!",
 			MESSAGE:
-				'{member:string} Pong! The message round-trip took {time:number}ms.{heartbeat:string}',
+				'{member}, Чути добре! Генерація повідомлення зайняла {time} мілісекунд. {heartbeat}',
 		},
 	},
 } as BaseTranslation;
