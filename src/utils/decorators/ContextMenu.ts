@@ -4,7 +4,6 @@ import { basename } from 'path';
 import {
 	constantPreserveDots,
 	getCallerFile,
-	sanitizeLocales,
 	setOptionsLocalization,
 } from '@/utils/functions';
 import type {
@@ -48,5 +47,5 @@ export function ContextMenu(options: ContextMenuOptions) {
 		});
 	}
 
-	return ContextMenuX(sanitizeLocales(options));
+	return ContextMenuX(options);
 }

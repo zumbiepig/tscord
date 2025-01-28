@@ -2,7 +2,6 @@ import { SlashChoice as SlashChoiceX } from 'discordx';
 
 import {
 	constantPreserveDots,
-	sanitizeLocales,
 	setOptionsLocalization,
 } from '@/utils/functions';
 import type {
@@ -46,7 +45,7 @@ export function SlashChoice(...options: SanitizedOptions[]) {
 				});
 			}
 
-			options[i] = sanitizeLocales(option);
+			options[i] = option;
 		}
 	}
 

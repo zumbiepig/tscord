@@ -8,7 +8,6 @@ import {
 import { InvalidOptionNameError } from '@/utils/errors';
 import {
 	constantPreserveDots,
-	sanitizeLocales,
 	setFallbackDescription,
 	setOptionsLocalization,
 } from '@/utils/functions';
@@ -48,8 +47,6 @@ export function SlashOption(options: SlashOptionOptions) {
 			localizationSource,
 		});
 	}
-
-	options = sanitizeLocales(options);
 
 	if (!isValidOptionName(options.name))
 		throw new InvalidOptionNameError(options.name);
