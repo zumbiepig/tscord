@@ -4,7 +4,6 @@ on: [push, pull_request, workflow_dispatch, workflow_call]
 
 jobs:
   build:
-    name: Build
     permissions:
       contents: read
     runs-on: ubuntu-latest
