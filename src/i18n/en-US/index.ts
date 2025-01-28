@@ -1,6 +1,6 @@
-import type { BaseTranslation } from '../i18n-types.js';
+import type { Translation } from '../i18n-types.js';
 
-export default {
+const en_US = {
 	GUARDS: {
 		DISABLED_COMMAND: 'This command is currently disabled.',
 		MAINTENANCE: 'This bot is currently in maintenance mode.',
@@ -18,7 +18,7 @@ export default {
 			DESCRIPTION: 'Invite the bot to your server!',
 			EMBED: {
 				TITLE: 'Invite me on your server!',
-				DESCRIPTION: '[Click here]({link:string}) to invite me!',
+				DESCRIPTION: '[Click here]({link}) to invite me!',
 			},
 		},
 		PREFIX: {
@@ -31,13 +31,13 @@ export default {
 				},
 			},
 			EMBED: {
-				DESCRIPTION: 'Prefix changed to `{prefix:string}`.',
+				DESCRIPTION: 'Prefix changed to `{prefix}`.',
 			},
 		},
 		MAINTENANCE: {
 			DESCRIPTION: 'Set the maintenance mode of the bot.',
 			EMBED: {
-				DESCRIPTION: 'Maintenance mode set to `{state:string}`.',
+				DESCRIPTION: 'Maintenance mode set to `{state}`.',
 			},
 		},
 		STATS: {
@@ -53,17 +53,19 @@ export default {
 			DESCRIPTION: 'Get global help about the bot and its commands',
 			EMBED: {
 				TITLE: 'Help panel',
-				CATEGORY_TITLE: '{category:string} Commands',
+				CATEGORY_TITLE: '{category} Commands',
 			},
 			SELECT_MENU: {
 				TITLE: 'Select a category',
-				CATEGORY_DESCRIPTION: '{category:string} commands',
+				CATEGORY_DESCRIPTION: '{category} commands',
 			},
 		},
 		PING: {
 			DESCRIPTION: 'Pong!',
 			MESSAGE:
-				'{member:string}, Pong! The message round-trip took {time:number}ms. {heartbeat:string}',
+				'{member}, Pong! The message round-trip took {time}ms. {heartbeat}',
 		},
 	},
-} as BaseTranslation;
+} satisfies Translation;
+
+export default en_US;
