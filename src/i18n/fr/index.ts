@@ -62,7 +62,7 @@ export default {
 		PING: {
 			DESCRIPTION: 'Pong!',
 			MESSAGE:
-				'{member} Pong! Le temps de réponse de la réponse était {time}ms.{heartbeat}',
+				'{member}, Pong! Le temps de réponse de la réponse était {time}ms. {heartbeat}',
 		},
 	},
 } as BaseTranslation;
