@@ -18,7 +18,7 @@ export default {
 			DESCRIPTION: 'Invite the bot to your server!',
 			EMBED: {
 				TITLE: 'Invite me on your server!',
-				DESCRIPTION: '[Click here]({link}) to invite me!',
+				DESCRIPTION: '[Click here]({link:string}) to invite me!',
 			},
 		},
 		PREFIX: {
@@ -63,7 +63,7 @@ export default {
 		PING: {
 			DESCRIPTION: 'Pong!',
 			MESSAGE:
-				'{member:string} Pong! The message round-trip took {time:number}ms.{heartbeat:string}',
+				'{member:string}, Pong! The message round-trip took {time:number}ms. {heartbeat:string}',
 		},
 	},
 } as BaseTranslation;

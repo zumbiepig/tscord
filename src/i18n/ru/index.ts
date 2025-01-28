@@ -63,7 +63,7 @@ export default {
 		PING: {
 			DESCRIPTION: 'Тук-тук!',
 			MESSAGE:
-				'{member} Что нужно? Было потрачено {time} милисекунд на генерацию ответа. {heartbeat}',
+				'{member}, Что нужно? Было потрачено {time} милисекунд на генерацию ответа. {heartbeat}',
 		},
 	},
 } as Translation;

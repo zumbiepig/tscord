@@ -63,7 +63,7 @@ export default {
 		PING: {
 			DESCRIPTION: "Перевірка зв'язку!",
 			MESSAGE:
-				'{member} Чути добре! Генерація повідомлення зайняла {time} мілісекунд. {heartbeat}',
+				'{member}, Чути добре! Генерація повідомлення зайняла {time} мілісекунд. {heartbeat}',
 		},
 	},
 } as Translation;

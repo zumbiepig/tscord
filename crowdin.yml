@@ -8,8 +8,7 @@
 
   'pull_request_title': 'crowdin[bot]: New Crowdin updates',
   'pull_request_labels': ['crowdin'],
-  'commit_message': 'crowdin[bot]: New translations for %original_file_name% (%language%)
-[ci skip]',
+  'commit_message': 'crowdin[bot]: New translations for %original_file_name% (%language%) [ci skip]',
   'append_commit_message': false,
 
   'files':
