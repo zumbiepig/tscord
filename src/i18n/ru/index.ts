@@ -4,7 +4,7 @@ export default {
 		DISABLED_COMMAND: 'Эта команда на данный момент не доступна.',
 		MAINTENANCE: 'Бот закрыт на техническое обслуживание.',
 		GUILD_ONLY: 'Эту команду можно использовать только на сервере.',
-		NSFW: 'Эта команда доступна только в чатах 18+.',
+		NSFW: 'This command can only be used in a NSFW channel.',
 	},
 	ERRORS: {
 		UNKNOWN: 'Произошла непонятная ошибка.',
