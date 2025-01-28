@@ -1,4 +1,5 @@
 import type { BaseTranslation } from '../i18n-types.js';
+
 export default {
 	GUARDS: {
 		DISABLED_COMMAND: 'Ця команда на разі відключена',

@@ -17,7 +17,7 @@ export declare enum AdditionalLocaleString {
 export type TranslationsNestedPaths = NestedPaths<Translations>;
 
 export type LocalizationMap = Partial<
-	Record<`${Locale | AdditionalLocaleString}`, string>
+	Record<Locale | AdditionalLocaleString, string>
 >;
 
 export interface SanitizedOptions {

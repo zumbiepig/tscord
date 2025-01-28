@@ -55,24 +55,6 @@ export function setOptionsLocalization<
 	return options;
 }
 
-export function sanitizeLocales<K extends SanitizedOptions>(option: K) {
-	// convert 'en' localizations to 'en-US' and 'en-GB'
-	if (option.nameLocalizations?.en) {
-		option.nameLocalizations['en-US'] = option.nameLocalizations.en;
-		option.nameLocalizations['en-GB'] = option.nameLocalizations.en;
-		delete option.nameLocalizations.en;
-	}
-	if (option.descriptionLocalizations?.en) {
-		option.descriptionLocalizations['en-US'] =
-			option.descriptionLocalizations.en;
-		option.descriptionLocalizations['en-GB'] =
-			option.descriptionLocalizations.en;
-		delete option.descriptionLocalizations.en;
-	}
-
-	return option;
-}
-
 export function getLocalizationFromPathString(
 	localePath: TranslationsNestedPaths,
 	locale?: Locales,
@@ -96,16 +78,11 @@ export function setFallbackDescription<K extends SanitizedOptions>(
 		options.descriptionLocalizations[locale] =
 			L[locale].SHARED.NO_COMMAND_DESCRIPTION();
 
-	return sanitizeLocales(options);
+	return options;
 }
 
-export const getLocaleFromInteraction = (interaction: AllInteractions) => {
-	return detectLocale(() => {
-		let locale: string =
-			resolveLocale(interaction) ?? generalConfig.defaultLocale;
-
-		if (['en-US', 'en-GB'].includes(locale)) locale = 'en';
-
-		return [locale];
-	});
-};
+export function getLocaleFromInteraction(interaction: AllInteractions) {
+	return detectLocale(() => [
+		resolveLocale(interaction) ?? generalConfig.defaultLocale,
+	]);
+}

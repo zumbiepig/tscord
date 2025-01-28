@@ -8,7 +8,6 @@ import {
 
 import {
 	constantPreserveDots,
-	sanitizeLocales,
 	setFallbackDescription,
 	setOptionsLocalization,
 } from '@/utils/functions';
@@ -99,8 +98,6 @@ export function SlashGroup<TRoot extends string>(
 				localizationSource,
 			});
 		}
-
-		options = sanitizeLocales(options);
 
 		if (!options.description) options = setFallbackDescription(options);
 

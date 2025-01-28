@@ -24,7 +24,7 @@ export default class PingCommand {
 		const content = localize.COMMANDS.PING.MESSAGE({
 			member: msg.inGuild() ? JSON.stringify(interaction.member) : '',
 			time: msg.createdTimestamp - interaction.createdTimestamp,
-			heartbeat: `The heartbeat ping is ${Math.floor(client.ws.ping).toString()}ms.`
+			heartbeat: `The heartbeat ping is ${Math.floor(client.ws.ping).toString()}ms.`,
 		});
 
 		await msg.edit(content);
