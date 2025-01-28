@@ -1,5 +1,4 @@
-import type { Translation } from '../i18n-types.js';
-
+import type { BaseTranslation } from '../i18n-types.js';
 export default {
 	GUARDS: {
 		DISABLED_COMMAND: 'Ця команда на разі відключена',
@@ -66,4 +65,4 @@ export default {
 				'{member}, Чути добре! Генерація повідомлення зайняла {time} мілісекунд. {heartbeat}',
 		},
 	},
-} as Translation;
+} as BaseTranslation;
