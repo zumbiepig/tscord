@@ -1,5 +1,4 @@
-import type { Translation } from '../i18n-types.js';
-
+import type { BaseTranslation } from '../i18n-types.js';
 export default {
 	GUARDS: {
 		DISABLED_COMMAND: 'Cette commande est désactivée.',
@@ -66,4 +65,4 @@ export default {
 				'{member} Pong! Le temps de réponse de la réponse était {time}ms.{heartbeat}',
 		},
 	},
-} as Translation;
+} as BaseTranslation;
