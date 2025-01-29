@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: crowdin/github-action@v2
         with:
-          crowdin_branch_name: ${{ github.ref }}
+          crowdin_branch_name: ${{ github.ref_name }}
           config: crowdin.yml
 
           upload_sources: true
