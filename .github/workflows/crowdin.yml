@@ -19,7 +19,7 @@ jobs:
       - uses: crowdin/github-action@v2
         with:
           crowdin_branch_name: ${{ github.ref }}
-          config: crowdin.json
+          config: crowdin.yml
 
           upload_sources: true
           upload_translations: true
