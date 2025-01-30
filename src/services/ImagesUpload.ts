@@ -7,7 +7,7 @@ import axios from 'axios';
 import chalk from 'chalk';
 import fastGlob from 'fast-glob';
 import { mkdir } from 'fs/promises';
-import { imageHash as callbackImageHash } from 'image-hash';
+import { imageHash as imageHashCallback } from 'image-hash';
 import { ImgurClient } from 'imgur';
 
 import { Image, ImageRepository } from '@/entities';
@@ -16,7 +16,7 @@ import { Database, Logger } from '@/services';
 import { Service } from '@/utils/decorators';
 import { base64Encode } from '@/utils/functions';
 
-const imageHasher = promisify(callbackImageHash);
+const imageHash = promisify(imageHashCallback);
 
 @Service()
 export class ImagesUpload {
@@ -84,7 +84,7 @@ export class ImagesUpload {
 
 		// check if the image is already in the database and that its md5 hash is the same.
 		for (const imagePath of images) {
-			const imageHash = (await imageHasher(
+			const imageHash = (await imageHash(
 				join(this.imageFolderPath, imagePath),
 				16,
 				true,
@@ -121,7 +121,6 @@ export class ImagesUpload {
 	async addNewImageToImgur(
 		imagePath: string,
 		imageHash: string,
-		_reupload = false,
 	) {
 		if (!this.imgurClient) return;
 
@@ -143,7 +142,6 @@ export class ImagesUpload {
 					'error',
 					`Error uploading image ${imageFileName} to imgur: ${uploadResponse.status.toString()} ${JSON.stringify(uploadResponse.data)}`,
 				);
-
 				return;
 			}
 

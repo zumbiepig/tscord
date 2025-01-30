@@ -168,14 +168,14 @@ export class Stats {
 				},
 				{
 					$group: {
-						_id: { type: '$type', value: '$value' },
+						id: { type: '$type', value: '$value' },
 						count: { $sum: 1 },
 					},
 				},
 				{
 					$replaceRoot: {
 						newRoot: {
-							$mergeObjects: ['$_id', { count: '$count' }],
+							$mergeObjects: ['$id', { count: '$count' }],
 						},
 					},
 				},

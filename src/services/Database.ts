@@ -1,15 +1,12 @@
 import { readdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
-import { promisify } from 'node:util';
 
 import {
 	type EntityName,
-	EntityRepository,
-	type GetRepository,
 	MikroORM,
 	type Options,
 } from '@mikro-orm/core';
-import fastFolderSize from 'fast-folder-size';
+import getFolderSize from 'get-folder-size';
 import { backup, restore } from 'saveqlite';
 import { delay, inject } from 'tsyringe';
 
@@ -25,7 +22,6 @@ import {
 } from '@/utils/functions';
 import type {
 	DatabaseDriver,
-	DatabaseEntityManager,
 	DatabaseSize,
 } from '@/utils/types';
 
@@ -73,11 +69,11 @@ export class Database {
 		this._orm = await MikroORM.init();
 	}
 
-	get orm(): MikroORM<DatabaseDriver> {
+	get orm() {
 		return this._orm;
 	}
 
-	get em(): DatabaseEntityManager {
+	get em() {
 		return this._orm.em;
 	}
 
@@ -85,9 +81,7 @@ export class Database {
 	 * Shorthand to get custom and natives repositories
 	 * @param entity Entity of the custom repository to get
 	 */
-	get<T extends object>(
-		entity: EntityName<T>,
-	): GetRepository<T, EntityRepository<T>> {
+	get<T extends object>(entity: EntityName<T>) {
 		return this._orm.em.getRepository(entity);
 	}
 
@@ -185,25 +179,10 @@ export class Database {
 	}
 
 	async getSize(): Promise<DatabaseSize> {
-		const size: DatabaseSize = {
-			db: null,
-			backups: null,
-		};
-
-		if (this.isSQLiteDatabase()) {
-			const dbPath = mikroORMConfig[env.NODE_ENV].dbName;
-			if (dbPath) {
-				const dbSize = (await stat(dbPath)).size;
-				size.db = dbSize;
-			}
-		}
-
-		const backupSize = await promisify(fastFolderSize)(
-			join(databaseConfig.path, 'backups'),
-		);
-		size.backups = backupSize ?? null;
-
-		return size;
+		return {
+			db: (this.isSQLiteDatabase()) ? (await stat(mikroORMConfig[env.NODE_ENV].dbName ?? '')).size : null,
+			backups: await getFolderSize.loose(join(databaseConfig.path, 'backups')) || null,
+		} satisfies DatabaseSize;
 	}
 
 	isSQLiteDatabase(): boolean {
