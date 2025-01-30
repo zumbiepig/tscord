@@ -2,14 +2,13 @@ name: Sync with Crowdin
 
 on:
   push:
-    branches:
-      - main
+    branches: ['main']
   schedule:
     - cron: '0 * * * *'
   workflow_dispatch:
 
 jobs:
-  synchronize-with-crowdin:
+  crowdin:
     permissions:
       contents: write
       pull-requests: write
@@ -35,11 +34,11 @@ jobs:
           push_translations: true
           push_sources: true
           localization_branch_name: crowdin/${{ github.ref_name }}
-          commit_message: 'crowdin[bot]: New translations for %original_file_name% (%language%)'
+          commit_message: 'crowdin[bot]: New translations from Crowdin'
           create_pull_request: true
           pull_request_title: 'crowdin[bot]: New Crowdin updates'
           pull_request_labels: 'crowdin'
-          pull_request_base_branch_name: ${{ github.ref }}
+          pull_request_base_branch_name: ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
