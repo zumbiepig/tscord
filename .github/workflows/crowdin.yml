@@ -3,9 +3,15 @@ name: Sync with Crowdin
 on:
   push:
     branches: ['main']
+    paths:
+      - 'src/i18n/*/index.ts'
   schedule:
     - cron: '0 * * * *'
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   crowdin:
@@ -19,19 +25,15 @@ jobs:
       - name: Sync with Crowdin
         uses: crowdin/github-action@v2
         with:
-          crowdin_branch_name: ${{ github.ref_name }}
-
           upload_translations: true
           auto_approve_imported: true
-
           download_translations: true
           export_only_approved: true
-
           localization_branch_name: crowdin/${{ github.ref_name }}
           commit_message: 'crowdin[bot]: New translations from Crowdin'
           pull_request_title: 'crowdin[bot]: New Crowdin updates'
           pull_request_labels: 'crowdin'
-          # pull_request_base_branch_name: ${{ github.ref_name }}
+          crowdin_branch_name: ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
