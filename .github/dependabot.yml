@@ -5,6 +5,6 @@ updates:
       - '/'
       - '/src/plugins/*'
     schedule:
-      interval: 'weekly'
+      interval: 'daily'
     commit-message:
       prefix: 'dependabot[bot]'
