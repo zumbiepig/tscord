@@ -1,4 +1,4 @@
-name: Deploy (SSH)
+name: Deploy with SSH
 
 on:
   push:
@@ -11,7 +11,8 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: appleboy/ssh-action@v1.2.0
+      - name: Deploy with SSH
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.REMOTE_HOST }}
           port: ${{ secrets.REMOTE_PORT }}
