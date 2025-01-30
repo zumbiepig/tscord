@@ -22,7 +22,7 @@ files:
         lt: lt
         hu: hu
         nl: nl
-        no: no
+        no: 'no'
         pl: pl
         pt-BR: pt-BR
         ro: ro
