@@ -105,7 +105,8 @@ export class Logger {
 		@inject(delay(() => Client)) private client: Client,
 		@inject(delay(() => Scheduler)) private scheduler: Scheduler,
 		@inject(delay(() => Pastebin)) private pastebin: Pastebin,
-		@inject(delay(() => PluginsManager)) private pluginsManager: PluginsManager,
+		@inject(delay(() => PluginsManager))
+		private pluginsManager: PluginsManager,
 	) {}
 
 	/**

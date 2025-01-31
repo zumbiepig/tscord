@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { type AnyEntity, type EntityClass } from '@mikro-orm/core';
-import fastGlob from 'fast-glob';
+import { glob } from 'glob';
 import { coerce, satisfies, valid } from 'semver';
 
 import { generalConfig } from '@/configs';
@@ -173,17 +173,21 @@ export class Plugin {
 
 	public async importCommands() {
 		return Promise.all(
-			(await fastGlob(join(this._path, 'commands', '**', '*.ts'))).map(
-				(file) => import(file),
-			),
+			(
+				await glob(join(this._path, 'commands', '**', '*.ts'), {
+					windowsPathsNoEscape: true,
+				})
+			).map((file) => import(file)),
 		);
 	}
 
 	public async importEvents() {
 		return Promise.all(
-			(await fastGlob(join(this._path, 'events', '**', '*.ts'))).map(
-				(file) => import(file),
-			),
+			(
+				await glob(join(this._path, 'events', '**', '*.ts'), {
+					windowsPathsNoEscape: true,
+				})
+			).map((file) => import(file)),
 		);
 	}
 

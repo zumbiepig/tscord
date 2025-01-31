@@ -5,7 +5,7 @@ import { promisify } from 'node:util';
 
 import axios from 'axios';
 import chalk from 'chalk';
-import fastGlob from 'fast-glob';
+import { glob } from 'glob';
 import { mkdir } from 'fs/promises';
 import { imageHash as imageHashCallback } from 'image-hash';
 import { ImgurClient } from 'imgur';
@@ -50,7 +50,8 @@ export class ImagesUpload {
 		if (!existsSync(this.imageFolderPath)) await mkdir(this.imageFolderPath);
 
 		// get all images inside the assets folder
-		const files = await fastGlob(join('**', '*'), {
+		const files = await glob(join('**', '*'), {
+			windowsPathsNoEscape: true,
 			cwd: this.imageFolderPath,
 		});
 		const images = [];
@@ -118,10 +119,7 @@ export class ImagesUpload {
 		);
 	}
 
-	async addNewImageToImgur(
-		imagePath: string,
-		imageHash: string,
-	) {
+	async addNewImageToImgur(imagePath: string, imageHash: string) {
 		if (!this.imgurClient) return;
 
 		// upload the image to imgur

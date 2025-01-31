@@ -2,7 +2,7 @@ import { rmdir } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { type AnyEntity, type EntityClass } from '@mikro-orm/core';
-import fastGlob from 'fast-glob';
+import { glob } from 'glob';
 import {
 	type ImportLocaleMapping,
 	storeTranslationsToDisk,
@@ -17,7 +17,9 @@ export class PluginsManager {
 	private _plugins: Plugin[] = [];
 
 	public async loadPlugins(): Promise<void> {
-		const pluginPaths = await fastGlob(join('src', 'plugins', '*'));
+		const pluginPaths = await glob(join('src', 'plugins', '*'), {
+			windowsPathsNoEscape: true,
+		});
 
 		for (const path of pluginPaths) {
 			const plugin = new Plugin(path);
@@ -89,8 +91,9 @@ export class PluginsManager {
 
 		const pluginNames = this._plugins.map((plugin) => plugin.name);
 		for (const locale of locales) {
-			for (const path of await fastGlob(
+			for (const path of await glob(
 				join('src', 'i18n', locale, '*', 'index.ts'),
+				{ windowsPathsNoEscape: true },
 			)) {
 				const name = new RegExp(
 					join('src', 'i18n', locale, '(.+)', 'index.ts$'),

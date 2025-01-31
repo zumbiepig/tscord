@@ -29,7 +29,9 @@ export function On(
 			...(options?.botIds !== undefined && { botIds: options.botIds }),
 			event,
 			once: false,
-			...(options?.priority !== undefined && { priority: options.priority }),
+			...(options?.priority !== undefined && {
+				priority: options.priority,
+			}),
 			rest: false,
 		}).decorate(
 			clazz.constructor,

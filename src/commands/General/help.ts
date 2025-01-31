@@ -101,7 +101,9 @@ export default class HelpCommand {
 			const embed = new EmbedBuilder()
 				.setAuthor({
 					name: interaction.user.username,
-					iconURL: interaction.user.displayAvatarURL({ forceStatic: false }),
+					iconURL: interaction.user.displayAvatarURL({
+						forceStatic: false,
+					}),
 				})
 				.setTitle(locale.COMMANDS.HELP.EMBED.TITLE())
 				.setThumbnail(
@@ -141,7 +143,9 @@ export default class HelpCommand {
 		const embed = new EmbedBuilder()
 			.setAuthor({
 				name: interaction.user.username,
-				iconURL: interaction.user.displayAvatarURL({ forceStatic: false }),
+				iconURL: interaction.user.displayAvatarURL({
+					forceStatic: false,
+				}),
 			})
 			.setTitle(locale.COMMANDS.HELP.EMBED.CATEGORY_TITLE({ category }))
 			.setFooter({
@@ -193,7 +197,9 @@ export default class HelpCommand {
 
 		for (const [category] of this._categories) {
 			const description = locale.COMMANDS.HELP.SELECT_MENU.CATEGORY_DESCRIPTION(
-				{ category },
+				{
+					category,
+				},
 			);
 			optionsForEmbed.push({
 				description,
