@@ -3,18 +3,18 @@ description: Request a new feature
 title: '[Feature] '
 labels: [enhancement]
 assignees:
-    - barthofu
+  - barthofu
 body:
-    - type: markdown
-      attributes:
-          value: |
-              Thanks for taking the time to fill out this feature request!
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this feature request!
 
-    - type: textarea
-      id: feature
-      attributes:
-          label: Feature
-          description: Please describe the feature you are requesting in detail
-          placeholder: describe....
-      validations:
-          required: true
+  - type: textarea
+    id: feature
+    attributes:
+      label: Feature
+      description: Please describe the feature you are requesting in detail
+      placeholder: describe....
+    validations:
+      required: true

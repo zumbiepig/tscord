@@ -105,16 +105,16 @@ Fully extensible thanks to the plugin ecosystem
 Talking about features, here are some of the core features of the template:
 
 - Advanced **handlers** for:
-    - Interactions (slash, context menu, button, modal, select menu, etc)
-    - Simple message commands
-    - Discord events listeners
+  - Interactions (slash, context menu, button, modal, select menu, etc)
+  - Simple message commands
+  - Discord events listeners
 - **Guards** functions, acting like middlewares on handlers with some built-ins:
-    - Rate limiter
-    - Maintenance mode
-    - Disabling command
-    - Guild only command (no DMs)
-    - NSFW only command
-    - Message's content match using regex
+  - Rate limiter
+  - Maintenance mode
+  - Disabling command
+  - Guild only command (no DMs)
+  - NSFW only command
+  - Message's content match using regex
 - Internal **API** to interact with the bot from external services, with built-in useful endpoints
 - Multiple **databases** support out-of-the-box using [Mikro-ORM](https://github.com/mikro-orm/mikro-orm)
 - **Migrations** system to keep a safe database

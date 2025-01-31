@@ -1,37 +1,37 @@
 name: Deploy with SSH
 
 on:
-    push:
-        branches:
-            - main
-    workflow_dispatch:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 concurrency:
-    group: ${{ github.workflow }}-${{ github.ref }}
-    cancel-in-progress: false
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-    deploy:
-        permissions:
-            contents: read
-        runs-on: ubuntu-latest
-        steps:
-            - name: Deploy with SSH
-              uses: appleboy/ssh-action@v1.2.0
-              with:
-                  host: ${{ secrets.REMOTE_HOST }}
-                  port: ${{ secrets.REMOTE_PORT }}
-                  username: ${{ secrets.REMOTE_USERNAME }}
-                  password: ${{ secrets.REMOTE_PASSWORD }}
-                  key: ${{ secrets.REMOTE_KEY }}
-                  passphrase: ${{ secrets.REMOTE_PASSPHRASE }}
-                  script: |
-                      cd "$PROJECT_PATH"
-                      git pull "https://$GITHUB_TOKEN@github.com/barthofu/tscord.git" "$GITHUB_REF"
-                      docker-compose up -d --build
-                  script_stop: true
-                  envs: GITHUB_TOKEN,GITHUB_REF,PROJECT_PATH
-              env:
-                  GITHUB_TOKEN: ${{ github.token }}
-                  GITHUB_REF: ${{ github.ref }}
-                  PROJECT_PATH: ${{ secrets.REMOTE_PROJECT_PATH }}
+  deploy:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy with SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          port: ${{ secrets.REMOTE_PORT }}
+          username: ${{ secrets.REMOTE_USERNAME }}
+          password: ${{ secrets.REMOTE_PASSWORD }}
+          key: ${{ secrets.REMOTE_KEY }}
+          passphrase: ${{ secrets.REMOTE_PASSPHRASE }}
+          script: |
+            cd "$PROJECT_PATH"
+            git pull "https://$GITHUB_TOKEN@github.com/barthofu/tscord.git" "$GITHUB_REF"
+            docker-compose up -d --build
+          script_stop: true
+          envs: GITHUB_TOKEN,GITHUB_REF,PROJECT_PATH
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REF: ${{ github.ref }}
+          PROJECT_PATH: ${{ secrets.REMOTE_PROJECT_PATH }}

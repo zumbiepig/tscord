@@ -1,61 +1,59 @@
 {
-    "extends": ["@tsconfig/strictest"],
-    "include": ["src/**/*"],
-    "compilerOptions": {
-        "rootDir": "src",
-        "outDir": "dist",
+  "extends": ["@tsconfig/strictest"],
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
 
-        "target": "ESNext",
-        "module": "NodeNext",
+    "target": "ESNext",
+    "module": "NodeNext",
 
-        "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": true,
 
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
 
-        "paths": {
-            "@/env": ["./src/env.ts"],
-            "@/env/*": ["./src/plugins/*/env.ts"],
+    "paths": {
+      "@/env": ["./src/env.ts"],
+      "@/env/*": ["./src/plugins/*/env.ts"],
 
-            "@/api/controllers": ["./src/api/controllers/index.ts"],
-            "@/api/controllers/*": ["./src/plugins/*/api/controllers/index.ts"],
+      "@/api/controllers": ["./src/api/controllers/index.ts"],
+      "@/api/controllers/*": ["./src/plugins/*/api/controllers/index.ts"],
 
-            "@/api/middlewares": ["./src/api/middlewares/index.ts"],
-            "@/api/middlewares/*": ["./src/plugins/*/api/middlewares/index.ts"],
+      "@/api/middlewares": ["./src/api/middlewares/index.ts"],
+      "@/api/middlewares/*": ["./src/plugins/*/api/middlewares/index.ts"],
 
-            "@/api/server": ["./src/api/server.ts"],
+      "@/api/server": ["./src/api/server.ts"],
 
-            "@/configs": ["./src/configs/index.ts"],
-            "@/configs/*": ["./src/plugins/*/configs/index.ts"],
+      "@/configs": ["./src/configs/index.ts"],
+      "@/configs/*": ["./src/plugins/*/configs/index.ts"],
 
-            "@/entities": ["./src/entities/index.ts"],
-            "@/entities/*": ["./src/plugins/*/entities/index.ts"],
+      "@/entities": ["./src/entities/index.ts"],
+      "@/entities/*": ["./src/plugins/*/entities/index.ts"],
 
-            "@/guards": ["./src/guards/index.ts"],
-            "@/guards/*": ["./src/plugins/*/guards/index.ts"],
+      "@/guards": ["./src/guards/index.ts"],
+      "@/guards/*": ["./src/plugins/*/guards/index.ts"],
 
-            "@/i18n": ["./src/i18n/index.ts"],
-            "@/i18n/*": ["./src/plugins/*/i18n/index.ts"],
+      "@/i18n": ["./src/i18n/index.ts"],
+      "@/i18n/*": ["./src/plugins/*/i18n/index.ts"],
 
-            "@/services": ["./src/services/index.ts"],
-            "@/services/*": ["./src/plugins/*/services/index.ts"],
+      "@/services": ["./src/services/index.ts"],
+      "@/services/*": ["./src/plugins/*/services/index.ts"],
 
-            "@/utils/classes": ["./src/utils/classes/index.ts"],
-            "@/utils/classes/*": ["./src/plugins/*/utils/classes/index.ts"],
+      "@/utils/classes": ["./src/utils/classes/index.ts"],
+      "@/utils/classes/*": ["./src/plugins/*/utils/classes/index.ts"],
 
-            "@/utils/decorators": ["./src/utils/decorators/index.ts"],
-            "@/utils/decorators/*": [
-                "./src/plugins/*/utils/decorators/index.ts"
-            ],
+      "@/utils/decorators": ["./src/utils/decorators/index.ts"],
+      "@/utils/decorators/*": ["./src/plugins/*/utils/decorators/index.ts"],
 
-            "@/utils/errors": ["./src/utils/errors/index.ts"],
-            "@/utils/errors/*": ["./src/plugins/*/utils/errors/index.ts"],
+      "@/utils/errors": ["./src/utils/errors/index.ts"],
+      "@/utils/errors/*": ["./src/plugins/*/utils/errors/index.ts"],
 
-            "@/utils/functions": ["./src/utils/functions/index.ts"],
-            "@/utils/functions/*": ["./src/plugins/*/utils/functions/index.ts"],
+      "@/utils/functions": ["./src/utils/functions/index.ts"],
+      "@/utils/functions/*": ["./src/plugins/*/utils/functions/index.ts"],
 
-            "@/utils/types": ["./src/utils/types/index.d.ts"],
-            "@/utils/types/*": ["./src/plugins/*/utils/types/index.d.ts"]
-        }
+      "@/utils/types": ["./src/utils/types/index.d.ts"],
+      "@/utils/types/*": ["./src/plugins/*/utils/types/index.d.ts"]
     }
+  }
 }
