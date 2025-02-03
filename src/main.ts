@@ -1,5 +1,7 @@
 import 'reflect-metadata';
 
+import { join } from 'node:path';
+
 import { RequestContext } from '@mikro-orm/core';
 import chalk from 'chalk';
 import { GatewayIntentBits, Partials } from 'discord.js';
@@ -10,6 +12,7 @@ import {
 	MetadataStorage,
 	tsyringeDependencyRegistryEngine,
 } from 'discordx';
+import { glob } from 'glob';
 import { container } from 'tsyringe';
 import type { constructor } from 'tsyringe/dist/typings/types';
 
@@ -34,7 +37,19 @@ import {
 import { keptInstances } from '@/utils/decorators';
 import { initDataTable, resolveDependency } from '@/utils/functions';
 
-let botInitialized: boolean | undefined;
+async function reloadImports() {
+	const files = await glob(
+		join(import.meta.dirname, '{events,commands}', '**', '*.{js,ts}'),
+		{ windowsPathsNoEscape: true },
+	);
+	await Promise.all(
+		files.map((file) => {
+			const module = require.resolve(file)
+			delete require.cache[module];
+			return import(module);
+		}),
+	);
+}
 
 /**
  * Hot reload
@@ -69,13 +84,15 @@ async function reload(client: Client) {
 	// re-register the client instance
 	container.registerInstance(Client, client);
 
+	// reload files
+	await reloadImports();
+
 	// rebuild
 	await MetadataStorage.instance.build();
 	await client.initApplicationCommands();
 	client.initEvents();
 
 	// re-init services
-
 	const pluginsManager = await resolveDependency(PluginsManager);
 	await pluginsManager.loadPlugins();
 
@@ -136,7 +153,6 @@ async function init() {
 	});
 
 	// Load all new events
-	// @ts-expect-error - discordx/discord.js type overlap
 	await discordLogs(client, { debug: !env.isDev });
 	container.registerInstance(Client, client);
 

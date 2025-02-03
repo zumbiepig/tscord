@@ -1,9 +1,10 @@
+import os from 'node:os';
 import process from 'node:process';
 
 import { EntityRepository } from '@mikro-orm/core';
 import Case from 'case';
 import { Client, SimpleCommandMessage } from 'discordx';
-import osu from 'node-os-utils';
+import nodeOsUtils from 'node-os-utils';
 import pidusage from 'pidusage';
 import { delay, inject } from 'tsyringe';
 
@@ -345,7 +346,7 @@ export class Stats {
 			cpu: pidUsage.cpu.toFixed(1),
 			memory: {
 				usedInMb: (pidUsage.memory / (1024 * 1024)).toFixed(1),
-				percentage: ((pidUsage.memory / osu.mem.totalMem()) * 100).toFixed(1),
+				percentage: ((pidUsage.memory / nodeOsUtils.mem.totalMem()) * 100).toFixed(1),
 			},
 		};
 	}
@@ -355,12 +356,12 @@ export class Stats {
 	 */
 	async getHostUsage() {
 		return {
-			cpu: await osu.cpu.usage(),
-			memory: await osu.mem.info(),
-			os: await osu.os.oos()(),
-			uptime: osu.os.uptime(),
-			hostname: osu.os.hostname(),
-			platform: osu.os.platform(),
+			cpu: await nodeOsUtils.cpu.usage(),
+			memory: await nodeOsUtils.mem.info(),
+			os: await nodeOsUtils.os.oos()(),
+			uptime: nodeOsUtils.os.uptime(),
+			hostname: nodeOsUtils.os.hostname(),
+			platform: nodeOsUtils.os.platform(),
 		};
 	}
 

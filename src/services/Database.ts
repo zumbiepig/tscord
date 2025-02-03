@@ -1,8 +1,8 @@
+import { existsSync } from 'node:fs';
 import { readdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { type EntityName, MikroORM, type Options } from '@mikro-orm/core';
-import getFolderSize from 'get-folder-size';
 import { backup, restore } from 'saveqlite';
 import { delay, inject } from 'tsyringe';
 
@@ -14,6 +14,7 @@ import { Schedule, Service } from '@/utils/decorators';
 import {
 	dayjsTimezone,
 	formatDate,
+	getFolderSize,
 	resolveDependency,
 } from '@/utils/functions';
 import type { DatabaseDriver, DatabaseSize } from '@/utils/types';
@@ -172,13 +173,11 @@ export class Database {
 	}
 
 	async getSize(): Promise<DatabaseSize> {
+		const dbName = mikroORMConfig[env.NODE_ENV].dbName;
+		const backupPath = join(databaseConfig.path, 'backups');
 		return {
-			db: this.isSQLiteDatabase()
-				? (await stat(mikroORMConfig[env.NODE_ENV].dbName ?? '')).size
-				: null,
-			backups:
-				(await getFolderSize.loose(join(databaseConfig.path, 'backups'))) ||
-				null,
+			db: this.isSQLiteDatabase() ? (await stat(dbName ?? '')).size : null,
+			backups: existsSync(backupPath) ? await getFolderSize(backupPath) : null,
 		} satisfies DatabaseSize;
 	}
 
