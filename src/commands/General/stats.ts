@@ -21,12 +21,12 @@ const statsResolver: StatsResolverType = [
 	{
 		name: 'COMMANDS',
 		data: async (stats: Stats, days: number) => {
-			const simpleCommandMessages = await stats.countStatsPerDays(
-				'SIMPLE_COMMAND_MESSAGE',
-				days,
-			);
 			const commandInteractions = await stats.countStatsPerDays(
 				'CHAT_INPUT_COMMAND_INTERACTION',
+				days,
+			);
+			const simpleCommandMessages = await stats.countStatsPerDays(
+				'SIMPLE_COMMAND_MESSAGE',
 				days,
 			);
 			const userContextMenus = await stats.countStatsPerDays(
@@ -39,8 +39,8 @@ const statsResolver: StatsResolverType = [
 			);
 
 			return stats.sumStats(
-				stats.sumStats(simpleCommandMessages, commandInteractions),
-				stats.sumStats(userContextMenus, messageContextMenus),
+				stats.sumStats(commandInteractions, simpleCommandMessages),
+				stats.sumStats(messageContextMenus, userContextMenus),
 			);
 		},
 	},

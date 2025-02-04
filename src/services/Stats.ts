@@ -1,14 +1,12 @@
-import os from 'node:os';
 import process from 'node:process';
 
 import { EntityRepository } from '@mikro-orm/core';
 import Case from 'case';
-import { Client, SimpleCommandMessage } from 'discordx';
+import { Client } from 'discordx';
 import nodeOsUtils from 'node-os-utils';
 import pidusage from 'pidusage';
 import { delay, inject } from 'tsyringe';
 
-import { statsConfig } from '@/configs';
 import { Guild, Stat, User } from '@/entities';
 import { Database } from '@/services';
 import { Schedule, Service } from '@/utils/decorators';
@@ -27,16 +25,12 @@ import type {
 	StatPerInterval,
 } from '@/utils/types';
 
-const allInteractions: { $or: {type: InteractionsConstants}[]} = {
+const allInteractions = {
 	$or: [
 		{ type: 'CHAT_INPUT_COMMAND_INTERACTION' },
 		{ type: 'SIMPLE_COMMAND_MESSAGE' },
 		{ type: 'USER_CONTEXT_MENU_COMMAND_INTERACTION' },
 		{ type: 'MESSAGE_CONTEXT_MENU_COMMAND_INTERACTION' },
-		{ type: 'BUTTON_INTERACTION' },
-		{ type: 'SELECT_MENU_INTERACTION' }
-		{ type: 'STRING_SELECT_MENU_INTERACTION' },
-		{ type: 'MODAL_SUBMIT_INTERACTION' },
 	],
 };
 
@@ -57,7 +51,7 @@ export class Stats {
 	 * @param value
 	 * @param additionalData in JSON format
 	 */
-	async register(type: string, value: string, additionalData?: unknown) {
+	async register(type: InteractionsConstants, value: string, additionalData?: unknown) {
 		const stat = new Stat();
 		stat.type = type;
 		stat.value = value;
@@ -74,36 +68,17 @@ export class Stats {
 		// we extract data from the interaction
 		const type = Case.constant(
 			getTypeOfInteraction(interaction),
-		) as InteractionsConstants;
-		if (statsConfig.interaction.exclude.includes(type)) return;
+		);
 
 		const value = resolveAction(interaction);
 		const additionalData = {
 			user: resolveUser(interaction)?.id,
-			guild: resolveGuild(interaction)?.id ?? 'dm',
+			guild: resolveGuild(interaction)?.id,
 			channel: resolveChannel(interaction)?.id,
 		};
 
 		// add it to the db
 		await this.register(type, value ?? '', additionalData);
-	}
-
-	/**
-	 * Record a simple command message and add it to the database.
-	 * @param command
-	 */
-	async registerSimpleCommand(command: SimpleCommandMessage) {
-		// we extract data from the interaction
-		const type = 'SIMPLE_COMMAND_MESSAGE';
-		const value = command.name;
-		const additionalData = {
-			user: command.message.author.id,
-			guild: command.message.guild?.id ?? 'dm',
-			channel: command.message.channel.id,
-		};
-
-		// add it to the db
-		await this.register(type, value, additionalData);
 	}
 
 	/**
@@ -265,7 +240,7 @@ export class Stats {
 	 * @param days interval of days from now
 	 */
 	async countStatsPerDays(
-		type: string,
+		type: InteractionsConstants,
 		days: number,
 	): Promise<StatPerInterval> {
 		const stats: StatPerInterval = [];

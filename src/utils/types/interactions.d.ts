@@ -2,7 +2,6 @@ import type { ICategory } from '@discordx/utilities';
 import type {
 	ButtonInteraction,
 	CommandInteraction,
-	ContextMenuCommandInteraction,
 	ModalSubmitInteraction,
 	StringSelectMenuInteraction,
 } from 'discord.js';
@@ -13,22 +12,22 @@ import type { Locales, TranslationFunctions } from '@/i18n';
 export type EmittedInteractions =
 	| CommandInteraction
 	| SimpleCommandMessage
-	| ContextMenuCommandInteraction;
 export type OnTheFlyInteractions =
 	| ButtonInteraction
-	| StringSelectMenuInteraction
-	| ModalSubmitInteraction;
+	| ModalSubmitInteraction
+	| StringSelectMenuInteraction;
 
 export type AllInteractions = EmittedInteractions | OnTheFlyInteractions;
 
-export type InteractionsConstants =
-	| 'CHAT_INPUT_COMMAND_INTERACTION'
-	| 'SIMPLE_COMMAND_MESSAGE'
-	| 'CONTEXT_MENU_INTERACTION'
-	| 'BUTTON_INTERACTION'
-	| 'SELECT_MENU_INTERACTION'
-	| 'STRING_SELECT_MENU_INTERACTION'
-	| 'MODAL_SUBMIT_INTERACTION';
+/*export type InteractionsConstants =
+	| 'ChatInputCommandInteraction'
+	| 'SimpleCommandMessage'
+	| 'MessageContextMenuCommandInteraction'
+	| 'UserContextMenuCommandInteraction'
+	| 'ButtonInteraction'
+	| 'ModalSubmitInteraction'
+	| 'StringSelectMenuInteraction';*/
+export type InteractionsConstants = AllInteractions['constructor']['name'];
 
 export type CommandCategory = DApplicationCommand & ICategory;
 

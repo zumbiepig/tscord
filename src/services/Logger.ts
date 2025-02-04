@@ -86,16 +86,6 @@ export class Logger {
 		}),
 	};
 
-	private interactionTypeReadable: Record<InteractionsConstants, string> = {
-		CHAT_INPUT_COMMAND_INTERACTION: 'Slash command',
-		SIMPLE_COMMAND_MESSAGE: 'Simple command',
-		CONTEXT_MENU_INTERACTION: 'Context menu',
-		BUTTON_INTERACTION: 'Button',
-		SELECT_MENU_INTERACTION: 'Select menu',
-		STRING_SELECT_MENU_INTERACTION: 'Select menu',
-		MODAL_SUBMIT_INTERACTION: 'Modal submit',
-	};
-
 	private spinner = ora();
 
 	private lastLogsTail: string[] = [];
@@ -115,7 +105,7 @@ export class Logger {
 	 * @param chalkedMessage chalked version of message to log to console
 	 * @param logLocation where to log the message
 	 */
-	public async log(
+	async log(
 		level: (typeof this.levels)[number],
 		message: string,
 		chalkedMessage: string | null = null,
@@ -194,7 +184,7 @@ export class Logger {
 	 * @param type uncaughtException | unhandledRejection
 	 * @param trace
 	 */
-	public async logError(
+	async logError(
 		type: 'uncaughtException' | 'unhandledRejection',
 		error: Error,
 		trace: StackFrame[] = parse(error.stack ?? ''),
@@ -254,64 +244,10 @@ export class Logger {
 	}
 
 	/**
-	 * Archive the logs in a tar.gz file each day, and delete log archives older than the retention period.
-	 */
-	@Schedule('0 0 * * *')
-	public async archiveLogs(): Promise<void> {
-		if (!logsConfig.archive.enabled) return;
-
-		if (!existsSync(this.logPath)) return;
-		if (!existsSync(this.logArchivePath)) await mkdir(this.logArchivePath);
-
-		const archive = archiver('tar', {
-			gzip: true,
-			gzipOptions: {
-				level: 9,
-			},
-		});
-
-		archive.pipe(
-			createWriteStream(
-				join(
-					this.logArchivePath,
-					`logs-${formatDate(dayjsTimezone().subtract(1, 'day'), 'onlyDateFileName')}.tar.gz`,
-				),
-			),
-		);
-
-		// add files to the archive
-		for (const currentLogPath of (await readdir(this.logPath)).filter((file) =>
-			file.endsWith('.log'),
-		)) {
-			const path = join(this.logPath, currentLogPath);
-			archive.append(createReadStream(path), { name: currentLogPath });
-			await rm(path);
-		}
-
-		// create archive
-		await archive.finalize();
-
-		// retention policy
-		for (const file of await readdir(this.logArchivePath)) {
-			const match = /^logs-(.+)\.tar\.gz$/.exec(file);
-			if (match?.[1]) {
-				if (timeAgo(match[1], 'day') > logsConfig.archive.retentionDays) {
-					await this.log(
-						'info',
-						`Deleting log archive ${file} older than ${logsConfig.archive.retentionDays.toString()} days`,
-						`Deleting log archive ${chalk.bold.red(file)} older than ${chalk.bold.red(logsConfig.archive.retentionDays.toString())} days`,
-					);
-					await rm(join(this.logArchivePath, file));
-				}
-			}
-		}
-	}
-
-	/**
 	 * Logs all interactions.
 	 * @param interaction
 	 */
-	public async logInteraction(interaction: AllInteractions): Promise<void> {
+	async logInteraction(interaction: AllInteractions): Promise<void> {
 		const type = Case.constant(
 			getTypeOfInteraction(interaction),
 		) as InteractionsConstants;
@@ -344,7 +280,7 @@ export class Logger {
 						fields: [
 							{
 								name: 'Type',
-								value: this.interactionTypeReadable[type],
+								value: type,
 								inline: true,
 							},
 							{
@@ -389,7 +325,7 @@ export class Logger {
 	 * Logs all new users.
 	 * @param user
 	 */
-	public async logNewUser(user: User): Promise<void> {
+	async logNewUser(user: User): Promise<void> {
 		const message = `(NEW_USER) ${user.tag} (${user.id}) has been added to the db`;
 		const chalkedMessage = `(${chalk.bold.white('NEW_USER')}) ${chalk.bold.green(user.tag)} (${chalk.bold.blue(user.id)}) ${chalk.dim.italic.gray('has been added to the db')}`;
 
@@ -419,7 +355,7 @@ export class Logger {
 	 * @param guildId
 	 * @param type NEW_GUILD | DELETE_GUILD | RECOVER_GUILD
 	 */
-	public async logGuild(
+	async logGuild(
 		type: 'NEW_GUILD' | 'DELETE_GUILD' | 'RECOVER_GUILD',
 		guildId: Snowflake,
 	): Promise<void> {
@@ -469,17 +405,71 @@ export class Logger {
 		});
 	}
 
-	public getLastLogs(): string[] {
+	getLastLogs(): string[] {
 		return this.lastLogsTail;
 	}
 
-	public async startSpinner(text: string): Promise<void> {
+	async startSpinner(text: string): Promise<void> {
 		console.log('\n');
 		this.spinner.start(text);
 		await this.log('info', text, null, { console: false });
 	}
 
-	public async logStartingConsole(): Promise<void> {
+	/**
+	 * Archive the logs in a tar.gz file each day, and delete log archives older than the retention period.
+	 */
+	@Schedule('0 0 * * *')
+	async archiveLogs(): Promise<void> {
+		if (!logsConfig.archive.enabled) return;
+
+		if (!existsSync(this.logPath)) return;
+		if (!existsSync(this.logArchivePath)) await mkdir(this.logArchivePath);
+
+		const archive = archiver('tar', {
+			gzip: true,
+			gzipOptions: {
+				level: 9,
+			},
+		});
+
+		archive.pipe(
+			createWriteStream(
+				join(
+					this.logArchivePath,
+					`logs-${formatDate(dayjsTimezone().subtract(1, 'day'), 'onlyDateFileName')}.tar.gz`,
+				),
+			),
+		);
+
+		// add files to the archive
+		for (const currentLogPath of (await readdir(this.logPath)).filter((file) =>
+			file.endsWith('.log'),
+		)) {
+			const path = join(this.logPath, currentLogPath);
+			archive.append(createReadStream(path), { name: currentLogPath });
+			await rm(path);
+		}
+
+		// create archive
+		await archive.finalize();
+
+		// retention policy
+		for (const file of await readdir(this.logArchivePath)) {
+			const match = /^logs-(.+)\.tar\.gz$/.exec(file);
+			if (match?.[1]) {
+				if (timeAgo(match[1], 'day') > logsConfig.archive.retentionDays) {
+					await this.log(
+						'info',
+						`Deleting log archive ${file} older than ${logsConfig.archive.retentionDays.toString()} days`,
+						`Deleting log archive ${chalk.bold.red(file)} older than ${chalk.bold.red(logsConfig.archive.retentionDays.toString())} days`,
+					);
+					await rm(join(this.logArchivePath, file));
+				}
+			}
+		}
+	}
+
+	async logStartingConsole(): Promise<void> {
 		this.spinner.stop();
 
 		await this.log(

@@ -6,8 +6,6 @@ import type {
 	Snowflake,
 } from 'discord.js';
 
-import type { InteractionsConstants } from '@/utils/types';
-
 export interface GeneralConfigType {
 	name: string;
 	description: string;

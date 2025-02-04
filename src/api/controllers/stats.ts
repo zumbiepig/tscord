@@ -65,8 +65,8 @@ export class StatsController extends BaseController {
 				slashCommands: commandsUsage.slashCommands[i]?.count,
 				simpleCommands: commandsUsage.simpleCommands[i]?.count,
 				contextMenus:
-					(commandsUsage.userContextMenus[i]?.count ?? 0) +
-					(commandsUsage.messageContextMenus[i]?.count ?? 0),
+					(commandsUsage.messageContextMenus[i]?.count ?? 0) +
+					(commandsUsage.userContextMenus[i]?.count ?? 0),
 			});
 		}
 

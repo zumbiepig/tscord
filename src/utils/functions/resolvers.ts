@@ -130,9 +130,8 @@ const resolvers = {
 	},
 
 	action: {
-		ChatInputCommandInteraction: (interaction: ChatInputCommandInteraction) => {
-			return `${interaction.commandName} ${interaction.options.getSubcommandGroup(false) ?? ''} ${interaction.options.getSubcommand(false) ?? ''}`;
-		},
+		ChatInputCommandInteraction: (interaction: ChatInputCommandInteraction) =>
+			`${interaction.commandName} ${interaction.options.getSubcommandGroup(false) ?? ''} ${interaction.options.getSubcommand(false) ?? ''}`.trimEnd(),
 		SimpleCommandMessage: (interaction: SimpleCommandMessage) =>
 			interaction.name,
 		UserContextMenuCommandInteraction: (

@@ -4,6 +4,7 @@ import { join } from 'node:path';
 
 import { RequestContext } from '@mikro-orm/core';
 import chalk from 'chalk';
+import chokidar from 'chokidar';
 import { GatewayIntentBits, Partials } from 'discord.js';
 import discordLogs from 'discord-logs';
 import {
@@ -37,67 +38,8 @@ import {
 import { keptInstances } from '@/utils/decorators';
 import { initDataTable, resolveDependency } from '@/utils/functions';
 
-/**
- * Hot reload
- */
-async function reload(client: Client) {
-	const store = await resolveDependency(Store);
-	store.set('botHasBeenReloaded', true);
-
-	const logger = await resolveDependency(Logger);
-	await logger.startSpinner('Hot reloading...');
-
-	// remove events
-	client.removeEvents();
-
-	// get all instances to keep
-	const instancesToKeep = new Map<constructor<unknown>, unknown>();
-	for (const target of keptInstances) {
-		const instance = await resolveDependency(target);
-		instancesToKeep.set(target, instance);
-	}
-
-	// cleanup
-	MetadataStorage.clear();
-	DIService.engine.clearAllServices();
-
-	// transfer store instance to the new container in order to keep the same states
-	for (const [target, instance] of instancesToKeep) {
-		container.registerInstance(target, instance);
-	}
-
-	// re-register the client instance
-	container.registerInstance(Client, client);
-
-	// reload files
-	await Promise.all(
-		(
-			await glob(
-				join(import.meta.dirname, '{events,commands}', '**', '*.{js,ts}'),
-				{ windowsPathsNoEscape: true },
-			)
-		).map(async (file) => {
-			const module = require.resolve(file);
-			// eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-			delete require.cache[module];
-			await import(module);
-		}),
-	);
-
-	// rebuild
-	await MetadataStorage.instance.build();
-	await client.initApplicationCommands();
-	client.initEvents();
-
-	// re-init services
-	const pluginsManager = await resolveDependency(PluginsManager);
-	await pluginsManager.loadPlugins();
-
-	const db = await resolveDependency(Database);
-	await db.initialize();
-
-	await logger.log('info', 'Hot reloaded!', chalk.whiteBright('Hot reloaded!'));
-}
+/** 0: Not reloading, 1: Reloading, 2: Reload requested */
+let reloadingState = 0;
 
 async function init() {
 	// validate env values
@@ -170,7 +112,15 @@ async function init() {
 		// log in with the bot token
 		await client.login(env.BOT_TOKEN);
 
-		botInitialized = true;
+		if (env.isDev) {
+			const watcher = chokidar.watch([
+				join(import.meta.dirname, 'commands'),
+				join(import.meta.dirname, 'events'),
+			]);
+
+			// reload commands and events when a file is updated
+			watcher.on('all', () => void reload(client));
+		}
 
 		// start the api server
 		if (apiConfig.enabled) {
@@ -200,8 +150,79 @@ async function init() {
 	});
 }
 
-if (botInitialized) {
-	await reload(await resolveDependency(Client));
-} else {
-	await init();
+/**
+ * Hot reload
+ */
+async function reload(client: Client) {
+	// if currently reloading, request new reload
+	if (reloadingState > 0) {
+		reloadingState = 2;
+		return;
+	}
+	reloadingState = 1;
+
+	const store = await resolveDependency(Store);
+	store.set('botHasBeenReloaded', true);
+
+	const logger = await resolveDependency(Logger);
+	await logger.startSpinner('Hot reloading...');
+
+	// remove events
+	client.removeEvents();
+
+	// get all instances to keep
+	const instancesToKeep = new Map<constructor<unknown>, unknown>();
+	for (const target of keptInstances) {
+		const instance = await resolveDependency(target);
+		instancesToKeep.set(target, instance);
+	}
+
+	// cleanup
+	MetadataStorage.clear();
+	DIService.engine.clearAllServices();
+
+	// transfer store instance to the new container in order to keep the same states
+	for (const [target, instance] of instancesToKeep) {
+		container.registerInstance(target, instance);
+	}
+
+	// re-register the client instance
+	container.registerInstance(Client, client);
+
+	// reload files
+	await Promise.all(
+		(
+			await glob(
+				join(import.meta.dirname, '{commands,events}', '**', '*.{js,ts}'),
+				{ windowsPathsNoEscape: true },
+			)
+		).map(async (file) => {
+			const module = require.resolve(file);
+			delete require.cache[module];
+			await import(module);
+		}),
+	);
+
+	// rebuild
+	await MetadataStorage.instance.build();
+	await client.initApplicationCommands();
+	client.initEvents();
+
+	// re-init services
+	const pluginsManager = await resolveDependency(PluginsManager);
+	await pluginsManager.loadPlugins();
+
+	const db = await resolveDependency(Database);
+	await db.initialize();
+
+	await logger.log('info', 'Hot reloaded!', chalk.whiteBright('Hot reloaded!'));
+
+	// if another reload was requested, reload again
+	if (reloadingState === 2) {
+		reloadingState = 0;
+		await reload(client);
+	}
+	reloadingState = 0;
 }
+
+await init();

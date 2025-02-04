@@ -31,7 +31,7 @@ export default class SimpleCommandCreateEvent {
 		await this.db.get(User).updateLastInteract(command.message.author.id);
 		await this.db.get(Guild).updateLastInteract(command.message.guild?.id);
 
-		await this.stats.registerSimpleCommand(command);
+		await this.stats.registerInteraction(command);
 		await this.logger.logInteraction(command);
 	}
 
