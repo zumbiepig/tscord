@@ -9,6 +9,7 @@
     "module": "NodeNext",
 
     "verbatimModuleSyntax": true,
+    "resolveJsonModule": true,
 
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

@@ -1,9 +1,7 @@
 import { createReadStream, createWriteStream, existsSync } from 'node:fs';
 import { appendFile, mkdir, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import { cwd } from 'node:process';
 
-import archiver from 'archiver';
 import boxen from 'boxen';
 import Case from 'case';
 import chalk from 'chalk';
@@ -17,10 +15,11 @@ import {
 import { Client, MetadataStorage } from 'discordx';
 import ora from 'ora';
 import { parse, type StackFrame } from 'stacktrace-parser';
+import * as tar from 'tar';
 import { delay, inject } from 'tsyringe';
 
 import * as controllers from '@/api/controllers';
-import { apiConfig, logsConfig } from '@/configs';
+import { apiConfig, colorsConfig, logsConfig } from '@/configs';
 import { locales } from '@/i18n';
 import { Pastebin, PluginsManager, Scheduler } from '@/services';
 import { Schedule, Service } from '@/utils/decorators';
@@ -35,11 +34,11 @@ import {
 	resolveUser,
 	timeAgo,
 } from '@/utils/functions';
-import type { AllInteractions, InteractionsConstants } from '@/utils/types';
+import type { AllInteractions } from '@/utils/types';
 
 @Service()
 export class Logger {
-	private readonly logPath: string = join(cwd(), 'logs');
+	private readonly logPath: string = join('logs');
 	private readonly logArchivePath: string = join(this.logPath, 'archives');
 
 	private readonly levels = ['debug', 'info', 'warn', 'error'] as const;
@@ -49,7 +48,7 @@ export class Logger {
 				{
 					title: 'DEBUG',
 					description: message,
-					color: 0x696969,
+					color: colorsConfig.logDebug,
 					timestamp: dayjsTimezone().toISOString(),
 				},
 			],
@@ -59,7 +58,7 @@ export class Logger {
 				{
 					title: 'INFO',
 					description: message,
-					color: 0x007fe7,
+					color: colorsConfig.logInfo,
 					timestamp: dayjsTimezone().toISOString(),
 				},
 			],
@@ -69,7 +68,7 @@ export class Logger {
 				{
 					title: 'WARN',
 					description: message,
-					color: 0xf37100,
+					color: colorsConfig.logWarn,
 					timestamp: dayjsTimezone().toISOString(),
 				},
 			],
@@ -79,7 +78,7 @@ export class Logger {
 				{
 					title: 'ERROR',
 					description: message,
-					color: 0x7c1715,
+					color: colorsConfig.logError,
 					timestamp: dayjsTimezone().toISOString(),
 				},
 			],
@@ -119,7 +118,7 @@ export class Logger {
 		const date = dayjsTimezone();
 		const formattedDate = formatDate(date, 'onlyDateFileName');
 		const formattedTime = formatDate(date, 'logs');
-		const formattedLevel = Case.upper(level);
+		const formattedLevel = Case.upper(level) as Uppercase<typeof level>;
 		const trimmedMessage = message.trim();
 		const logMessage = `[${formattedTime}] [${formattedLevel}] ${trimmedMessage}`;
 		const chalkedLogMessage = `[${chalk.dim(formattedTime)}] [${formattedLevel}] ${chalkedMessage?.trim() ?? trimmedMessage}`;
@@ -235,7 +234,7 @@ export class Logger {
 								? `${embedTitle.substring(0, 252)}...`
 								: embedTitle,
 						description: embedMessage,
-						color: 0x7c1715,
+						color: colorsConfig.logError,
 						timestamp: dayjsTimezone().toISOString(),
 					},
 				],
@@ -250,7 +249,7 @@ export class Logger {
 	async logInteraction(interaction: AllInteractions): Promise<void> {
 		const type = Case.constant(
 			getTypeOfInteraction(interaction),
-		) as InteractionsConstants;
+		);
 
 		const action = resolveAction(interaction);
 		const channel = resolveChannel(interaction);
@@ -313,7 +312,7 @@ export class Logger {
 								inline: true,
 							},
 						],
-						color: 0xdb5c21,
+						color: colorsConfig.logInteraction,
 						timestamp: dayjsTimezone().toISOString(),
 					},
 				],
@@ -339,7 +338,7 @@ export class Logger {
 						thumbnail: {
 							url: user.displayAvatarURL({ forceStatic: false }),
 						},
-						color: 0x83dd80,
+						color: colorsConfig.logNewUser,
 						timestamp: dayjsTimezone().toISOString(),
 						footer: {
 							text: user.id,
@@ -394,10 +393,10 @@ export class Logger {
 						},
 						color:
 							type === 'NEW_GUILD'
-								? 0x02fd77
+								? colorsConfig.logGuildNew
 								: type === 'DELETE_GUILD'
-									? 0xff0000
-									: 0xfffb00,
+									? colorsConfig.logGuildDelete
+									: colorsConfig.logGuildRecover,
 						timestamp: dayjsTimezone().toISOString(),
 					},
 				],
@@ -425,20 +424,19 @@ export class Logger {
 		if (!existsSync(this.logPath)) return;
 		if (!existsSync(this.logArchivePath)) await mkdir(this.logArchivePath);
 
-		const archive = archiver('tar', {
-			gzip: true,
-			gzipOptions: {
+		const archive = tar.create({
+			portable: true,
+			gzip: {
 				level: 9,
-			},
-		});
+			}
+		},
+	)
 
 		archive.pipe(
-			createWriteStream(
-				join(
-					this.logArchivePath,
-					`logs-${formatDate(dayjsTimezone().subtract(1, 'day'), 'onlyDateFileName')}.tar.gz`,
-				),
-			),
+			createWriteStream(join(
+				this.logArchivePath,
+				`logs-${formatDate(dayjsTimezone().subtract(1, 'day'), 'onlyDateFileName')}.tar.gz`,
+			),)
 		);
 
 		// add files to the archive
@@ -446,12 +444,12 @@ export class Logger {
 			file.endsWith('.log'),
 		)) {
 			const path = join(this.logPath, currentLogPath);
-			archive.append(createReadStream(path), { name: currentLogPath });
+			archive.add(createReadStream(path), { name: currentLogPath });
 			await rm(path);
 		}
 
 		// create archive
-		await archive.finalize();
+		archive.end();
 
 		// retention policy
 		for (const file of await readdir(this.logArchivePath)) {
@@ -513,7 +511,7 @@ export class Logger {
 		);
 
 		// entities
-		const entities = (await readdir(join(cwd(), 'src', 'entities'))).filter(
+		const entities = (await readdir(join('src', 'entities'))).filter(
 			(entity) =>
 				!entity.startsWith('index') && !entity.startsWith('BaseEntity'),
 		);
@@ -530,7 +528,7 @@ export class Logger {
 		);
 
 		// services
-		const services = (await readdir(join(cwd(), 'src', 'services'))).filter(
+		const services = (await readdir(join('src', 'services'))).filter(
 			(service) => !service.startsWith('index'),
 		);
 		const pluginsServicesCount = this.pluginsManager.plugins.reduce(
@@ -540,7 +538,7 @@ export class Logger {
 		await this.log(
 			'info',
 			`✓ ${numberAlign(services.length + pluginsServicesCount)} services loaded`,
-			chalk.hex('ffc107')(
+			chalk.yellow(
 				`✓ ${numberAlign(services.length + pluginsServicesCount)} ${chalk.bold('services')} loaded`,
 			),
 		);
@@ -580,7 +578,7 @@ export class Logger {
 		await this.log(
 			'info',
 			`✓ ${numberAlign(locales.length)} translations loaded`,
-			chalk.hex('ab47bc')(
+			chalk.magenta(
 				`✓ ${numberAlign(locales.length)} ${chalk.bold('translations')} loaded`,
 			),
 		);
@@ -590,7 +588,7 @@ export class Logger {
 		await this.log(
 			'info',
 			`✓ ${numberAlign(pluginsCount)} plugin${pluginsCount > 1 ? 's' : ''} loaded`,
-			chalk.hex('#47d188')(
+			chalk.green(
 				`✓ ${numberAlign(pluginsCount)} ${chalk.bold(`plugin${pluginsCount > 1 ? 's' : ''}`)} loaded`,
 			),
 		);
@@ -599,22 +597,17 @@ export class Logger {
 		if (apiConfig.enabled) {
 			await this.log(
 				'info',
-				boxen(` API Server listening on port ${apiConfig.port.toString()} `, {
-					padding: 0,
-					margin: {
-						top: 1,
-						bottom: 0,
-						left: 1,
-						right: 1,
-					},
-					borderStyle: 'round',
-					dimBorder: true,
-				}),
+				`API Server listening on port ${apiConfig.port.toString()}`,
 				chalk.gray(
 					boxen(
-						` API Server listening on port ${chalk.bold(apiConfig.port)} `,
+						`API Server listening on port ${chalk.bold(apiConfig.port)}`,
 						{
-							padding: 0,
+							padding: {
+								top: 0,
+								bottom: 0,
+								left: 1,
+								right: 1,
+							},
 							margin: {
 								top: 1,
 								bottom: 0,
@@ -631,25 +624,17 @@ export class Logger {
 
 		await this.log(
 			'info',
-			boxen(
-				` ${this.client.user ? this.client.user.tag : 'Bot'} is connected! `,
-				{
-					padding: 0,
-					margin: {
-						top: 1,
-						bottom: 1,
-						left: 1 * 3,
-						right: 1 * 3,
-					},
-					borderStyle: 'round',
-					dimBorder: true,
-				},
-			),
-			chalk.hex('7289DA')(
+			`${this.client.user?.tag ?? 'Bot'} is connected!`,
+			chalk.blue(
 				boxen(
-					` ${this.client.user ? chalk.bold(this.client.user.tag) : 'Bot'} is ${chalk.green('connected')}! `,
+					`${chalk.bold(this.client.user?.tag ?? 'Bot')} is ${chalk.green('connected')}!`,
 					{
-						padding: 0,
+						padding: {
+							top: 0,
+							bottom: 0,
+							left: 1,
+							right: 1,
+						},
 						margin: {
 							top: 1,
 							bottom: 1,

@@ -40,7 +40,7 @@ export function setOptionsLocalization<
 	nameFallback?: string;
 }) {
 	const localizedInfo = getLocalizedInfo(
-		target.toUpperCase() as 'NAME' | 'DESCRIPTION',
+		target.toUpperCase() as Uppercase<typeof target>,
 		localizationSource,
 	);
 	if (!options[`${target}Localizations`] && localizedInfo)

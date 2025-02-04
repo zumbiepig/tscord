@@ -7,11 +7,7 @@ import { glob } from 'glob';
 import { coerce, satisfies, valid } from 'semver';
 
 import { generalConfig } from '@/configs';
-import {
-	type BaseTranslation,
-	type Locales,
-	locales as i18nLocales,
-} from '@/i18n';
+import { type Locales, locales as i18nLocales,type Translation } from '@/i18n';
 import { Logger } from '@/services';
 import { BaseController } from '@/utils/classes';
 import { AutoInjectable } from '@/utils/decorators';
@@ -29,7 +25,7 @@ export class Plugin {
 	private _entities!: Record<string, EntityClass<AnyEntity>>;
 	private _controllers!: Record<string, typeof BaseController>;
 	private _services!: Record<string, unknown>;
-	private _translations!: Record<Locales, BaseTranslation>;
+	private _translations!: Record<Locales, Translation>;
 
 	constructor(
 		path: string,
@@ -139,11 +135,13 @@ export class Plugin {
 		return (await import(path)) as Record<string, unknown>;
 	}
 
-	private async getTranslations(): Promise<Record<Locales, BaseTranslation>> {
-		const translations: Record<Locales, BaseTranslation> = {} as Record<
+	private async getTranslations(): Promise<Record<Locales, Translation>> {
+		const translations: Record<Locales, Translation> = {} as Record<
 			Locales,
-			BaseTranslation
+			Translation
 		>;
+
+		const missingLocales: Locales[] = [];
 
 		for (const locale of i18nLocales) {
 			const path = join(this._path, 'i18n', `${locale}.ts`);
@@ -152,16 +150,21 @@ export class Plugin {
 					await this.stopLoad(
 						`Missing translation file for default locale '${locale}'`,
 					);
-					return {} as Record<Locales, BaseTranslation>;
+					return {} as Record<Locales, Translation>;
 				} else {
-					await this.logger?.log(
-						'warn',
-						`Plugin ${this._name} v${this._version} is missing translations for locale '${locale}'`,
-					);
+					missingLocales.push(locale);
 					continue;
 				}
+			} else {
+				translations[locale] = (await import(path)) as Translation;
 			}
-			translations[locale] = (await import(path)) as BaseTranslation;
+		}
+
+		if (missingLocales.length > 0) {
+			await this.logger?.log(
+				'warn',
+				`Plugin ${this._name} v${this._version} is missing translations for locales: '${missingLocales.join("', '")}'`,
+			);
 		}
 
 		return translations;

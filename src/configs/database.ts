@@ -1,9 +1,9 @@
 import { join } from 'node:path';
 
+import { BetterSqliteDriver } from '@mikro-orm/better-sqlite';
 import { EntityGenerator } from '@mikro-orm/entity-generator';
 import { Migrator } from '@mikro-orm/migrations';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
-import { SqliteDriver } from '@mikro-orm/sqlite';
 
 import type { DatabaseConfigType, MikroORMConfigType } from '@/utils/types';
 
@@ -17,7 +17,7 @@ const envMikroORMConfig: MikroORMConfigType = {
 		/**
 		 * SQLite
 		 */
-		driver: SqliteDriver,
+		driver: BetterSqliteDriver,
 		dbName: join(databaseConfig.path, 'db.sqlite'),
 
 		/**

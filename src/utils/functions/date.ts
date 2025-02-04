@@ -4,6 +4,7 @@ import timezone from 'dayjs/plugin/timezone.js';
 import utc from 'dayjs/plugin/utc.js';
 
 import { generalConfig } from '@/configs';
+import type { Timezone } from '@/utils/types';
 
 dayjs.extend(relativeTime);
 dayjs.extend(timezone);
@@ -48,7 +49,7 @@ export function timeAgo(
  */
 export function convertTZ(
 	date: Date,
-	timezone: typeof generalConfig.timezone,
+	timezone: Timezone,
 ): Date {
 	return new Date(
 		date.toLocaleString(generalConfig.defaultLocale, {

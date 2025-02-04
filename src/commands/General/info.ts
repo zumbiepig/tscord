@@ -10,11 +10,11 @@ import {
 import { Client, Discord } from 'discordx';
 import { Guard } from 'discordx';
 
-import { generalConfig } from '@/configs';
+import { colorsConfig, generalConfig } from '@/configs';
 import { Stats } from '@/services';
 import { Injectable, Slash } from '@/utils/decorators';
-import { dayjsTimezone, getColor, isValidUrl } from '@/utils/functions';
-import { getPackageDotJson, getTscordVersion } from '@/utils/functions';
+import { dayjsTimezone, isValidUrl } from '@/utils/functions';
+import { getPackageJson, getTscordVersion } from '@/utils/functions';
 
 const links = [
 	...(generalConfig.links?.botInvite
@@ -46,7 +46,7 @@ export default class InfoCommand {
 			})
 			.setTitle(client.user?.tag ?? '')
 			.setThumbnail(client.user?.displayAvatarURL() ?? '')
-			.setColor(getColor('primary'))
+			.setColor(colorsConfig.primary)
 			.setDescription(generalConfig.description);
 
 		const fields: EmbedField[] = [];
@@ -102,7 +102,7 @@ export default class InfoCommand {
 		 */
 		fields.push({
 			name: 'Libraries',
-			value: `[discord.js](https://discord.js.org/) (v${(getPackageDotJson() as { dependencies: Record<string, string> }).dependencies['discord.js']?.replace(/[><=~^]/g, '') ?? ''})\n[discordx](https://discordx.js.org/) (v${(getPackageDotJson() as { dependencies: Record<string, string> }).dependencies['discordx']?.replace(/[><=~^]/g, '') ?? ''})`,
+			value: `[discord.js](https://discord.js.org/) (v${getPackageJson().dependencies?.['discord.js']?.replace(/[><=~^]/g, '') ?? ''})\n[discordx](https://discordx.js.org/) (v${getPackageJson().dependencies?.['discordx']?.replace(/[><=~^]/g, '') ?? ''})`,
 			inline: true,
 		});
 

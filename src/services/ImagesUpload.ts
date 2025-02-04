@@ -1,7 +1,6 @@
 import { createReadStream, existsSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import { basename, dirname, join, sep } from 'node:path';
-import { cwd } from 'node:process';
 
 import axios from 'axios';
 import chalk from 'chalk';
@@ -18,7 +17,7 @@ import { base64Encode, getFileHash } from '@/utils/functions';
 @Service()
 export class ImagesUpload {
 	private validImageExtensions = ['.png', '.jpg', '.jpeg', '.gif'];
-	private imageFolderPath = join(cwd(), 'assets');
+	private imageFolderPath = join('assets', 'images');
 
 	private imgurClient: ImgurClient | null =
 		generalConfig.automaticUploadImagesToImgur
@@ -157,8 +156,10 @@ export class ImagesUpload {
 		if (!this.imgurClient) return false;
 
 		const res = await axios.get(imageUrl);
-		return !(
-			res.request as { path: { includes: (_: string) => boolean } } | undefined
-		)?.path.includes('/removed');
+		return !res.request?.path.includes('/removed');
+
+		const res = await fetch(imageUrl);
+		const url = new URL(res.url);
+		return !url.pathname.includes('/removed');
 	}
 }

@@ -1,4 +1,5 @@
 import Case from 'case';
+import type { SnakeCase } from 'type-fest';
 
 /**
  * Ensures value(s) strings and has a size after trim
@@ -20,7 +21,7 @@ export function numberAlign(number: number, align = 2) {
 	return number.toString().padStart(align, ' ');
 }
 
-export function constantPreserveDots(string: string) {
+export function constantPreserveDots(string: string): SnakeCase<typeof string> {
 	return string
 		.split('.')
 		.map((word) => Case.constant(word))

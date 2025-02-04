@@ -18,11 +18,11 @@ import { type TranslationFunctions } from '@/i18n';
 import { Slash } from '@/utils/decorators';
 import {
 	chunkArray,
-	getColor,
 	resolveGuild,
 	validString,
 } from '@/utils/functions';
 import type { CommandCategory, InteractionData } from '@/utils/types';
+import { colorsConfig } from '@/configs';
 
 @Discord()
 @Category('General')
@@ -109,7 +109,7 @@ export default class HelpCommand {
 				.setThumbnail(
 					'https://upload.wikimedia.org/wikipedia/commons/a/a4/Cute-Ball-Help-icon.png',
 				)
-				.setColor(getColor('primary'));
+				.setColor(colorsConfig.primary);
 
 			const currentGuild = resolveGuild(interaction);
 			const applicationCommands = [

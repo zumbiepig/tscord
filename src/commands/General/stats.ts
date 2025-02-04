@@ -10,12 +10,12 @@ import { Discord } from 'discordx';
 
 import { Stats } from '@/services';
 import { Injectable, Slash, SlashOption } from '@/utils/decorators';
-import { getColor } from '@/utils/functions';
 import type {
 	InteractionData,
 	StatPerInterval,
 	StatsResolverType,
 } from '@/utils/types';
+import { colorsConfig } from '@/configs';
 
 const statsResolver: StatsResolverType = [
 	{
@@ -158,7 +158,7 @@ export default class StatsCommand {
 				name: author.username,
 				iconURL: author.displayAvatarURL({ forceStatic: false }),
 			})
-			.setColor(getColor('primary'))
+			.setColor(colorsConfig.primary)
 			.setImage(link);
 	}
 }

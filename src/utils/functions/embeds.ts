@@ -1,5 +1,6 @@
 import { CommandInteraction, EmbedBuilder } from 'discord.js';
 
+import { colorsConfig } from '@/configs';
 import { replyToInteraction } from '@/utils/functions';
 
 /**
@@ -12,7 +13,7 @@ export async function simpleSuccessEmbed(
 	message: string,
 ) {
 	const embed = new EmbedBuilder()
-		.setColor(0x57f287) // GREEN // see: https://github.com/discordjs/discord.js/blob/main/packages/discord.js/src/util/Colors.js
+		.setColor(colorsConfig.success)
 		.setTitle(`✅ ${message}`);
 
 	await replyToInteraction(interaction, { embeds: [embed] });
@@ -28,7 +29,7 @@ export async function simpleErrorEmbed(
 	message: string,
 ) {
 	const embed = new EmbedBuilder()
-		.setColor(0xed4245) // RED // see: https://github.com/discordjs/discord.js/blob/main/packages/discord.js/src/util/Colors.js
+		.setColor(colorsConfig.error)
 		.setTitle(`❌ ${message}`);
 
 	await replyToInteraction(interaction, { embeds: [embed] });

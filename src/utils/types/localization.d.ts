@@ -1,4 +1,4 @@
-import type { ApplicationCommandType, Locale } from 'discord.js';
+import type { ApplicationCommandType } from 'discord.js';
 import type {
 	ApplicationCommandOptions as ApplicationCommandOptionsX,
 	NotEmpty as NotEmptyX,
@@ -7,18 +7,12 @@ import type {
 	SlashOptionOptions as SlashOptionOptionsX,
 } from 'discordx';
 
-import type { Translations } from '@/i18n';
+import type { Locales, Translations } from '@/i18n';
 import type { Modify, NestedPaths, WithOptional } from '@/utils/types';
-
-export declare enum AdditionalLocaleString {
-	English = 'en',
-}
 
 export type TranslationsNestedPaths = NestedPaths<Translations>;
 
-export type LocalizationMap = Partial<
-	Record<Locale | AdditionalLocaleString, string>
->;
+export type LocalizationMap = Partial<Record<Locales, string>>;
 
 export interface SanitizedOptions {
 	descriptionLocalizations?: LocalizationMap;

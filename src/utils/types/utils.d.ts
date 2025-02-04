@@ -1,3 +1,5 @@
+export type ValueOf<T> = T[keyof T];
+
 export type Modify<T, R> = Omit<T, keyof R> & R;
 
 export type OmitPick<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;

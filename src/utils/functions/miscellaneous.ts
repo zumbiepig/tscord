@@ -1,13 +1,12 @@
-import { readFile } from 'node:fs/promises';
+import type { PackageJson } from 'type-fest';
 
-const packageJson = JSON.parse(
-	await readFile('package.json', 'utf-8'),
-) as Record<string, unknown>;
+import packageJson from '../../../package.json' assert { type: 'json' };
 
-export function getPackageDotJson() {
-	return packageJson;
+export function getPackageJson() {
+	return packageJson as PackageJson;
 }
 
 export function getTscordVersion(): string {
-	return (packageJson as { tscord: { version: string } }).tscord.version;
+	return (packageJson as PackageJson & { tscord: { version: string } }).tscord
+		.version;
 }

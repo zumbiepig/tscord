@@ -1,5 +1,4 @@
 export * from './array.js';
-export * from './colors.js';
 export * from './converter.js';
 export * from './database.js';
 export * from './date.js';

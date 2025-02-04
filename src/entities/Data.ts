@@ -1,10 +1,10 @@
+import { EntityRepository } from '@mikro-orm/better-sqlite';
 import {
 	Entity,
 	EntityRepositoryType,
 	PrimaryKey,
 	Property,
 } from '@mikro-orm/core';
-import { EntityRepository } from '@mikro-orm/sqlite';
 
 import { BaseEntity } from '@/utils/classes';
 import type { DataType } from '@/utils/types';

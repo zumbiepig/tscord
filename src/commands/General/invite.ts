@@ -2,9 +2,8 @@ import { Category } from '@discordx/utilities';
 import { CommandInteraction, EmbedBuilder } from 'discord.js';
 import { Discord, Guard } from 'discordx';
 
-import { generalConfig } from '@/configs';
+import { colorsConfig, generalConfig } from '@/configs';
 import { Slash } from '@/utils/decorators';
-import { getColor } from '@/utils/functions';
 import type { InteractionData } from '@/utils/types';
 
 @Discord()
@@ -22,7 +21,7 @@ export default class InviteCommand {
 					link: generalConfig.links?.botInvite,
 				}),
 			)
-			.setColor(getColor('primary'))
+			.setColor(colorsConfig.primary)
 			.setFooter({ text: 'Powered by DiscBot Team ❤' });
 
 		await interaction.followUp({

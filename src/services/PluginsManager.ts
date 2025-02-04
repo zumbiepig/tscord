@@ -8,7 +8,7 @@ import {
 	storeTranslationsToDisk,
 } from 'typesafe-i18n/importer';
 
-import { type BaseTranslation, type Locales, locales } from '@/i18n';
+import { type Locales, locales as i18nLocales,type Translation } from '@/i18n';
 import { BaseController, Plugin } from '@/utils/classes';
 import { Service } from '@/utils/decorators';
 
@@ -65,11 +65,11 @@ export class PluginsManager {
 	public async syncTranslations(): Promise<void> {
 		const localeMapping: ImportLocaleMapping[] = [];
 		const namespaces: Record<string, string[]> = {};
-		const translations: Record<string, BaseTranslation> = {};
+		const translations: Record<string, Translation> = {};
 
 		for (const plugin of this._plugins) {
 			for (const locale in plugin.translations) {
-				translations[locale] ??= {} as BaseTranslation;
+				translations[locale] ??= {} as Translation;
 				namespaces[locale] ??= [];
 
 				Object.assign(translations[locale], {
@@ -80,7 +80,7 @@ export class PluginsManager {
 		}
 
 		for (const locale in translations) {
-			if (locales.includes(locale as Locales)) {
+			if (i18nLocales.includes(locale as Locales)) {
 				localeMapping.push({
 					locale,
 					translations: translations[locale] ?? {},
@@ -90,7 +90,7 @@ export class PluginsManager {
 		}
 
 		const pluginNames = this._plugins.map((plugin) => plugin.name);
-		for (const locale of locales) {
+		for (const locale of i18nLocales) {
 			for (const path of await glob(
 				join('src', 'i18n', locale, '*', 'index.ts'),
 				{ windowsPathsNoEscape: true },

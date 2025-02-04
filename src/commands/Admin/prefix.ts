@@ -1,5 +1,4 @@
-import { Category } from '@discordx/utilities';
-import { PermissionGuard } from '@discordx/utilities';
+import { Category, PermissionGuard } from '@discordx/utilities';
 import { ApplicationCommandOptionType, CommandInteraction } from 'discord.js';
 import { Discord, Guard } from 'discordx';
 
