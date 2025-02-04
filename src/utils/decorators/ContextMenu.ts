@@ -1,5 +1,6 @@
+import { basename } from 'node:path';
+
 import { ContextMenu as ContextMenuX } from 'discordx';
-import { basename } from 'path';
 
 import {
 	constantPreserveDots,

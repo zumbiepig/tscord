@@ -11,16 +11,16 @@ export default cleanEnv(env, {
 
 	BOT_TOKEN: str(),
 
-	DATABASE_HOST: host({ default: undefined }),
-	DATABASE_PORT: port({ default: undefined }),
-	DATABASE_NAME: str({ default: undefined }),
-	DATABASE_USER: str({ default: undefined }),
-	DATABASE_PASSWORD: str({ default: undefined }),
+	DATABASE_HOST: host({ default: '' }),
+	DATABASE_PORT: port({ default: -1 }),
+	DATABASE_NAME: str({ default: '' }),
+	DATABASE_USER: str({ default: '' }),
+	DATABASE_PASSWORD: str({ default: '' }),
 
-	API_PORT: port({ default: undefined }),
-	API_ADMIN_TOKEN: str({ default: undefined }),
+	API_PORT: port({ default: -1 }),
+	API_ADMIN_TOKEN: str({ default: '' }),
 
-	IMGUR_CLIENT_ID: str({ default: undefined }),
+	IMGUR_CLIENT_ID: str({ default: '' }),
 });
 
 export const validateEnv = function () {

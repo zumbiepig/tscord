@@ -19,7 +19,7 @@ export class ErrorHandler {
 		});
 
 		// catch all unhandled rejections (promise)
-		process.on('unhandledRejection', (error: Error, _: Promise<never>) => {
+		process.on('unhandledRejection', (error: Error, _: Promise<unknown>) => {
 			if (error instanceof BaseError) {
 				void error.handle();
 			} else {

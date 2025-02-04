@@ -27,12 +27,16 @@ import type {
 	StatPerInterval,
 } from '@/utils/types';
 
-const allInteractions = {
+const allInteractions: { $or: {type: InteractionsConstants}[]} = {
 	$or: [
-		{ type: 'SIMPLE_COMMAND_MESSAGE' },
 		{ type: 'CHAT_INPUT_COMMAND_INTERACTION' },
+		{ type: 'SIMPLE_COMMAND_MESSAGE' },
 		{ type: 'USER_CONTEXT_MENU_COMMAND_INTERACTION' },
 		{ type: 'MESSAGE_CONTEXT_MENU_COMMAND_INTERACTION' },
+		{ type: 'BUTTON_INTERACTION' },
+		{ type: 'SELECT_MENU_INTERACTION' }
+		{ type: 'STRING_SELECT_MENU_INTERACTION' },
+		{ type: 'MODAL_SUBMIT_INTERACTION' },
 	],
 };
 

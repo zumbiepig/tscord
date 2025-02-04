@@ -641,8 +641,8 @@ export interface MikroORMConfigType {
 }
 
 interface LogsConfigCategoryType {
-	file: boolean;
 	console: boolean;
+	file: boolean;
 	channelId: Snowflake | null;
 }
 
@@ -654,23 +654,18 @@ export interface LogsConfigType {
 		retentionDays: number;
 	};
 
-	interaction: LogsConfigCategoryType & { exclude: InteractionsConstants[] };
+	system: LogsConfigCategoryType;
 
-	simpleCommand: LogsConfigCategoryType;
+	error: LogsConfigCategoryType;
+
+	interaction: LogsConfigCategoryType;
 
 	newUser: LogsConfigCategoryType;
 
 	guild: LogsConfigCategoryType;
-
-	error: LogsConfigCategoryType;
-}
-
-export interface StatsConfigType {
-	interaction: {
-		exclude: InteractionsConstants[];
-	};
 }
 
 export interface APIConfigType {
 	enabled: boolean;
+	port: number;
 }

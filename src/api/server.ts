@@ -11,7 +11,7 @@ import { json, urlencoded } from 'express';
 
 import * as controllers from '@/api/controllers';
 import { Log } from '@/api/middlewares';
-import env from '@/env';
+import { apiConfig } from '@/configs';
 import { Database, PluginsManager, Store } from '@/services';
 import { Service } from '@/utils/decorators';
 
@@ -43,7 +43,7 @@ export class Server {
 	async start() {
 		const server = await PlatformExpress.bootstrap(Server, {
 			rootDir: import.meta.dirname,
-			httpPort: env.API_PORT,
+			httpPort: apiConfig.port,
 			httpsPort: false,
 			acceptMimes: ['application/json'],
 			mount: {

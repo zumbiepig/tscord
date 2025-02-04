@@ -13,40 +13,33 @@ export const logsConfig: LogsConfigType = {
 	// - if the log should be saved to the log files
 	// - if the log should be sent to a discord channel (providing its channel ID)
 
-	interaction: {
-		file: true,
+	system: {
 		console: true,
-		channelId: null,
-
-		// exclude some interactions types
-		exclude: [
-			'BUTTON_INTERACTION',
-			'SELECT_MENU_INTERACTION',
-			'STRING_SELECT_MENU_INTERACTION',
-		],
-	},
-
-	simpleCommand: {
 		file: true,
-		console: true,
-		channelId: null,
-	},
-
-	newUser: {
-		file: true,
-		console: true,
-		channelId: null,
-	},
-
-	guild: {
-		file: true,
-		console: true,
 		channelId: null,
 	},
 
 	error: {
-		file: true,
 		console: true,
+		file: true,
+		channelId: null,
+	},
+
+	interaction: {
+		console: true,
+		file: true,
+		channelId: null,
+	},
+
+	newUser: {
+		console: true,
+		file: true,
+		channelId: null,
+	},
+
+	guild: {
+		console: true,
+		file: true,
 		channelId: null,
 	},
 };

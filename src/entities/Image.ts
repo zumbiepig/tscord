@@ -28,23 +28,10 @@ export class Image extends BaseEntity {
 	size!: number;
 
 	@Property()
-	tags!: string[];
-
-	@Property()
 	hash!: string;
 
 	@Property()
 	deleteHash!: string;
 }
 
-export class ImageRepository extends EntityRepository<Image> {
-	async findByTags(tags: string[], explicit = true): Promise<Image[]> {
-		const rows = await this.find({
-			$and: tags.map((tag) => ({ tags: new RegExp(tag) })),
-		});
-
-		return explicit
-			? rows.filter((row) => row.tags.length === tags.length)
-			: rows;
-	}
-}
+export class ImageRepository extends EntityRepository<Image> {}

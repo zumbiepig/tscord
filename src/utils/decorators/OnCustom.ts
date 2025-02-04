@@ -3,8 +3,6 @@ import { container, type InjectionToken } from 'tsyringe';
 import { EventManager } from '@/services';
 import { resolveDependency } from '@/utils/functions';
 
-const eventManager = await resolveDependency(EventManager);
-
 export function OnCustom(event: string) {
 	return function (
 		target: unknown,
@@ -20,9 +18,11 @@ export function OnCustom(event: string) {
 			);
 		};
 
-		eventManager.register(
-			event,
-			(descriptor.value as (...args: unknown[]) => unknown).bind(target),
-		);
+		void resolveDependency(EventManager).then((eventManager) => {
+			eventManager.register(
+				event,
+				(descriptor.value as (...args: unknown[]) => unknown).bind(target),
+			);
+		});
 	};
 }

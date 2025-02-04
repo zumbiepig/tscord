@@ -24,7 +24,7 @@ export function On(
 		key: string,
 		descriptor?: PropertyDescriptor,
 	) {
-		const clazz = target as unknown as new () => unknown;
+		const class = target as unknown as new () => unknown;
 		const on = DOn.create({
 			...(options?.botIds !== undefined && { botIds: options.botIds }),
 			event,

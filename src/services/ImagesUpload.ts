@@ -1,33 +1,31 @@
-import { existsSync } from 'node:fs';
-import { basename, dirname, join } from 'node:path';
+import { createReadStream, existsSync } from 'node:fs';
+import { mkdir } from 'node:fs/promises';
+import { basename, dirname, join, sep } from 'node:path';
 import { cwd } from 'node:process';
-import { promisify } from 'node:util';
 
 import axios from 'axios';
 import chalk from 'chalk';
 import { glob } from 'glob';
-import { mkdir } from 'fs/promises';
-import { imageHash as imageHashCallback } from 'image-hash';
 import { ImgurClient } from 'imgur';
 
+import { generalConfig } from '@/configs';
 import { Image, ImageRepository } from '@/entities';
 import env from '@/env';
 import { Database, Logger } from '@/services';
 import { Service } from '@/utils/decorators';
-import { base64Encode } from '@/utils/functions';
-
-const imageHash = promisify(imageHashCallback);
+import { base64Encode, getFileHash } from '@/utils/functions';
 
 @Service()
 export class ImagesUpload {
 	private validImageExtensions = ['.png', '.jpg', '.jpeg', '.gif'];
 	private imageFolderPath = join(cwd(), 'assets');
 
-	private imgurClient: ImgurClient | null = env.IMGUR_CLIENT_ID
-		? new ImgurClient({
-				clientId: env.IMGUR_CLIENT_ID,
-			})
-		: null;
+	private imgurClient: ImgurClient | null =
+		generalConfig.automaticUploadImagesToImgur
+			? new ImgurClient({
+					clientId: env.IMGUR_CLIENT_ID,
+				})
+			: null;
 
 	private imageRepo: ImageRepository;
 
@@ -60,7 +58,7 @@ export class ImagesUpload {
 				images.push(file);
 			} else {
 				await this.logger.log(
-					'warn',
+					'error',
 					`Image ${file} has an invalid format. Valid formats: ${this.validImageExtensions.join(', ')}`,
 					`Image ${chalk.bold.red(file)} has an invalid format. Valid formats: ${chalk.bold(this.validImageExtensions.join(', '))}`,
 				);
@@ -79,17 +77,15 @@ export class ImagesUpload {
 				await this.deleteImageFromImgur(image);
 			} else if (!(await this.isImgurImageValid(image.url))) {
 				// reupload if the image is not on imgur anymore
-				await this.addNewImageToImgur(imagePath, image.hash, true);
+				await this.addNewImageToImgur(imagePath, image.hash);
 			}
 		}
 
-		// check if the image is already in the database and that its md5 hash is the same.
+		// check if the image is already in the database and that its sha256 hash is the same.
 		for (const imagePath of images) {
-			const imageHash = (await imageHash(
+			const imageHash = await getFileHash(
 				join(this.imageFolderPath, imagePath),
-				16,
-				true,
-			)) as string;
+			);
 
 			const imageInDb = await this.imageRepo.findOne({
 				hash: imageHash,
@@ -114,7 +110,7 @@ export class ImagesUpload {
 		await this.imgurClient.deleteImage(image.deleteHash);
 
 		await this.logger.log(
-			'info',
+			'warn',
 			`Image ${image.fileName} deleted from database because it is not in the filesystem anymore`,
 		);
 	}
@@ -122,50 +118,39 @@ export class ImagesUpload {
 	async addNewImageToImgur(imagePath: string, imageHash: string) {
 		if (!this.imgurClient) return;
 
+		const imageFilename = basename(imagePath);
+
 		// upload the image to imgur
-		const base64 = await base64Encode(join(this.imageFolderPath, imagePath));
+		const uploadResponse = await this.imgurClient.upload({
+			image: await base64Encode(join(this.imageFolderPath, imagePath)),
+			type: 'base64',
+			name: imageFilename,
+		});
 
-		try {
-			const imageBasePath = dirname(imagePath);
-			const imageFileName = basename(imagePath);
-
-			const uploadResponse = await this.imgurClient.upload({
-				image: base64,
-				type: 'base64',
-				name: imageFileName,
-			});
-
-			if (!uploadResponse.success) {
-				await this.logger.log(
-					'error',
-					`Error uploading image ${imageFileName} to imgur: ${uploadResponse.status.toString()} ${JSON.stringify(uploadResponse.data)}`,
-				);
-				return;
-			}
-
-			// add the image to the database
-			const image = new Image();
-			image.basePath = imageBasePath;
-			image.fileName = imageFileName;
-			image.url = uploadResponse.data.link;
-			image.size = uploadResponse.data.size;
-			image.tags = imageBasePath.split('/');
-			image.hash = imageHash;
-			image.deleteHash = uploadResponse.data.deletehash ?? '';
-			await this.db.em.persistAndFlush(image);
-
-			// log the success
-			await this.logger.log(
-				'info',
-				`Image ${imagePath} uploaded to imgur`,
-				`Image ${chalk.bold.green(imagePath)} uploaded to imgur`,
-			);
-		} catch (error) {
+		if (!uploadResponse.success) {
 			await this.logger.log(
 				'error',
-				error instanceof Error ? error.message : String(error),
+				`Error uploading image ${imageFilename} to imgur: ${uploadResponse.status.toString()} ${JSON.stringify(uploadResponse.data)}`,
 			);
+			return;
 		}
+
+		// add the image to the database
+		const image = new Image();
+		image.basePath = dirname(imagePath);
+		image.fileName = imageFilename;
+		image.url = uploadResponse.data.link;
+		image.size = uploadResponse.data.size;
+		image.hash = imageHash;
+		image.deleteHash = uploadResponse.data.deletehash ?? '';
+		await this.db.em.persistAndFlush(image);
+
+		// log the success
+		await this.logger.log(
+			'info',
+			`Image ${imagePath} uploaded to imgur`,
+			`Image ${chalk.bold.green(imagePath)} uploaded to imgur`,
+		);
 	}
 
 	async isImgurImageValid(imageUrl: string): Promise<boolean> {

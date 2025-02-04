@@ -37,20 +37,6 @@ import {
 import { keptInstances } from '@/utils/decorators';
 import { initDataTable, resolveDependency } from '@/utils/functions';
 
-async function reloadImports() {
-	const files = await glob(
-		join(import.meta.dirname, '{events,commands}', '**', '*.{js,ts}'),
-		{ windowsPathsNoEscape: true },
-	);
-	await Promise.all(
-		files.map((file) => {
-			const module = require.resolve(file)
-			delete require.cache[module];
-			return import(module);
-		}),
-	);
-}
-
 /**
  * Hot reload
  */
@@ -59,8 +45,7 @@ async function reload(client: Client) {
 	store.set('botHasBeenReloaded', true);
 
 	const logger = await resolveDependency(Logger);
-	console.log('\n');
-	logger.startSpinner('Hot reloading...');
+	await logger.startSpinner('Hot reloading...');
 
 	// remove events
 	client.removeEvents();
@@ -85,7 +70,19 @@ async function reload(client: Client) {
 	container.registerInstance(Client, client);
 
 	// reload files
-	await reloadImports();
+	await Promise.all(
+		(
+			await glob(
+				join(import.meta.dirname, '{events,commands}', '**', '*.{js,ts}'),
+				{ windowsPathsNoEscape: true },
+			)
+		).map(async (file) => {
+			const module = require.resolve(file);
+			// eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+			delete require.cache[module];
+			await import(module);
+		}),
+	);
 
 	// rebuild
 	await MetadataStorage.instance.build();
@@ -99,8 +96,7 @@ async function reload(client: Client) {
 	const db = await resolveDependency(Database);
 	await db.initialize();
 
-	await logger.log('info', 'Hot reloaded', chalk.whiteBright('Hot reloaded'));
-	console.log('\n');
+	await logger.log('info', 'Hot reloaded!', chalk.whiteBright('Hot reloaded!'));
 }
 
 async function init() {
@@ -117,7 +113,7 @@ async function init() {
 
 	// start spinner
 	const logger = await resolveDependency(Logger);
-	logger.startSpinner('Starting...');
+	await logger.startSpinner('Starting...');
 
 	// init the database
 	const db = await resolveDependency(Database);
@@ -146,6 +142,7 @@ async function init() {
 		},
 
 		silent: !env.isDev,
+
 		...(env.isDev &&
 			generalConfig.testGuildId && {
 				botGuilds: [generalConfig.testGuildId],

@@ -21,7 +21,6 @@ import { delay, inject } from 'tsyringe';
 
 import * as controllers from '@/api/controllers';
 import { apiConfig, logsConfig } from '@/configs';
-import env from '@/env';
 import { locales } from '@/i18n';
 import { Pastebin, PluginsManager, Scheduler } from '@/services';
 import { Schedule, Service } from '@/utils/decorators';
@@ -125,13 +124,8 @@ export class Logger {
 			file?: boolean;
 			channelId?: Snowflake | null;
 			discordEmbed?: BaseMessageOptions | null;
-		} = {
-			console: true,
-			file: true,
-			channelId: null,
-			discordEmbed: null,
-		},
-	) {
+		} = {},
+	): Promise<void> {
 		const date = dayjsTimezone();
 		const formattedDate = formatDate(date, 'onlyDateFileName');
 		const formattedTime = formatDate(date, 'logs');
@@ -139,6 +133,12 @@ export class Logger {
 		const trimmedMessage = message.trim();
 		const logMessage = `[${formattedTime}] [${formattedLevel}] ${trimmedMessage}`;
 		const chalkedLogMessage = `[${chalk.dim(formattedTime)}] [${formattedLevel}] ${chalkedMessage?.trim() ?? trimmedMessage}`;
+
+		// set default values
+		logLocation.console = logLocation.console ?? logsConfig.system.console;
+		logLocation.file = logLocation.file ?? logsConfig.system.file;
+		logLocation.channelId = logLocation.channelId ?? logsConfig.system.channelId;
+		logLocation.discordEmbed = logLocation.discordEmbed ?? this.embedLevelBuilder[level](logMessage);
 
 		// log to console
 		if (logLocation.console) {
@@ -177,18 +177,7 @@ export class Logger {
 					channel &&
 					(channel instanceof TextChannel || channel instanceof ThreadChannel)
 				) {
-					return await channel
-						.send(
-							logLocation.discordEmbed
-								? logLocation.discordEmbed
-								: this.embedLevelBuilder[level](logMessage),
-						)
-						.catch(async (error: unknown) => {
-							await this.log(
-								'error',
-								`Couldn't log to Discord channel: ${error as string}`,
-							);
-						});
+					await channel.send(logLocation.discordEmbed);
 				}
 			}
 		}
@@ -200,10 +189,75 @@ export class Logger {
 	}
 
 	/**
+	 * Logs errors.
+	 * @param error
+	 * @param type uncaughtException | unhandledRejection
+	 * @param trace
+	 */
+	public async logError(
+		type: 'uncaughtException' | 'unhandledRejection',
+		error: Error,
+		trace: StackFrame[] = parse(error.stack ?? ''),
+	): Promise<void> {
+		let message = '(ERROR)';
+		let chalkedMessage = `(${chalk.bold.white('ERROR')})`;
+		let embedTitle = '';
+		let embedMessage = '';
+
+		if (trace[0]) {
+			message += ` ${type === 'uncaughtException' ? 'Exception' : 'Unhandled rejection'} : ${error.message}\n${trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n')}`;
+			chalkedMessage += ` ${chalk.dim.italic.gray(type === 'uncaughtException' ? 'Exception' : 'Unhandled rejection')} : ${error.message}\n${chalk.dim.italic(trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n'))}`;
+			embedTitle += `***${type === 'uncaughtException' ? 'Exception' : 'Unhandled rejection'}* : ${error.message}**`;
+			embedMessage += `\`\`\`\n${trace.map((frame: StackFrame) => `> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n')}\n\`\`\``;
+		} else {
+			if (type === 'uncaughtException') {
+				message += `An exception as occurred in a unknown file\n\t> ${error.message}`;
+				chalkedMessage += `An exception as occurred in a unknown file\n\t> ${error.message}`;
+				embedMessage += `An exception as occurred in a unknown file\n${error.message}`;
+			} else {
+				message += `An unhandled rejection as occurred in a unknown file\n\t> ${error}`;
+				chalkedMessage += `An unhandled rejection as occurred in a unknown file\n\t> ${error}`;
+				embedMessage += `An unhandled rejection as occurred in a unknown file\n${error}`;
+			}
+		}
+
+		if (embedMessage.length > 4096) {
+			const paste = await this.pastebin.createPaste(
+				`${embedTitle}\n${embedMessage}`,
+			);
+			await this.log(
+				'info',
+				'Error embed was too long, uploaded error to pastebin: ' +
+					(paste?.getLink() ?? ''),
+					null,
+					logsConfig.error
+			);
+			embedMessage = `[Pastebin of the error](https://rentry.co/${paste?.getLink() ?? ''})`;
+		}
+
+		await this.log('error', message, chalkedMessage, {
+			...logsConfig.error,
+			discordEmbed: {
+				embeds: [
+					{
+						title:
+							embedTitle.length > 256
+								? `${embedTitle.substring(0, 252)}...`
+								: embedTitle,
+						description: embedMessage,
+						color: 0x7c1715,
+						timestamp: dayjsTimezone().toISOString(),
+					},
+				],
+			},
+		});
+	}
+
+	/**
 	 * Archive the logs in a tar.gz file each day, and delete log archives older than the retention period.
 	 */
 	@Schedule('0 0 * * *')
-	public async archiveLogs() {
+	public async archiveLogs(): Promise<void> {
 		if (!logsConfig.archive.enabled) return;
 
 		if (!existsSync(this.logPath)) return;
@@ -254,14 +308,13 @@ export class Logger {
 	}
 
 	/**
-	 * Logs any interaction that is not excluded in the config.
+	 * Logs all interactions.
 	 * @param interaction
 	 */
-	public async logInteraction(interaction: AllInteractions) {
+	public async logInteraction(interaction: AllInteractions): Promise<void> {
 		const type = Case.constant(
 			getTypeOfInteraction(interaction),
 		) as InteractionsConstants;
-		if (logsConfig.interaction.exclude.includes(type)) return;
 
 		const action = resolveAction(interaction);
 		const channel = resolveChannel(interaction);
@@ -336,7 +389,7 @@ export class Logger {
 	 * Logs all new users.
 	 * @param user
 	 */
-	public async logNewUser(user: User) {
+	public async logNewUser(user: User): Promise<void> {
 		const message = `(NEW_USER) ${user.tag} (${user.id}) has been added to the db`;
 		const chalkedMessage = `(${chalk.bold.white('NEW_USER')}) ${chalk.bold.green(user.tag)} (${chalk.bold.blue(user.id)}) ${chalk.dim.italic.gray('has been added to the db')}`;
 
@@ -369,7 +422,7 @@ export class Logger {
 	public async logGuild(
 		type: 'NEW_GUILD' | 'DELETE_GUILD' | 'RECOVER_GUILD',
 		guildId: Snowflake,
-	) {
+	): Promise<void> {
 		const guild = await this.client.guilds.fetch(guildId).catch(() => null);
 		const additionalMessage =
 			type === 'NEW_GUILD'
@@ -416,87 +469,24 @@ export class Logger {
 		});
 	}
 
-	/**
-	 * Logs errors.
-	 * @param error
-	 * @param type uncaughtException | unhandledRejection
-	 * @param trace
-	 */
-	public async logError(
-		type: 'uncaughtException' | 'unhandledRejection',
-		error: Error,
-		trace: StackFrame[] = parse(error.stack ?? ''),
-	) {
-		let message = '(ERROR)';
-		let chalkedMessage = `(${chalk.bold.white('ERROR')})`;
-		let embedTitle = '';
-		let embedMessage = '';
-
-		if (trace[0]) {
-			message += ` ${type === 'uncaughtException' ? 'Exception' : 'Unhandled rejection'} : ${error.message}\n${trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n')}`;
-			chalkedMessage += ` ${chalk.dim.italic.gray(type === 'uncaughtException' ? 'Exception' : 'Unhandled rejection')} : ${error.message}\n${chalk.dim.italic(trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n'))}`;
-			embedTitle += `***${type === 'uncaughtException' ? 'Exception' : 'Unhandled rejection'}* : ${error.message}**`;
-			embedMessage += `\`\`\`\n${trace.map((frame: StackFrame) => `> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n')}\n\`\`\``;
-		} else {
-			if (type === 'uncaughtException') {
-				message += `An exception as occurred in a unknown file\n\t> ${error.message}`;
-				chalkedMessage += `An exception as occurred in a unknown file\n\t> ${error.message}`;
-				embedMessage += `An exception as occurred in a unknown file\n${error.message}`;
-			} else {
-				message += `An unhandled rejection as occurred in a unknown file\n\t> ${error}`;
-				chalkedMessage += `An unhandled rejection as occurred in a unknown file\n\t> ${error}`;
-				embedMessage += `An unhandled rejection as occurred in a unknown file\n${error}`;
-			}
-		}
-
-		if (embedMessage.length > 4096) {
-			const paste = await this.pastebin.createPaste(
-				`${embedTitle}\n${embedMessage}`,
-			);
-			await this.log(
-				'debug',
-				'Error embed was too long, uploaded error to pastebin: ' +
-					(paste?.getLink() ?? ''),
-			);
-			embedMessage = `[Pastebin of the error](https://rentry.co/${paste?.getLink() ?? ''})`;
-		}
-
-		await this.log('error', message, chalkedMessage, {
-			...logsConfig.error,
-			discordEmbed: {
-				embeds: [
-					{
-						title:
-							embedTitle.length > 256
-								? `${embedTitle.substring(0, 252)}...`
-								: embedTitle,
-						description: embedMessage,
-						color: 0x7c1715,
-						timestamp: dayjsTimezone().toISOString(),
-					},
-				],
-			},
-		});
-	}
-
-	public getLastLogs() {
+	public getLastLogs(): string[] {
 		return this.lastLogsTail;
 	}
 
-	public startSpinner(text: string) {
+	public async startSpinner(text: string): Promise<void> {
+		console.log('\n');
 		this.spinner.start(text);
+		await this.log('info', text, null, { console: false });
 	}
 
-	public async logStartingConsole() {
+	public async logStartingConsole(): Promise<void> {
 		this.spinner.stop();
 
-		console.log('\n');
 		await this.log(
 			'info',
 			'━━━━━━━━━━ Started! ━━━━━━━━━━',
-			chalk.dim.gray('━━━━━━━━━━ Started! ━━━━━━━━━━'),
+			chalk.green('\n━━━━━━━━━━ Started! ━━━━━━━━━━\n'),
 		);
-		console.log('\n');
 
 		// commands
 		const slashCommands = MetadataStorage.instance.applicationCommandSlashes;
@@ -619,32 +609,32 @@ export class Logger {
 		if (apiConfig.enabled) {
 			await this.log(
 				'info',
-				boxen(
-					` API Server listening on port ${env.API_PORT?.toString() ?? ''} `,
-					{
-						padding: 0,
-						margin: {
-							top: 1,
-							bottom: 0,
-							left: 1,
-							right: 1,
-						},
-						borderStyle: 'round',
-						dimBorder: true,
+				boxen(` API Server listening on port ${apiConfig.port.toString()} `, {
+					padding: 0,
+					margin: {
+						top: 1,
+						bottom: 0,
+						left: 1,
+						right: 1,
 					},
-				),
+					borderStyle: 'round',
+					dimBorder: true,
+				}),
 				chalk.gray(
-					boxen(` API Server listening on port ${chalk.bold(env.API_PORT)} `, {
-						padding: 0,
-						margin: {
-							top: 1,
-							bottom: 0,
-							left: 1,
-							right: 1,
+					boxen(
+						` API Server listening on port ${chalk.bold(apiConfig.port)} `,
+						{
+							padding: 0,
+							margin: {
+								top: 1,
+								bottom: 0,
+								left: 1,
+								right: 1,
+							},
+							borderStyle: 'round',
+							dimBorder: true,
 						},
-						borderStyle: 'round',
-						dimBorder: true,
-					}),
+					),
 				),
 			);
 		}

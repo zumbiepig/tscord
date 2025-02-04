@@ -1,0 +1,2 @@
+find old console.debugs
+find old resolve dependencies

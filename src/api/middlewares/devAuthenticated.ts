@@ -9,8 +9,6 @@ import { isDev } from '@/utils/functions';
 
 const discordOauth2 = new DiscordOauth2();
 
-const timeout = 10 * 60 * 1000; // 10 minutes
-
 // const fmaTokenRegex = /mfa\.[\w-]{84}/
 // const nonFmaTokenRegex = /[\w-]{24}\.[\w-]{6}\.[\w-]{27}/
 
@@ -20,9 +18,6 @@ export class DevAuthenticated {
 	constructor(private store: Store) {}
 
 	async use(@Context() { request }: PlatformContext) {
-		// if we are in development mode, we don't need to check the token
-		// if (env.isDev === true) return next()
-
 		// check if the request includes valid authorization header
 		const authHeader = request.headers.authorization;
 		if (!authHeader?.startsWith('Bearer '))
@@ -44,26 +39,27 @@ export class DevAuthenticated {
 		if (authorizedAPITokens.includes(token)) return;
 
 		// we get the user's profile from the token using the `discord-oauth2` package
-		try {
-			const user = await discordOauth2.getUser(token);
+		const user = await discordOauth2.getUser(token).catch(() => {
+			throw new BadRequest('Invalid discord token');
+		});
 
-			// check if logged user is a dev (= admin) of the bot
-			if (isDev(user.id)) {
-				// we add the token to the store and set a timeout to remove it after 10 minutes
-				this.store.update('authorizedAPITokens', (authorizedAPITokens) => [
-					...authorizedAPITokens,
-					token,
-				]);
-				setTimeout(() => {
+		// check if logged user is a dev (= admin) of the bot
+		if (isDev(user.id)) {
+			// we add the token to the store and set a timeout to remove it after 10 minutes
+			this.store.update('authorizedAPITokens', (authorizedAPITokens) => [
+				...authorizedAPITokens,
+				token,
+			]);
+			setTimeout(
+				() => {
 					this.store.update('authorizedAPITokens', (authorizedAPITokens) =>
 						authorizedAPITokens.filter((t) => t !== token),
 					);
-				}, timeout);
-			} else {
-				throw new Unauthorized('Unauthorized');
-			}
-		} catch {
-			throw new BadRequest('Invalid discord token');
+				},
+				10 * 60 * 1000,
+			);
+		} else {
+			throw new Unauthorized('Unauthorized');
 		}
 	}
 }
