@@ -172,7 +172,9 @@ const resolvers = {
 	},
 };
 
-export function resolveUser(interaction: AllInteractions) {
+type InteractionTypes<T extends Record<string, (_: unknown) => unknown>> = Parameters<T[Exclude<keyof T, 'fallback'>]>[0]
+
+export function resolveUser(interaction: InteractionTypes<typeof resolvers.user>) {
 	return (
 		resolvers.user[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.user
@@ -235,6 +237,6 @@ export function resolveLocale(interaction: AllInteractions) {
 	);
 }
 
-export function getTypeOfInteraction(interaction: AllInteractions): string {
+export function getTypeOfInteraction(interaction: object): string {
 	return interaction.constructor.name;
 }

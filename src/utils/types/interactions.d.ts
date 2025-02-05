@@ -6,6 +6,7 @@ import type {
 	StringSelectMenuInteraction,
 } from 'discord.js';
 import type { DApplicationCommand, SimpleCommandMessage } from 'discordx';
+import type { ScreamingSnakeCase } from 'type-fest';
 
 import type { Locales, TranslationFunctions } from '@/i18n';
 
@@ -27,7 +28,7 @@ export type AllInteractions = EmittedInteractions | OnTheFlyInteractions;
 	| 'ButtonInteraction'
 	| 'ModalSubmitInteraction'
 	| 'StringSelectMenuInteraction';*/
-export type InteractionsConstants = AllInteractions['constructor']['name'];
+export type InteractionsConstants = ScreamingSnakeCase<AllInteractions['constructor']['name']>;
 
 export type CommandCategory = DApplicationCommand & ICategory;
 

@@ -36,16 +36,16 @@ import type { ColorsConfigType } from "@/utils/types";
  * @property {number} Yellow 0xFEE75C | rgb(254,231,92)
  */
 export const colorsConfig: ColorsConfigType = {
-	primary: Colors.DarkButNotBlack, // #2f3136
-	success: Colors.Green, // #57f287
-	error: Colors.Red, // #ed4245
-	logDebug: Colors.DarkerGrey, // #696969
-	logInfo: Colors.Blue, // #007fe7
-	logWarn: Colors.Orange, // #f37100
-	logError: Colors.DarkRed, // #992d22
-	logInteraction: Colors.DarkOrange, // #db5c21
-	logNewUser: Colors.Aqua, // #83dd80
-	logGuildNew: Colors.Green, // #02fd77
-	logGuildDelete: Colors.Red, // #ff0000
-	logGuildRecover: Colors.Yellow, // #fffb00
+	primary: Colors.DarkButNotBlack, // #2C2F33
+	success: Colors.Green, // #57F287
+	error: Colors.Red, // #ED4245
+	logDebug: Colors.DarkerGrey, // #7F8C8D
+	logInfo: Colors.Blue, // #3498DB
+	logWarn: Colors.Orange, // #E67E22
+	logError: Colors.DarkRed, // #992D22
+	logInteraction: Colors.DarkOrange, // #A84300
+	logNewUser: Colors.Aqua, // #1ABC9C
+	logGuildNew: Colors.Green, // #57F287
+	logGuildDelete: Colors.Red, // #ED4245
+	logGuildRecover: Colors.Yellow, // #FEE75C
 };
