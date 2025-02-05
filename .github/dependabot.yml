@@ -8,3 +8,4 @@ updates:
       interval: 'daily'
     commit-message:
       prefix: 'dependabot[bot]'
+    versioning-strategy: increase
