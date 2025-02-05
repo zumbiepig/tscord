@@ -25,9 +25,8 @@ export const ExtractLocale: GuardFunction<
 		interaction instanceof StringSelectMenuInteraction ||
 		interaction instanceof ButtonInteraction
 	) {
-		const sanitizedLocale = getLocaleFromInteraction(interaction);
-		guardData.sanitizedLocale = sanitizedLocale;
-		guardData.localize = L[sanitizedLocale];
+		const locale = getLocaleFromInteraction(interaction);
+		guardData.localize = L[locale];
 	}
 
 	return next(guardData);

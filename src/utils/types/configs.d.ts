@@ -17,21 +17,21 @@ export interface GeneralConfigType {
 	defaultLocale: Locales;
 	timezone: Timezone;
 
-	simpleCommandsPrefix: string;
+	simpleCommandsPrefix: string | null;
 	automaticDeferring: boolean;
 
-	ownerId?: Snowflake;
+	ownerId?: Snowflake | null;
 	devs?: Snowflake[];
-	testGuildId?: Snowflake;
+	testGuildId?: Snowflake | null;
 
 	activities: ActivitiesOptions[] & { status: PresenceStatusData }[];
 
 	automaticUploadImagesToImgur: boolean;
 
-	links?: {
-		botInvite?: string;
-		supportServer?: string;
-		gitRepo?: string;
+	links: {
+		botInvite: string | null;
+		supportServer: string | null;
+		gitRepo: string | null;
 	};
 }
 

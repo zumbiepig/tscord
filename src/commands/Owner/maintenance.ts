@@ -27,7 +27,7 @@ export default class MaintenanceCommand {
 		await simpleSuccessEmbed(
 			interaction,
 			localize.COMMANDS.MAINTENANCE.EMBED.DESCRIPTION({
-				state: state ? 'on' : 'off',
+				status: state,
 			}),
 		);
 	}

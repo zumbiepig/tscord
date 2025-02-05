@@ -13,7 +13,7 @@ import {
 } from '@/utils/functions';
 import type {
 	SlashOptionOptions,
-	TranslationsNestedPaths,
+	TranslationPath,
 } from '@/utils/types';
 
 /**
@@ -27,12 +27,12 @@ import type {
  * @category Decorator
  */
 export function SlashOption(options: SlashOptionOptions) {
-	let localizationSource: TranslationsNestedPaths | null = null;
+	let localizationSource: TranslationPath | null = null;
 
 	if (options.localizationSource)
 		localizationSource = constantPreserveDots(
 			options.localizationSource,
-		) as TranslationsNestedPaths;
+		) as TranslationPath;
 
 	if (localizationSource) {
 		options = setOptionsLocalization({

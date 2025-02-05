@@ -1,6 +1,6 @@
 import type { Translation } from '../i18n-types.js';
 
-const en_US = {
+export default {
 	GUARDS: {
 		DISABLED_COMMAND: 'This command is currently disabled.',
 		MAINTENANCE: 'This bot is currently in maintenance mode.',
@@ -18,7 +18,7 @@ const en_US = {
 			DESCRIPTION: 'Invite the bot to your server!',
 			EMBED: {
 				TITLE: 'Invite me on your server!',
-				DESCRIPTION: '[Click here]({link}) to invite me!',
+				DESCRIPTION: '[Click here]({link:string}) to invite me!',
 			},
 		},
 		PREFIX: {
@@ -31,13 +31,13 @@ const en_US = {
 				},
 			},
 			EMBED: {
-				DESCRIPTION: 'Prefix changed to `{prefix}`.',
+				DESCRIPTION: 'Prefix changed to `{prefix:string}`.',
 			},
 		},
 		MAINTENANCE: {
 			DESCRIPTION: 'Set the maintenance mode of the bot.',
 			EMBED: {
-				DESCRIPTION: 'Maintenance mode set to `{state}`.',
+				DESCRIPTION: 'Maintenance mode has been {status | {enabled: enabled, disabled: disabled}}.',
 			},
 		},
 		STATS: {
@@ -61,11 +61,9 @@ const en_US = {
 			},
 		},
 		PING: {
-			DESCRIPTION: 'Pong!',
+			DESCRIPTION: 'Get the ping of the bot.',
 			MESSAGE:
-				'{member}, Pong! The message round-trip took {time}ms. {heartbeat}',
+				'Pong! The message round-trip took {time}ms. The heartbeat ping is {heartbeat}ms.',
 		},
 	},
 } satisfies Translation;
-
-export default en_US;

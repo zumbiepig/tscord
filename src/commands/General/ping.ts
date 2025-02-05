@@ -18,13 +18,11 @@ export default class PingCommand {
 	) {
 		const msg = await interaction.followUp({
 			content: 'Pinging...',
-			fetchReply: true,
 		});
 
 		const content = localize.COMMANDS.PING.MESSAGE({
-			member: msg.inGuild() ? JSON.stringify(interaction.member) : '',
 			time: msg.createdTimestamp - interaction.createdTimestamp,
-			heartbeat: `The heartbeat ping is ${Math.floor(client.ws.ping).toString()}ms.`,
+			heartbeat: Math.floor(client.ws.ping).toString(),
 		});
 
 		await msg.edit(content);

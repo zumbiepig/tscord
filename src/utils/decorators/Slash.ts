@@ -11,7 +11,7 @@ import {
 } from '@/utils/functions';
 import type {
 	ApplicationCommandOptions,
-	TranslationsNestedPaths,
+	TranslationPath,
 } from '@/utils/types';
 
 /**
@@ -27,15 +27,15 @@ export function Slash(options?: ApplicationCommandOptions) {
 	if (!options) options = {};
 	else if (typeof options === 'string') options = { name: options };
 
-	let localizationSource: TranslationsNestedPaths | null = null;
+	let localizationSource: TranslationPath | null = null;
 
 	if (options.localizationSource)
 		localizationSource = constantPreserveDots(
 			options.localizationSource,
-		) as TranslationsNestedPaths;
+		) as TranslationPath;
 	else if (options.name)
 		localizationSource =
-			`COMMANDS.${constantPreserveDots(options.name)}` as TranslationsNestedPaths;
+			`COMMANDS.${constantPreserveDots(options.name)}` as TranslationPath;
 
 	if (localizationSource) {
 		options = setOptionsLocalization({

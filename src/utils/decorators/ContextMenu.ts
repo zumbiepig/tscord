@@ -9,7 +9,7 @@ import {
 } from '@/utils/functions';
 import type {
 	ContextMenuOptions,
-	TranslationsNestedPaths,
+	TranslationPath,
 } from '@/utils/types';
 
 /**
@@ -23,7 +23,7 @@ import type {
  * @category Decorator
  */
 export function ContextMenu(options: ContextMenuOptions) {
-	let localizationSource: TranslationsNestedPaths | null = null;
+	let localizationSource: TranslationPath | null = null;
 	const commandNameFromFile = /^(.*)\..*$/.exec(
 		basename(getCallerFile(1) ?? ''),
 	)?.[1];
@@ -31,13 +31,13 @@ export function ContextMenu(options: ContextMenuOptions) {
 	if (options.localizationSource)
 		localizationSource = constantPreserveDots(
 			options.localizationSource,
-		) as TranslationsNestedPaths;
+		) as TranslationPath;
 	else if (options.name)
 		localizationSource =
-			`COMMANDS.${constantPreserveDots(options.name)}` as TranslationsNestedPaths;
+			`COMMANDS.${constantPreserveDots(options.name)}` as TranslationPath;
 	else if (commandNameFromFile)
 		localizationSource =
-			`COMMANDS.${constantPreserveDots(commandNameFromFile)}` as TranslationsNestedPaths;
+			`COMMANDS.${constantPreserveDots(commandNameFromFile)}` as TranslationPath;
 
 	if (localizationSource) {
 		options = setOptionsLocalization({

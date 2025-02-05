@@ -7,7 +7,7 @@ import {
 import type {
 	SanitizedOptions,
 	SlashChoiceType,
-	TranslationsNestedPaths,
+	TranslationPath,
 } from '@/utils/types';
 
 /**
@@ -25,11 +25,11 @@ export function SlashChoice(...options: SanitizedOptions[]) {
 		let option = options[i];
 
 		if (option && typeof option !== 'number' && typeof option !== 'string') {
-			let localizationSource: TranslationsNestedPaths | undefined;
+			let localizationSource: TranslationPath | undefined;
 			if (option.localizationSource)
 				localizationSource = constantPreserveDots(
 					option.localizationSource,
-				) as TranslationsNestedPaths;
+				) as TranslationPath;
 
 			if (localizationSource) {
 				option = setOptionsLocalization({

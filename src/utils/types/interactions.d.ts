@@ -33,6 +33,5 @@ export type InteractionsConstants = ScreamingSnakeCase<AllInteractions['construc
 export type CommandCategory = DApplicationCommand & ICategory;
 
 export interface InteractionData {
-	sanitizedLocale: Locales;
 	localize: TranslationFunctions;
 }

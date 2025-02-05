@@ -6,48 +6,61 @@ import type {
 	SlashGroupOptions as SlashGroupOptionsX,
 	SlashOptionOptions as SlashOptionOptionsX,
 } from 'discordx';
+import type {
+	Except,
+	Get,
+	OverrideProperties,
+	Paths,
+	PositiveInfinity,
+	SetOptional,
+	Simplify,
+} from 'type-fest';
 
 import type { Locales, Translations } from '@/i18n';
-import type { Modify, NestedPaths, WithOptional } from '@/utils/types';
 
-export type TranslationsNestedPaths = NestedPaths<Translations>;
+export type TranslationPath = Paths<
+	Translations,
+	{ maxRecursionDepth: PositiveInfinity }
+>;
 
-export type LocalizationMap = Partial<Record<Locales, string>>;
+export type TranslationType<K extends TranslationPath> = Simplify<Get<Translations, K>>;
+
+type LocalizationMap = Partial<Record<Locales, string>>;
 
 export interface SanitizedOptions {
 	descriptionLocalizations?: LocalizationMap;
 	nameLocalizations?: LocalizationMap;
-	localizationSource?: TranslationsNestedPaths;
+	localizationSource?: TranslationPath;
 }
 
-export type Sanitization<K> = Modify<K, SanitizedOptions>;
+type Sanitization<K> = OverrideProperties<K, SanitizedOptions>;
 
 export type ApplicationCommandOptions = Sanitization<
-	WithOptional<ApplicationCommandOptionsX<string, string>, 'description'>
+	SetOptional<ApplicationCommandOptionsX<string, string>, 'description'>
 >;
 
 export type SlashGroupOptions = Sanitization<
-	WithOptional<SlashGroupOptionsX<string, string, string>, 'description'>
+	SetOptional<SlashGroupOptionsX<string, string, string>, 'description'>
 >;
 
 export type SlashOptionOptions = Sanitization<
-	WithOptional<SlashOptionOptionsX<string, string>, 'description'>
+	SetOptional<SlashOptionOptionsX<string, string>, 'description'>
 >;
 
-export type SlashChoiceType = Modify<SlashChoiceTypeX, SanitizedOptions>;
+export type SlashChoiceType = OverrideProperties<
+	SlashChoiceTypeX,
+	SanitizedOptions
+>;
 
-export type ContextMenuOptions = Modify<
-	Modify<
-		Omit<
+export type ContextMenuOptions = OverrideProperties<
+	OverrideProperties<
+		Except<
 			ApplicationCommandOptionsX<NotEmptyX<string>, string>,
 			'description' | 'descriptionLocalizations'
 		>,
 		SanitizedOptions
 	>,
 	{
-		type:
-			| Exclude<ApplicationCommandType, ApplicationCommandType.ChatInput>
-			| ApplicationCommandType.User
-			| ApplicationCommandType.Message;
+		type: Exclude<ApplicationCommandType, ApplicationCommandType.ChatInput>;
 	}
 >;

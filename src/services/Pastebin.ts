@@ -1,3 +1,5 @@
+import { setTimeout } from 'node:timers/promises';
+
 import { Paste, RentryClient } from 'rentry-pastebin';
 
 import { Pastebin as PastebinEntity } from '@/entities';
@@ -14,8 +16,7 @@ export class Pastebin {
 	}
 
 	private async waitForToken(): Promise<void> {
-		while (!this.client.getToken())
-			await new Promise((resolve) => setTimeout(resolve, 100));
+		while (!this.client.getToken()) await setTimeout(50);
 	}
 
 	async createPaste(

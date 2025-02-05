@@ -1,22 +1,22 @@
 import { generalConfig } from '@/configs';
-import { detectLocale, L, loadedLocales, type Locales, locales } from '@/i18n';
+import { L, loadedLocales, type Locales, locales } from '@/i18n';
 import { resolveLocale } from '@/utils/functions';
 import type {
 	AllInteractions,
 	SanitizedOptions,
-	TranslationsNestedPaths,
+	TranslationPath,
 } from '@/utils/types';
 
 export function getLocalizedInfo(
 	target: 'NAME' | 'DESCRIPTION',
-	localizationSource: TranslationsNestedPaths,
+	localizationSource: TranslationPath,
 ) {
 	const localizations = Object.fromEntries(
 		locales
 			.map((locale) => [
 				locale,
 				getLocalizationFromPathString(
-					`${localizationSource}.${target}` as TranslationsNestedPaths,
+					`${localizationSource}.${target}` as TranslationPath,
 					locale,
 				),
 			])
@@ -36,7 +36,7 @@ export function setOptionsLocalization<
 }: {
 	options: K;
 	target: 'name' | 'description';
-	localizationSource: TranslationsNestedPaths;
+	localizationSource: TranslationPath;
 	nameFallback?: string;
 }) {
 	const localizedInfo = getLocalizedInfo(
@@ -56,7 +56,7 @@ export function setOptionsLocalization<
 }
 
 export function getLocalizationFromPathString(
-	localePath: TranslationsNestedPaths,
+	localePath: TranslationPath,
 	locale?: Locales,
 ): string {
 	return localePath.split('.').reduce<unknown>(
@@ -82,7 +82,5 @@ export function setFallbackDescription<K extends SanitizedOptions>(
 }
 
 export function getLocaleFromInteraction(interaction: AllInteractions) {
-	return detectLocale(() => [
-		resolveLocale(interaction) ?? generalConfig.defaultLocale,
-	]);
+	return resolveLocale(interaction) ?? generalConfig.defaultLocale
 }

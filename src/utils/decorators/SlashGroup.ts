@@ -11,7 +11,7 @@ import {
 	setFallbackDescription,
 	setOptionsLocalization,
 } from '@/utils/functions';
-import type { SlashGroupOptions, TranslationsNestedPaths } from '@/utils/types';
+import type { SlashGroupOptions, TranslationPath } from '@/utils/types';
 
 /**
  * Create slash group
@@ -79,11 +79,11 @@ export function SlashGroup<TRoot extends string>(
 	root?: VerifyName<TRoot>,
 ) {
 	if (typeof options !== 'string') {
-		let localizationSource: TranslationsNestedPaths | null = null;
+		let localizationSource: TranslationPath | null = null;
 		if (options.localizationSource)
 			localizationSource = constantPreserveDots(
 				options.localizationSource,
-			) as TranslationsNestedPaths;
+			) as TranslationPath;
 
 		if (localizationSource) {
 			options = setOptionsLocalization({

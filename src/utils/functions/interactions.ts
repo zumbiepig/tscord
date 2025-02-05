@@ -10,10 +10,13 @@ import type { AllInteractions } from '@/utils/types';
 export async function replyToInteraction(
 	interaction: AllInteractions,
 	message: string | Record<string, unknown>,
+	editMessage = true,
 ) {
 	if (interaction instanceof SimpleCommandMessage) {
-		await interaction.message.reply(message);
+		return await interaction.message.reply(message);
+	} else if (editMessage) {
+		return await interaction.editReply(message);
 	} else {
-		await interaction.followUp(message);
+		return await interaction.followUp(message);
 	}
 }

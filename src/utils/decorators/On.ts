@@ -4,6 +4,7 @@ import {
 	MetadataStorage,
 	type MethodDecoratorEx,
 } from 'discordx';
+import type { Except } from 'type-fest';
 
 /**
  * Handle both discord and custom events with a defined handler
@@ -17,7 +18,7 @@ import {
  */
 export function On(
 	event: string,
-	options?: Omit<EventOptions, 'event'>,
+	options?: Except<EventOptions, 'event'>,
 ): MethodDecoratorEx {
 	return function <T>(
 		target: Record<string, T>,
