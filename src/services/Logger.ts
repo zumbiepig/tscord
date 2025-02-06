@@ -3,7 +3,6 @@ import { appendFile, mkdir, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import boxen from 'boxen';
-import Case from 'case';
 import chalk from 'chalk';
 import {
 	type BaseMessageOptions,
@@ -35,6 +34,7 @@ import {
 	timeAgo,
 } from '@/utils/functions';
 import type { AllInteractions } from '@/utils/types';
+import { constantCase } from 'change-case';
 
 @Service()
 export class Logger {
@@ -118,7 +118,7 @@ export class Logger {
 		const date = dayjsTimezone();
 		const formattedDate = formatDate(date, 'onlyDateFileName');
 		const formattedTime = formatDate(date, 'logs');
-		const formattedLevel = Case.upper(level) as Uppercase<typeof level>;
+		const formattedLevel = level.toUpperCase() as Uppercase<typeof level>;
 		const trimmedMessage = message.trim();
 		const logMessage = `[${formattedTime}] [${formattedLevel}] ${trimmedMessage}`;
 		const chalkedLogMessage = `[${chalk.dim(formattedTime)}] [${formattedLevel}] ${chalkedMessage?.trim() ?? trimmedMessage}`;
@@ -247,7 +247,7 @@ export class Logger {
 	 * @param interaction
 	 */
 	async logInteraction(interaction: AllInteractions): Promise<void> {
-		const type = Case.constant(
+		const type = constantCase(
 			getTypeOfInteraction(interaction),
 		);
 

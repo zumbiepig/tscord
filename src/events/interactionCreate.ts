@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js';
+import { AutocompleteInteraction } from 'discord.js';
 import { type ArgsOf, Client, Discord, Guard } from 'discordx';
 
 import { generalConfig } from '@/configs';
@@ -27,7 +27,7 @@ export default class InteractionCreateEvent {
 		// defer the reply
 		if (
 			generalConfig.automaticDeferring &&
-			interaction instanceof CommandInteraction
+			!(interaction instanceof AutocompleteInteraction)
 		)
 			await interaction.deferReply();
 

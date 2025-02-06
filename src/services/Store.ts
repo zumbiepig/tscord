@@ -1,4 +1,4 @@
-import { Store as RxStore } from 'rxeta';
+import Keyv from 'keyv';
 
 import { apiConfig } from '@/configs';
 import { Service } from '@/utils/decorators';
@@ -14,8 +14,14 @@ const initialState: State = {
 };
 
 @Service(true)
-export class Store extends RxStore<State> {
+export const store = new RxStore(initialState);
+
+export class Store extends Keyv<string[] | boolean | null> {
 	constructor() {
 		super(initialState);
+
+		void Promise.all(Object.entries(initialState).map(([key, value]) => 
+			this.set(key, value)
+		));
 	}
 }

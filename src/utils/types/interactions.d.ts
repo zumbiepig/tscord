@@ -8,7 +8,7 @@ import type {
 import type { DApplicationCommand, SimpleCommandMessage } from 'discordx';
 import type { ScreamingSnakeCase } from 'type-fest';
 
-import type { Locales, TranslationFunctions } from '@/i18n';
+import type { TranslationFunctions } from '@/i18n';
 
 export type EmittedInteractions =
 	| CommandInteraction

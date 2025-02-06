@@ -7,7 +7,7 @@ import {
 	PlatformApplication,
 } from '@tsed/common';
 import { PlatformExpress } from '@tsed/platform-express';
-import { json, urlencoded } from 'express';
+import { json } from 'body-parser';
 
 import * as controllers from '@/api/controllers';
 import { Log } from '@/api/middlewares';
@@ -32,7 +32,6 @@ export class Server {
 	$beforeRoutesInit() {
 		this.app
 			.use(json())
-			.use(urlencoded({ extended: true }))
 			.use(Log)
 			.use(PlatformAcceptMimesMiddleware);
 

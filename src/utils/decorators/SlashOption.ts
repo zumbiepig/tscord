@@ -1,4 +1,3 @@
-import Case from 'case';
 import {
 	SlashOption as SlashOptionX,
 	type SlashOptionOptions as SlashOptionOptionsX,
@@ -64,5 +63,5 @@ export function SlashOption(options: SlashOptionOptions) {
 }
 
 function isValidOptionName(name: string) {
-	return ['lower', 'snake'].includes(Case.of(name)) && !name.includes(' ');
+	return /^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$/u.exec(name);
 }

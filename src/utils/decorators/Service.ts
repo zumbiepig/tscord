@@ -3,9 +3,9 @@ import type { constructor } from 'tsyringe/dist/typings/types';
 
 export const keptInstances = new Set<constructor<unknown>>();
 
-export function Service<T>(keepInstanceAfterHmr?: boolean) {
+export function Service<T>(keepInstanceAfterReload?: boolean) {
 	return function (target: constructor<T>) {
-		if (keepInstanceAfterHmr) keptInstances.add(target);
+		if (keepInstanceAfterReload) keptInstances.add(target);
 
 		singleton()(target);
 	};

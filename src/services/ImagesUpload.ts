@@ -1,8 +1,8 @@
 import { createReadStream, existsSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
-import { basename, dirname, join, sep } from 'node:path';
+import { basename, dirname, join } from 'node:path';
+import { Readable } from 'node:stream';
 
-import axios from 'axios';
 import chalk from 'chalk';
 import { glob } from 'glob';
 import { ImgurClient } from 'imgur';
@@ -16,8 +16,8 @@ import { base64Encode, getFileHash } from '@/utils/functions';
 
 @Service()
 export class ImagesUpload {
-	private validImageExtensions = ['.png', '.jpg', '.jpeg', '.gif'];
-	private imageFolderPath = join('assets', 'images');
+	private validImageExtensions = ['.png', '.jpeg', '.jpg', '.gif'];
+	private imageFolderPath = join('images');
 
 	private imgurClient: ImgurClient | null =
 		generalConfig.automaticUploadImagesToImgur
@@ -76,6 +76,11 @@ export class ImagesUpload {
 				await this.deleteImageFromImgur(image);
 			} else if (!(await this.isImgurImageValid(image.url))) {
 				// reupload if the image is not on imgur anymore
+				await this.logger.log(
+					'info',
+					`Image ${imagePath} was been removed from Imgur so it will be reuploaded`,
+					`Image ${chalk.bold.green(imagePath)} was been removed from Imgur so it will be reuploaded`,
+				);
 				await this.addNewImageToImgur(imagePath, image.hash);
 			}
 		}
@@ -125,11 +130,15 @@ export class ImagesUpload {
 			type: 'base64',
 			name: imageFilename,
 		});
+		const uploadResponse = await this.imgurClient.upload({
+			image: Readable.toWeb(createReadStream(join(this.imageFolderPath, imagePath))),
+			type: 'stream',
+		});
 
 		if (!uploadResponse.success) {
 			await this.logger.log(
 				'error',
-				`Error uploading image ${imageFilename} to imgur: ${uploadResponse.status.toString()} ${JSON.stringify(uploadResponse.data)}`,
+				`Error uploading image ${imageFilename} to Imgur: ${uploadResponse.status.toString()} ${JSON.stringify(uploadResponse.data)}`,
 			);
 			return;
 		}
@@ -155,11 +164,7 @@ export class ImagesUpload {
 	async isImgurImageValid(imageUrl: string): Promise<boolean> {
 		if (!this.imgurClient) return false;
 
-		const res = await axios.get(imageUrl);
-		return !res.request?.path.includes('/removed');
-
-		const res = await fetch(imageUrl);
-		const url = new URL(res.url);
-		return !url.pathname.includes('/removed');
+		const res = await fetch(imageUrl, { method: 'HEAD' });
+		return res.url !== 'https://i.imgur.com/removed.png';
 	}
 }

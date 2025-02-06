@@ -1,7 +1,6 @@
 import process from 'node:process';
 
 import { EntityRepository } from '@mikro-orm/core';
-import Case from 'case';
 import { Client } from 'discordx';
 import nodeOsUtils from 'node-os-utils';
 import pidusage from 'pidusage';
@@ -24,6 +23,7 @@ import type {
 	InteractionsConstants,
 	StatPerInterval,
 } from '@/utils/types';
+import { constantCase } from 'change-case';
 
 const allInteractions = {
 	$or: [
@@ -66,7 +66,7 @@ export class Stats {
 	 */
 	async registerInteraction(interaction: AllInteractions) {
 		// we extract data from the interaction
-		const type = Case.constant(
+		const type = constantCase(
 			getTypeOfInteraction(interaction),
 		);
 

@@ -12,7 +12,7 @@ import {
 } from 'discord.js';
 import { SimpleCommandMessage } from 'discordx';
 
-import type { AllInteractions } from '@/utils/types';
+import { getTypeOfInteraction } from '@/utils/functions';
 
 const resolvers = {
 	user: {
@@ -40,8 +40,6 @@ const resolvers = {
 			interaction.message.author,
 		PartialMessageReaction: (interaction: PartialMessageReaction) =>
 			interaction.message.author,
-
-		fallback: (_: unknown) => null,
 	},
 
 	member: {
@@ -68,8 +66,6 @@ const resolvers = {
 			interaction.message.member,
 		PartialMessageReaction: (interaction: PartialMessageReaction) =>
 			interaction.message.member,
-
-		fallback: (_: unknown) => null,
 	},
 
 	guild: {
@@ -89,8 +85,6 @@ const resolvers = {
 			interaction.guild,
 		ModalSubmitInteraction: (interaction: ModalSubmitInteraction) =>
 			interaction.guild,
-
-		fallback: (_: unknown) => null,
 	},
 
 	channel: {
@@ -110,8 +104,6 @@ const resolvers = {
 			interaction.channel,
 		ModalSubmitInteraction: (interaction: ModalSubmitInteraction) =>
 			interaction.channel,
-
-		fallback: (_: unknown) => null,
 	},
 
 	commandName: {
@@ -125,8 +117,6 @@ const resolvers = {
 		MessageContextMenuCommandInteraction: (
 			interaction: MessageContextMenuCommandInteraction,
 		) => interaction.commandName,
-
-		fallback: (_: unknown) => null,
 	},
 
 	action: {
@@ -146,8 +136,6 @@ const resolvers = {
 			interaction.customId,
 		ModalSubmitInteraction: (interaction: ModalSubmitInteraction) =>
 			interaction.customId,
-
-		fallback: (_: unknown) => null,
 	},
 
 	locale: {
@@ -167,76 +155,78 @@ const resolvers = {
 			interaction.locale,
 		ModalSubmitInteraction: (interaction: ModalSubmitInteraction) =>
 			interaction.locale,
-
-		fallback: (_: unknown) => null,
 	},
 };
 
-type InteractionTypes<T extends Record<string, (_: unknown) => unknown>> = Parameters<T[Exclude<keyof T, 'fallback'>]>[0]
+type InteractionTypes<T extends Record<string, (...args: never) => unknown>> =
+	Parameters<T[keyof T]>[0];
 
-export function resolveUser(interaction: InteractionTypes<typeof resolvers.user>) {
+export function resolveUser(
+	interaction: InteractionTypes<typeof resolvers.user>,
+) {
 	return (
 		resolvers.user[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.user
-		](interaction as keyof typeof interaction) ??
-		resolvers.user.fallback(interaction)
+		](interaction as keyof typeof interaction) ?? null
 	);
 }
 
-export function resolveMember(interaction: AllInteractions) {
+export function resolveMember(
+	interaction: InteractionTypes<typeof resolvers.member>,
+) {
 	return (
 		resolvers.member[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.member
-		](interaction as keyof typeof interaction) ??
-		resolvers.member.fallback(interaction)
+		](interaction as keyof typeof interaction) ?? null
 	);
 }
 
-export function resolveGuild(interaction: AllInteractions) {
+export function resolveGuild(
+	interaction: InteractionTypes<typeof resolvers.guild>,
+) {
 	return (
 		resolvers.guild[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.guild
-		](interaction as keyof typeof interaction) ??
-		resolvers.guild.fallback(interaction)
+		](interaction as keyof typeof interaction) ?? null
 	);
 }
 
-export function resolveChannel(interaction: AllInteractions) {
+export function resolveChannel(
+	interaction: InteractionTypes<typeof resolvers.channel>,
+) {
 	return (
 		resolvers.channel[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.channel
-		](interaction as keyof typeof interaction) ??
-		resolvers.channel.fallback(interaction)
+		](interaction as keyof typeof interaction) ?? null
 	);
 }
 
-export function resolveCommandName(interaction: AllInteractions) {
+export function resolveCommandName(
+	interaction: InteractionTypes<typeof resolvers.commandName>,
+) {
 	return (
 		resolvers.commandName[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.commandName
-		](interaction as keyof typeof interaction) ??
-		resolvers.commandName.fallback(interaction)
+		](interaction as keyof typeof interaction) ?? null
 	);
 }
 
-export function resolveAction(interaction: AllInteractions) {
+export function resolveAction(
+	interaction: InteractionTypes<typeof resolvers.action>,
+) {
 	return (
 		resolvers.action[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.action
-		](interaction as keyof typeof interaction) ??
-		resolvers.action.fallback(interaction)
+		](interaction as keyof typeof interaction) ?? null
 	);
 }
 
-export function resolveLocale(interaction: AllInteractions) {
+export function resolveLocale(
+	interaction: InteractionTypes<typeof resolvers.locale>,
+) {
 	return (
 		resolvers.locale[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.locale
-		](interaction as keyof typeof interaction) ??
-		resolvers.locale.fallback(interaction)
+		](interaction as keyof typeof interaction) ?? null
 	);
-}
-
-export function getTypeOfInteraction(interaction: object): string {
-	return interaction.constructor.name;
 }

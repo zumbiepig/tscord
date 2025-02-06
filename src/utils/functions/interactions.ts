@@ -1,14 +1,18 @@
+import type { RepliableInteraction } from 'discord.js';
 import { SimpleCommandMessage } from 'discordx';
 
-import type { AllInteractions } from '@/utils/types';
+export function getTypeOfInteraction(interaction: object): typeof interaction['constructor']['name'] {
+	return interaction.constructor.name;
+}
 
 /**
  * Abstraction level to reply to either a slash command or a simple command message.
- * @param interaction
- * @param message
+ * @param interaction The interaction to reply to.
+ * @param message The message to reply with.
+ * @param editMessage Whether to edit the message or reply to the interaction.
  */
 export async function replyToInteraction(
-	interaction: AllInteractions,
+	interaction: RepliableInteraction | SimpleCommandMessage,
 	message: string | Record<string, unknown>,
 	editMessage = true,
 ) {
