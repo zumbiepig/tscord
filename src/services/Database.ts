@@ -1,8 +1,9 @@
-import { existsSync } from 'node:fs';
 import { readdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { type EntityName, MikroORM, type Options } from '@mikro-orm/core';
+import { EntityGenerator } from '@mikro-orm/entity-generator';
+import { Migrator } from '@mikro-orm/migrations';
 import { backup, restore } from 'saveqlite';
 import { delay, inject } from 'tsyringe';
 
@@ -18,6 +19,7 @@ import {
 	resolveDependency,
 } from '@/utils/functions';
 import type { DatabaseDriver, DatabaseSize } from '@/utils/types';
+import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 
 @Service()
 export class Database {
@@ -32,29 +34,35 @@ export class Database {
 		const pluginsManager = await resolveDependency(PluginsManager);
 
 		// get config
-		const config = mikroORMConfig[env.NODE_ENV] as Options<DatabaseDriver>;
-
-		// defines entities into the config
-		config.entities = [
-			...Object.values(entities),
-			...pluginsManager.getEntities(),
-		] as keyof typeof config.entities;
+		const config = mikroORMConfig[env.NODE_ENV];
 
 		// initialize the ORM using the configuration exported in `mikro-orm.config.ts`
-		this._orm = await MikroORM.init(config);
+		this._orm = await MikroORM.init({
+			...config,
 
-		const shouldMigrate = !this.store.get('botHasBeenReloaded');
-		if (shouldMigrate) {
+			entities: [...Object.values(entities), ...pluginsManager.getEntities()],
+
+			debug: env.isDev,
+			highlighter: new SqlHighlighter(),
+
+			extensions: [EntityGenerator, Migrator],
+			migrations: {
+				path: join(databaseConfig.path, 'migrations'),
+			},
+		});
+
+		if (!(await this.store.get('botHasBeenReloaded') as boolean)) {
 			const migrator = this._orm.getMigrator();
 
-			// create migration if no one is present in the migrations folder
+			// create migration if none are present in the migrations folder
 			const pendingMigrations = await migrator.getPendingMigrations();
 			const executedMigrations = await migrator.getExecutedMigrations();
 			if (pendingMigrations.length === 0 && executedMigrations.length === 0)
 				await migrator.createInitialMigration();
 
 			// migrate to the latest migration
-			await this._orm.getMigrator().up();
+			if (await migrator.checkMigrationNeeded())
+				await this._orm.getMigrator().up();
 		}
 	}
 
@@ -177,7 +185,14 @@ export class Database {
 		const backupPath = join(databaseConfig.path, 'backups');
 		return {
 			db: this.isSQLiteDatabase() ? (await stat(dbName ?? '')).size : null,
-			backups: existsSync(backupPath) ? await getFolderSize(backupPath) : null,
+			backups: await getFolderSize(backupPath).catch((err: unknown) => {
+				if (
+					err instanceof Error &&
+					(err as NodeJS.ErrnoException).code === 'ENOENT'
+				)
+					return null;
+				else throw err;
+			}),
 		} satisfies DatabaseSize;
 	}
 

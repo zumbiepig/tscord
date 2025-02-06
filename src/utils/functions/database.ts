@@ -1,12 +1,13 @@
 import { createHash } from 'node:crypto';
-import {
-	createReadStream,
-	createWriteStream,
-	existsSync} from 'node:fs';
-import { mkdir, readFile,writeFile } from 'node:fs/promises';
+import { createReadStream, createWriteStream } from 'node:fs';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { createInterface } from 'node:readline/promises';
+
+import chalk from 'chalk';
 
 import { Data } from '@/entities';
-import { Database } from '@/services';
+import { Database, Logger } from '@/services';
 import { resolveDependency } from '@/utils/functions';
 import type { DataType } from '@/utils/types';
 
@@ -30,114 +31,124 @@ export async function initDataTable() {
 	}
 }
 
-const HEADER_LENGTH = 100;
-
 /**
  * Backup any Sqlite3 Database incrementally. For simple use case, just call this function as `backup('<Your Database File>')`. Refer to documentation for more.
- * @param {string} sourceDb The input file name of the database which should be backed up. ***PLEASE USE AN UNIQUE FILENAME FOR EACH BACKUP***. Defaults to `snapshot-<current_timestamp>.txt`.
- * @param {string} snapshotName The name of the snapshot name. This file contains the references the objects (saves).
- * @param {string} objDir The directory where all the objects will be generated. The script must have right permission to that folder. For consistency, please use the same directory where the previous call of the API generated. Otherwise it would not be useful at all. It defaults to `objects/`.
+ * @param sourceDb The input file name of the database which should be backed up. ***PLEASE USE AN UNIQUE FILENAME FOR EACH BACKUP***. Defaults to `snapshot-<current_timestamp>.txt`.
+ * @param snapshotName The name of the snapshot name. This file contains the references the objects (saves).
  */
 export async function backupDatabase(
 	sourceDb: string,
-	snapshotName = `snapshot-${Date.now()}.txt`,
-	objDir: `${string}/` = 'objects/',
+	backupDir: string,
+	snapshotName = `snapshot-${Date.now().toString()}.txt`,
 ) {
-	// get header of the file
-	const readStream = createReadStream(sourceDb, {
-		start: 0,
-		end: HEADER_LENGTH,
-	});
+	const logger = await resolveDependency(Logger);
 
-	readStream.on('data', (header) => {
-		if (!(header instanceof Buffer)) return;
+	// create the objects directory if it doesn't exist
+	await mkdir(join(dirname(backupDir), 'objects'), { recursive: true });
 
-		// get the page size and count of the sqlite file at the 16th and 28th bytes
-		const pageSize = header.readUInt16LE(16) * 256;
-		// const pageCount = header.readUInt32LE(28)
+	await new Promise<void>((resolve) => {
+		// get header of the file
+		const headerStream = createReadStream(sourceDb, { start: 0, end: 99 });
 
-		const dbFile = createReadStream(sourceDb, { highWaterMark: pageSize });
+		headerStream.on('data', (header) => {
+			if (!(header instanceof Buffer)) return;
 
-		const fileNames: string[] = [];
+			const objectHashes: string[] = [];
 
-		dbFile.on(
-			'data',
-			(chunk) =>
-				void (async (pageContent) => {
-					// create a hash of the page content
-					const hash = createHash('sha256').update(pageContent).digest('hex');
+			// get the page size of the sqlite file at the 16th byte
+			const pageSize = header.readUInt16BE(16);
 
-					// use the hash as the obj file name
-					const fileDir = objDir + hash[0];
-					const fileName = hash.substring(1);
-					const fileDest = `${fileDir}/${fileName}`;
+			const dbStream = createReadStream(sourceDb, { highWaterMark: pageSize });
 
-					// create the obj directory if it doesn't exist
-					if (!existsSync(fileDir)) await mkdir(fileDir, { recursive: true });
+			dbStream.on(
+				'data',
+				(pageContent) =>
+					void (async () => {
+						// create a hash of the page content
+						const hash = createHash('sha256').update(pageContent).digest('hex');
 
-					// write the sqlite page content to the obj file
-					await writeFile(fileDest, pageContent);
+						// use the hash as the object file name
+						const fileDir = join('objects', hash.slice(0, 2));
+						const fileName = hash.slice(2);
 
-					fileNames.push(fileDest);
-				})(chunk),
-		);
+						const fileDest = join(fileDir, fileName);
 
-		dbFile.on('end', () => {
-			console.log(
-				'--->',
-				sourceDb,
-				'Backed up successfully to ---> ',
-				snapshotName,
+						// write the sqlite page content to the object file
+						await writeFile(fileDest, pageContent);
+
+						objectHashes.push(hash);
+					})(),
 			);
 
-			// write the `fileNames` into a snapshot file that contains the locations of the obj files which contain the current State of specified page of the sqlite database
-			await writeFile(`${objDir}../${snapshotName}`, fileNames.join('\n'));
+			dbStream.on('end', () => {
+				logger.log(
+					'info',
+					`---> ${sourceDb} Backed up successfully to ---> ${snapshotName}`,
+				);
+
+				// write the `fileNames` into a snapshot file that contains the locations of the object files which contain the current State of specified page of the sqlite database
+				void writeFile(
+					join('objects', '..', snapshotName),
+					objectHashes.join('\n'),
+				).then(resolve);
+			});
 		});
 	});
 }
 
 /**
  * Restore the database from a `snapshot` file. Please ***DO NOT*** alter the foder structure which was used to backup specifically, do not modify the folder where all the object file resides. The database will be restored and saved into the filename given by the parameter `targetDb`.
- * @param {string} targetDb The filename of the snapshot from which you want to restore the database. If resides in different database, please use the full path.
- * @param {string} snapshotFile The name of the file where the database will be restored. If there is an existing database having the same name, the previous database will be destroyed and the database from current snapshot will overwrite the content. 
+ * @param targetDb The filename of the snapshot from which you want to restore the database. If resides in different database, please use the full path.
+ * @param snapshotFile The name of the file where the database will be restored. If there is an existing database having the same name, the previous database will be destroyed and the database from current snapshot will overwrite the content.
  */
- export async function restoreDatabase(
-    targetDb: string, 
-    snapshotFile: string 
-) {
+export async function restoreDatabase(targetDb: string, snapshotFile: string) {
+	const logger = await resolveDependency(Logger);
 
-    console.log('---> Restoration started from <--- ', snapshotFile)
+	await logger.log(
+		'info',
+		`Restoring database ${targetDb} from ${snapshotFile}`,
+		`Restoring database ${chalk.bold.cyan(targetDb)} from ${chalk.bold.green(snapshotFile)}`,
+	);
 
-    // get obj files from snapshot file
-    const sources = await readFile(snapshotFile, { encoding: 'utf-8' }).split('\n')
+	// get object files from snapshot file
+	const sources: string[] = [];
+	const lines = createInterface(createReadStream(snapshotFile, 'utf-8'));
+	for await (const line of lines) sources.push(line);
 
-    const writer = createWriteStream(targetDb, {autoClose: true})
+	await new Promise<void>((resolve) => {
+		const writer = createWriteStream(targetDb);
 
-    writer.on(
-        'ready',
-        () => {
+		writer.on(
+			'ready',
+			() =>
+				void (async () => {
+					// write the object files to the target database
+					for (const source of sources) {
+						await new Promise<void>((resolveSource) => {
+							if (!source) return;
 
-            // write the obj files to the target database
-            sources.forEach(
-                (source) => {
+							const reader = createReadStream(source);
+							reader.on('data', (chunk) => writer.write(chunk));
+							reader.on(
+								'close',
+								() =>
+									void logger
+										.log('debug', `\t---> ${source} ${chunk.length.toString()}`)
+										.then(resolveSource),
+							);
+						});
+					}
 
-                    if (!source) return
-                    
-                    const chunk = await readFile(source)
-                    writer.write(chunk)
-                    
-                    console.log('\t--->', source, chunk.length)
-                }
-            )
-            writer.end()
-        }
-    )
+					writer.end();
+				}),
+		);
 
-    writer.on(
-        'close',
-        () => {
-            
-            console.log('---> Restored successfully to ---> ', targetDb)
-        }
-    )
+		writer.on(
+			'close',
+			() =>
+				void logger
+					.log('info', '---> Restored successfully to ---> ' + targetDb)
+					.then(resolve),
+		);
+	});
 }

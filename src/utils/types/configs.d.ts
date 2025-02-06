@@ -9,6 +9,7 @@ import type { ValueOf } from 'type-fest';
 
 import type { Locales } from '@/i18n';
 import type { Timezone } from '@/utils/types';
+import env from '@/env'
 
 export interface GeneralConfigType {
 	name: string;
@@ -40,10 +41,7 @@ export interface DatabaseConfigType {
 	enableBackups: boolean;
 }
 
-export interface MikroORMConfigType {
-	production: Options;
-	development: Options;
-}
+export type MikroORMConfigType = Record<typeof env.NODE_ENV, Options>;
 
 interface LogsConfigCategoryType {
 	console: boolean;

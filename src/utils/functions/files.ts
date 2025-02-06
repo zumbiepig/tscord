@@ -43,11 +43,13 @@ export async function getFolderSize(rootItemPath: string): Promise<number> {
  * @returns The SHA-256 hash of the file.
  */
 export async function getFileHash(path: PathLike): Promise<string> {
-	return new Promise((resolve, reject) => {
+	return await new Promise((resolve, reject) => {
 		const hash = createHash('sha256');
 		const stream = createReadStream(path);
+		stream.on('data', (chunk) => hash.update(chunk));
+		stream.on('close', () => {
+			resolve(hash.digest('hex'));
+		});
 		stream.on('error', reject);
-		stream.on('data', (chunk) => { hash.update(chunk) });
-		stream.on('end', () => { resolve(hash.digest('hex')) });
 	});
 }

@@ -1,9 +1,6 @@
 import { join } from 'node:path';
 
-import { BetterSqliteDriver } from '@mikro-orm/better-sqlite';
-import { EntityGenerator } from '@mikro-orm/entity-generator';
-import { Migrator } from '@mikro-orm/migrations';
-import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
+import {BetterSqliteDriver} from '@mikro-orm/better-sqlite';
 
 import type { DatabaseConfigType, MikroORMConfigType } from '@/utils/types';
 
@@ -37,17 +34,7 @@ const envMikroORMConfig: MikroORMConfigType = {
 		password: env.DATABASE_PASSWORD, */
 
 		/**
-		 * MySQL
-		 */
-		/* driver: MySqlDriver,
-		dbName: env.DATABASE_NAME,
-		host: env.DATABASE_HOST,
-		port: env.DATABASE_PORT,
-		user: env.DATABASE_USER,
-		password: env.DATABASE_PASSWORD, */
-
-		/**
-		 * MariaDB
+		 * MariaDB (this will work with MySQL as well)
 		 */
 		/* driver: MariaDbDriver,
 		dbName: env.DATABASE_NAME,
@@ -55,22 +42,6 @@ const envMikroORMConfig: MikroORMConfigType = {
 		port: env.DATABASE_PORT,
 		user: env.DATABASE_USER,
 		password: env.DATABASE_PASSWORD, */
-
-		highlighter: new SqlHighlighter(),
-		debug: false,
-
-		migrations: {
-			path: join(databaseConfig.path, 'migrations'),
-			emit: 'ts',
-			snapshot: true,
-		},
-
-		entities: [
-			join('src', 'entities', '*.ts'),
-			join('src', 'plugins', '*', 'entities', '*.ts'),
-		],
-
-		extensions: [Migrator, EntityGenerator],
 	},
 	development: {
 		// leave blank to autofill from production

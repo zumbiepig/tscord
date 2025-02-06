@@ -185,7 +185,7 @@ async function reload(client: Client) {
 	reloadingState = 1;
 
 	const store = await resolveDependency(Store);
-	store.set('botHasBeenReloaded', true);
+	await store.set('botHasBeenReloaded', true);
 
 	const logger = await resolveDependency(Logger);
 	await logger.startSpinner('Hot reloading...');

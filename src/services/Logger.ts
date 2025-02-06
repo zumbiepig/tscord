@@ -1,4 +1,4 @@
-import { createReadStream, createWriteStream, existsSync } from 'node:fs';
+import { createReadStream, createWriteStream } from 'node:fs';
 import { appendFile, mkdir, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 
@@ -149,7 +149,7 @@ export class Logger {
 
 		// save log to file
 		if (logLocation.file) {
-			if (!existsSync(this.logPath)) await mkdir(this.logPath);
+			await mkdir(this.logPath, {recursive: true});
 			await appendFile(
 				join(this.logPath, `${formattedDate}.log`),
 				logMessage + '\n',
@@ -421,8 +421,7 @@ export class Logger {
 	async archiveLogs(): Promise<void> {
 		if (!logsConfig.archive.enabled) return;
 
-		if (!existsSync(this.logPath)) return;
-		if (!existsSync(this.logArchivePath)) await mkdir(this.logArchivePath);
+		await mkdir(this.logArchivePath, {recursive: true});
 
 		const archive = tar.create({
 			portable: true,

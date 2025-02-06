@@ -1,4 +1,4 @@
-import { createReadStream, existsSync } from 'node:fs';
+import { createReadStream } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import { basename, dirname, join } from 'node:path';
 import { Readable } from 'node:stream';
@@ -44,7 +44,7 @@ export class ImagesUpload {
 	}
 
 	async syncWithDatabase() {
-		if (!existsSync(this.imageFolderPath)) await mkdir(this.imageFolderPath);
+		await mkdir(this.imageFolderPath, {recursive: true});
 
 		// get all images inside the assets folder
 		const files = await glob(join('**', '*'), {
@@ -59,7 +59,7 @@ export class ImagesUpload {
 				await this.logger.log(
 					'error',
 					`Image ${file} has an invalid format. Valid formats: ${this.validImageExtensions.join(', ')}`,
-					`Image ${chalk.bold.red(file)} has an invalid format. Valid formats: ${chalk.bold(this.validImageExtensions.join(', '))}`,
+					`Image ${chalk.bold.green(file)} has an invalid format. Valid formats: ${chalk.bold(this.validImageExtensions.join(', '))}`,
 				);
 			}
 		}
