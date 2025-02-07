@@ -37,7 +37,7 @@
     "@mikro-orm/sql-highlighter": "^1.0.1",
     "@tsed/common": "^8.4.5",
     "@tsed/exceptions": "^8.4.4",
-    "@tsed/platform-express": "^8.4.5",
+    "@tsed/platform-express": "^8.4.7",
     "@tsed/schema": "^8.4.4",
     "@tsed/swagger": "^8.4.5",
     "body-parser": "^1.20.3",
