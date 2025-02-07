@@ -167,7 +167,7 @@ export function resolveUser(
 	return (
 		resolvers.user[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.user
-		](interaction as keyof typeof interaction) ?? null
+		](interaction as never) ?? null
 	);
 }
 
@@ -177,7 +177,7 @@ export function resolveMember(
 	return (
 		resolvers.member[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.member
-		](interaction as keyof typeof interaction) ?? null
+		](interaction as never) ?? null
 	);
 }
 
@@ -187,7 +187,7 @@ export function resolveGuild(
 	return (
 		resolvers.guild[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.guild
-		](interaction as keyof typeof interaction) ?? null
+		](interaction as never) ?? null
 	);
 }
 
@@ -197,7 +197,7 @@ export function resolveChannel(
 	return (
 		resolvers.channel[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.channel
-		](interaction as keyof typeof interaction) ?? null
+		](interaction as never) ?? null
 	);
 }
 
@@ -207,7 +207,7 @@ export function resolveCommandName(
 	return (
 		resolvers.commandName[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.commandName
-		](interaction as keyof typeof interaction) ?? null
+		](interaction as never) as string | null ?? null
 	);
 }
 
@@ -217,7 +217,7 @@ export function resolveAction(
 	return (
 		resolvers.action[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.action
-		](interaction as keyof typeof interaction) ?? null
+		](interaction as never) as string | null ?? null
 	);
 }
 
@@ -227,6 +227,6 @@ export function resolveLocale(
 	return (
 		resolvers.locale[
 			getTypeOfInteraction(interaction) as keyof typeof resolvers.locale
-		](interaction as keyof typeof interaction) ?? null
+		](interaction as never) ?? null
 	);
 }

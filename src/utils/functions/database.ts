@@ -116,34 +116,24 @@ export async function restoreDatabase(targetDb: string, snapshotFile: string) {
 	for await (const line of lines) sources.push(line);
 
 	await new Promise<void>((resolve) => {
-		const writer = createWriteStream(targetDb);
+		const writeStream = createWriteStream(targetDb);
 
-		writer.on(
-			'ready',
-			() =>
-				void (async () => {
-					// write the object files to the target database
-					for (const source of sources) {
-						await new Promise<void>((resolveSource) => {
-							if (!source) return;
+		writeStream.on('ready', () => {
+			// write the object files to the target database
+			void sources
+				.reduce(async (promise, source) => {
+					await promise;
+					if (!source) return;
+					await new Promise<void>((resolveSource) => {
+						const reader = createReadStream(
+							join(source.slice(0, 2), source.slice(2)));
+						reader.on('data', (chunk) => writeStream.write(chunk));
+						reader.on('close', resolveSource);
+					});
+				}, Promise.resolve()).then(() => writeStream.end());
+		});
 
-							const reader = createReadStream(source);
-							reader.on('data', (chunk) => writer.write(chunk));
-							reader.on(
-								'close',
-								() =>
-									void logger
-										.log('debug', `\t---> ${source} ${chunk.length.toString()}`)
-										.then(resolveSource),
-							);
-						});
-					}
-
-					writer.end();
-				}),
-		);
-
-		writer.on(
+		writeStream.on(
 			'close',
 			() =>
 				void logger

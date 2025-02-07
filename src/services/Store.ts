@@ -1,4 +1,4 @@
-import Keyv from 'keyv';
+import Rxeta from 'rxeta';
 
 import { apiConfig } from '@/configs';
 import { Service } from '@/utils/decorators';
@@ -13,7 +13,7 @@ const initialState = {
 };
 
 @Service(true)
-export class Store extends Keyv {
+export class Store extends Rxeta<typeof initialState> {
 	constructor() {
 		super();
 

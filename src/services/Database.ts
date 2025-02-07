@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { type EntityName, MikroORM, type Options } from '@mikro-orm/core';
 import { EntityGenerator } from '@mikro-orm/entity-generator';
 import { Migrator } from '@mikro-orm/migrations';
-import { backup, restore } from 'saveqlite';
+import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import { delay, inject } from 'tsyringe';
 
 import { databaseConfig, mikroORMConfig } from '@/configs';
@@ -13,34 +13,32 @@ import env from '@/env';
 import { Logger, PluginsManager, Store } from '@/services';
 import { Schedule, Service } from '@/utils/decorators';
 import {
+	backupDatabase,
 	dayjsTimezone,
 	formatDate,
 	getFolderSize,
-	resolveDependency,
+	restoreDatabase,
 } from '@/utils/functions';
-import type { DatabaseDriver, DatabaseSize } from '@/utils/types';
-import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
+import type { DatabaseSize } from '@/utils/types';
 
 @Service()
 export class Database {
-	private _orm!: MikroORM<DatabaseDriver>;
+	private _orm!: MikroORM;
+	private mikroORMConfig!: Options;
 
 	constructor(
 		@inject(delay(() => Store)) private store: Store,
 		@inject(delay(() => Logger)) private logger: Logger,
-	) {}
+		@inject(delay(() => PluginsManager)) private pluginsManager: PluginsManager,
+	) {
+		// set config
+		this.mikroORMConfig = {
+			...mikroORMConfig[env.NODE_ENV],
 
-	async initialize() {
-		const pluginsManager = await resolveDependency(PluginsManager);
-
-		// get config
-		const config = mikroORMConfig[env.NODE_ENV];
-
-		// initialize the ORM using the configuration exported in `mikro-orm.config.ts`
-		this._orm = await MikroORM.init({
-			...config,
-
-			entities: [...Object.values(entities), ...pluginsManager.getEntities()],
+			entities: [
+				...Object.values(entities),
+				...this.pluginsManager.getEntities(),
+			],
 
 			debug: env.isDev,
 			highlighter: new SqlHighlighter(),
@@ -49,9 +47,14 @@ export class Database {
 			migrations: {
 				path: join(databaseConfig.path, 'migrations'),
 			},
-		});
+		};
+	}
 
-		if (!(await this.store.get('botHasBeenReloaded') as boolean)) {
+	async initialize() {
+		// initialize the ORM using the configuration exported in `mikro-orm.config.ts`
+		this._orm = await MikroORM.init(this.mikroORMConfig);
+
+		if (!(await this.store.get('botHasBeenReloaded'))) {
 			const migrator = this._orm.getMigrator();
 
 			// create migration if none are present in the migrations folder
@@ -68,7 +71,7 @@ export class Database {
 
 	async refreshConnection() {
 		await this._orm.close();
-		this._orm = await MikroORM.init();
+		this._orm = await MikroORM.init(this.mikroORMConfig);
 	}
 
 	get orm() {
@@ -110,23 +113,12 @@ export class Database {
 		if (!snapshotName)
 			snapshotName = `snapshot-${formatDate(dayjsTimezone().toDate(), 'onlyDateFileName')}`;
 
-		try {
-			await backup(
-				mikroORMConfig[env.NODE_ENV].dbName ?? '',
-				`${snapshotName}.txt`,
-				`${join(databaseConfig.path, 'backups', 'objects')}/`,
-			);
-
-			return true;
-		} catch (e) {
-			const errorMessage =
-				typeof e === 'string' ? e : e instanceof Error ? e.message : String(e);
-			await this.logger.log(
-				'error',
-				`Couldn't backup database: ${errorMessage}`,
-			);
-			return false;
-		}
+		await backupDatabase(
+			mikroORMConfig[env.NODE_ENV].dbName ?? '',
+			`${snapshotName}.txt`,
+			`${join(databaseConfig.path, 'backups', 'objects')}/`,
+		);
+		return true;
 	}
 
 	/**
@@ -143,26 +135,20 @@ export class Database {
 			return false;
 		}
 
-		if (!databaseConfig.path)
+		if (!databaseConfig.path) {
 			await this.logger.log(
 				'error',
 				"Database path not set, couldn't restore backup",
 			);
-
-		try {
-			await restore(
-				mikroORMConfig[env.NODE_ENV].dbName ?? '',
-				join(databaseConfig.path, 'backups', snapshotName),
-			);
-			await this.refreshConnection();
-			return true;
-		} catch {
-			await this.logger.log(
-				'error',
-				"Snapshot file not found, couldn't restore",
-			);
 			return false;
 		}
+
+		await restoreDatabase(
+			mikroORMConfig[env.NODE_ENV].dbName ?? '',
+			join(databaseConfig.path, 'backups', snapshotName),
+		);
+		await this.refreshConnection();
+		return true;
 	}
 
 	async getBackupList(): Promise<string[] | null> {
