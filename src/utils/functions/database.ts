@@ -1,8 +1,9 @@
 import { createHash } from 'node:crypto';
+import { once } from 'node:events';
 import { createReadStream, createWriteStream } from 'node:fs';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, open, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import { createInterface } from 'node:readline/promises';
+import { pipeline } from 'node:stream/promises';
 
 import chalk from 'chalk';
 
@@ -34,66 +35,97 @@ export async function initDataTable() {
 /**
  * Backup any Sqlite3 Database incrementally. For simple use case, just call this function as `backup('<Your Database File>')`. Refer to documentation for more.
  * @param sourceDb The input file name of the database which should be backed up. ***PLEASE USE AN UNIQUE FILENAME FOR EACH BACKUP***. Defaults to `snapshot-<current_timestamp>.txt`.
- * @param snapshotName The name of the snapshot name. This file contains the references the objects (saves).
+ * @param snapshotFile The name of the snapshot name. This file contains the references the objects (saves).
  */
 export async function backupDatabase(
 	sourceDb: string,
 	backupDir: string,
-	snapshotName = `snapshot-${Date.now().toString()}.txt`,
+	snapshotFile = `snapshot-${Date.now().toString()}.txt`,
 ) {
 	const logger = await resolveDependency(Logger);
+
+	const hashes: string[] = [];
+	const queue = new Map<string, Promise<void>>();
+
+	function saveChunk(chunk: Buffer | string) {
+		// create a hash of the page content
+		const hash = createHash('sha256').update(chunk).digest('hex');
+
+		// use the hash as the object file name
+		const fileDest = join(
+			backupDir,
+			'objects',
+			hash.slice(0, 2),
+			hash.slice(2),
+		);
+
+		// write the sqlite page content to the object file
+		const promise = logger
+			.log(
+				'debug',
+				`Copying chunk ${hash} from ${sourceDb}`,
+				`Copying chunk ${chalk.bold.magenta(hash)} from ${chalk.bold.cyan(sourceDb)}`,
+			)
+			.then(() => writeFile(fileDest, chunk))
+			.then(() => {
+				hashes.push(hash);
+				queue.delete(hash);
+			});
+		queue.set(hash, promise);
+
+		return promise;
+	}
+
+	// log the database backup
+	await logger.log(
+		'info',
+		`Backing up database ${sourceDb} from ${snapshotFile}`,
+		`Backing up database ${chalk.bold.cyan(sourceDb)} from ${chalk.bold.green(snapshotFile)}`,
+	);
 
 	// create the objects directory if it doesn't exist
 	await mkdir(join(dirname(backupDir), 'objects'), { recursive: true });
 
-	await new Promise<void>((resolve) => {
-		// get header of the file
-		const headerStream = createReadStream(sourceDb, { start: 0, end: 99 });
+	// get header of the file
+	const fileHandle = await open(sourceDb);
+	const headerBuffer = (await fileHandle.read(Buffer.alloc(100), 0, 100, 0))
+		.buffer;
 
-		headerStream.on('data', (header) => {
-			if (!(header instanceof Buffer)) return;
+	// backup the database header
+	await saveChunk(headerBuffer);
 
-			const objectHashes: string[] = [];
+	// get the page size of the sqlite file at the 16th byte
+	let pageSize = headerBuffer.readUInt16BE(16);
+	if (pageSize === 1) pageSize = 65536;
 
-			// get the page size of the sqlite file at the 16th byte
-			const pageSize = header.readUInt16BE(16);
+	// read the database file
+	const reader = fileHandle.createReadStream({
+		start: 100,
+		highWaterMark: pageSize,
+	});
 
-			const dbStream = createReadStream(sourceDb, { highWaterMark: pageSize });
+	// backup each page as it is streamed
+	reader.on('data', (chunk) => {
+		if (queue.size >= 100) reader.pause();
 
-			dbStream.on(
-				'data',
-				(pageContent) =>
-					void (async () => {
-						// create a hash of the page content
-						const hash = createHash('sha256').update(pageContent).digest('hex');
-
-						// use the hash as the object file name
-						const fileDir = join('objects', hash.slice(0, 2));
-						const fileName = hash.slice(2);
-
-						const fileDest = join(fileDir, fileName);
-
-						// write the sqlite page content to the object file
-						await writeFile(fileDest, pageContent);
-
-						objectHashes.push(hash);
-					})(),
-			);
-
-			dbStream.on('end', () => {
-				logger.log(
-					'info',
-					`---> ${sourceDb} Backed up successfully to ---> ${snapshotName}`,
-				);
-
-				// write the `fileNames` into a snapshot file that contains the locations of the object files which contain the current State of specified page of the sqlite database
-				void writeFile(
-					join('objects', '..', snapshotName),
-					objectHashes.join('\n'),
-				).then(resolve);
-			});
+		void saveChunk(chunk).then(() => {
+			if (queue.size < 90) reader.resume();
 		});
 	});
+
+	// wait until all data is read, then wait for everything to finish writing
+	await once(reader, 'close');
+	await Promise.all(queue.values());
+
+	// write the `fileNames` into a snapshot file that contains the locations of the object files which contain the current State of specified page of the sqlite database
+	await writeFile(join(backupDir, snapshotFile), hashes.join('\n'));
+
+	// log the success
+	await logger.log(
+		'info',
+		`Successfully backed up database ${sourceDb} from ${snapshotFile}`,
+		`Successfully backed up database ${chalk.bold.cyan(sourceDb)} from ${chalk.bold.green(snapshotFile)}`,
+	);
 }
 
 /**
@@ -104,6 +136,7 @@ export async function backupDatabase(
 export async function restoreDatabase(targetDb: string, snapshotFile: string) {
 	const logger = await resolveDependency(Logger);
 
+	// log the database restoration
 	await logger.log(
 		'info',
 		`Restoring database ${targetDb} from ${snapshotFile}`,
@@ -111,34 +144,31 @@ export async function restoreDatabase(targetDb: string, snapshotFile: string) {
 	);
 
 	// get object files from snapshot file
-	const sources: string[] = [];
-	const lines = createInterface(createReadStream(snapshotFile, 'utf-8'));
-	for await (const line of lines) sources.push(line);
+	const hashes = (await readFile(snapshotFile, 'utf-8'))
+		.split('\n')
+		.map((hash) => join(hash.slice(0, 2), hash.slice(2)));
 
-	await new Promise<void>((resolve) => {
-		const writeStream = createWriteStream(targetDb);
+	// write to the batabase file
+	const writer = createWriteStream(targetDb);
 
-		writeStream.on('ready', () => {
-			// write the object files to the target database
-			void sources
-				.reduce(async (promise, source) => {
-					await promise;
-					if (!source) return;
-					await new Promise<void>((resolveSource) => {
-						const reader = createReadStream(
-							join(source.slice(0, 2), source.slice(2)));
-						reader.on('data', (chunk) => writeStream.write(chunk));
-						reader.on('close', resolveSource);
-					});
-				}, Promise.resolve()).then(() => writeStream.end());
-		});
-
-		writeStream.on(
-			'close',
-			() =>
-				void logger
-					.log('info', '---> Restored successfully to ---> ' + targetDb)
-					.then(resolve),
+	// pipe each chunk to the write stream
+	for (const hash of hashes) {
+		await logger.log(
+			'debug',
+			`Writing chunk ${hash} to ${targetDb}`,
+			`Writing chunk ${chalk.bold.magenta(hash)} to ${chalk.bold.cyan(targetDb)}`,
 		);
-	});
+		await pipeline(createReadStream(hash), writer, { end: false });
+	}
+
+	// end the write stream and wait for it to close
+	writer.end();
+	await once(writer, 'close');
+
+	// log the success
+	await logger.log(
+		'info',
+		`Successfully restored database ${targetDb} from ${snapshotFile}`,
+		`Successfully restored database ${chalk.bold.cyan(targetDb)} from ${chalk.bold.green(snapshotFile)}`,
+	);
 }

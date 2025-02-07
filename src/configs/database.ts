@@ -24,9 +24,9 @@ const envMikroORMConfig: MikroORMConfigType = {
 		clientUrl: env.DATABASE_HOST, */
 
 		/**
-		 * PostgreSQL
+		 * MariaDB (this will work with MySQL as well)
 		 */
-		/* driver: PostgreSqlDriver,
+		/* driver: MariaDbDriver,
 		dbName: env.DATABASE_NAME,
 		host: env.DATABASE_HOST,
 		port: env.DATABASE_PORT,
@@ -34,9 +34,9 @@ const envMikroORMConfig: MikroORMConfigType = {
 		password: env.DATABASE_PASSWORD, */
 
 		/**
-		 * MariaDB (this will work with MySQL as well)
+		 * PostgreSQL
 		 */
-		/* driver: MariaDbDriver,
+		/* driver: PostgreSqlDriver,
 		dbName: env.DATABASE_NAME,
 		host: env.DATABASE_HOST,
 		port: env.DATABASE_PORT,

@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { RequestContext } from '@mikro-orm/core';
 import chalk from 'chalk';
 import chokidar from 'chokidar';
-import { GatewayIntentBits, Partials } from 'discord.js';
+import { GatewayIntentBits, Partials, Client as DJSClient } from 'discord.js';
 import discordLogs from 'discord-logs';
 import {
 	Client,
@@ -13,7 +13,6 @@ import {
 	MetadataStorage,
 	tsyringeDependencyRegistryEngine,
 } from 'discordx';
-import { glob } from 'glob';
 import { container } from 'tsyringe';
 import type { constructor } from 'tsyringe/dist/typings/types';
 
@@ -115,6 +114,7 @@ async function init() {
 	});
 
 	// Load all new events
+	// @ts-expect-error: discord.js/discordx type overlap
 	await discordLogs(client, { debug: !env.isDev });
 	container.registerInstance(Client, client);
 
@@ -176,16 +176,16 @@ async function init() {
 /**
  * Hot reload
  */
-async function reload(client: Client) {
+async function reload(client: Client, force = false) {
 	// if currently reloading, request new reload
-	if (reloadingState > 0) {
+	if (!force && reloadingState > 0) {
 		reloadingState = 2;
 		return;
 	}
 	reloadingState = 1;
 
 	const store = await resolveDependency(Store);
-	await store.set('botHasBeenReloaded', true);
+	store.set('botHasBeenReloaded', true);
 
 	const logger = await resolveDependency(Logger);
 	await logger.startSpinner('Hot reloading...');
@@ -212,8 +212,8 @@ async function reload(client: Client) {
 	// re-register the client instance
 	container.registerInstance(Client, client);
 
-	// reload files
-	await Promise.all(
+	// reload files (this does not work in esm)
+	/* await Promise.all(
 		(
 			await glob(
 				join(import.meta.dirname, '{commands,events}', '**', '*.{js,ts}'),
@@ -224,7 +224,7 @@ async function reload(client: Client) {
 			delete require.cache[module];
 			await import(module);
 		}),
-	);
+	); */
 
 	// rebuild
 	await MetadataStorage.instance.build();
@@ -241,10 +241,7 @@ async function reload(client: Client) {
 	await logger.log('info', 'Hot reloaded!', chalk.whiteBright('Hot reloaded!'));
 
 	// if another reload was requested, reload again
-	if (reloadingState === 2) {
-		reloadingState = 0;
-		await reload(client);
-	}
+	if (reloadingState === 2) await reload(client, true);
 	reloadingState = 0;
 }
 

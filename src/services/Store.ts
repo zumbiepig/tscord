@@ -1,9 +1,10 @@
-import Rxeta from 'rxeta';
+import { Store as Rxeta } from 'rxeta';
 
 import { apiConfig } from '@/configs';
 import { Service } from '@/utils/decorators';
+import type { State } from '@/utils/types';
 
-const initialState = {
+const initialState: State = {
 	ready: {
 		bot: false,
 		api: apiConfig.enabled ? false : null,
@@ -13,12 +14,8 @@ const initialState = {
 };
 
 @Service(true)
-export class Store extends Rxeta<typeof initialState> {
+export class Store extends Rxeta<State> {
 	constructor() {
-		super();
-
-		void Promise.all(
-			Object.entries(initialState).map(([key, value]) => this.set(key, value)),
-		);
+		super(initialState);
 	}
 }

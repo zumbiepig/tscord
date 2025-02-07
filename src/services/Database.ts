@@ -54,10 +54,10 @@ export class Database {
 		// initialize the ORM using the configuration exported in `mikro-orm.config.ts`
 		this._orm = await MikroORM.init(this.mikroORMConfig);
 
-		if (!(await this.store.get('botHasBeenReloaded'))) {
+		if (!this.store.get('botHasBeenReloaded')) {
 			const migrator = this._orm.getMigrator();
 
-			// create migration if none are present in the migrations folder
+			// create initial migration if none are present in the migrations folder
 			const pendingMigrations = await migrator.getPendingMigrations();
 			const executedMigrations = await migrator.getExecutedMigrations();
 			if (pendingMigrations.length === 0 && executedMigrations.length === 0)
