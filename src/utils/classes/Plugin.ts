@@ -7,7 +7,7 @@ import { glob } from 'glob';
 import { coerce, satisfies, valid } from 'semver';
 
 import { generalConfig } from '@/configs';
-import { type Locales, locales as i18nLocales,type Translation } from '@/i18n';
+import { type Locales, locales as i18nLocales, type Translation } from '@/i18n';
 import { Logger } from '@/services';
 import { BaseController } from '@/utils/classes';
 import { AutoInjectable } from '@/utils/decorators';

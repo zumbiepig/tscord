@@ -1,6 +1,7 @@
 import process from 'node:process';
 
 import { EntityRepository } from '@mikro-orm/core';
+import { constantCase } from 'change-case';
 import { Client } from 'discordx';
 import nodeOsUtils from 'node-os-utils';
 import pidusage from 'pidusage';
@@ -23,7 +24,6 @@ import type {
 	InteractionsConstants,
 	StatPerInterval,
 } from '@/utils/types';
-import { constantCase } from 'change-case';
 
 const allInteractions = {
 	$or: [
@@ -51,7 +51,11 @@ export class Stats {
 	 * @param value
 	 * @param additionalData in JSON format
 	 */
-	async register(type: InteractionsConstants, value: string, additionalData?: unknown) {
+	async register(
+		type: InteractionsConstants,
+		value: string,
+		additionalData?: unknown,
+	) {
 		const stat = new Stat();
 		stat.type = type;
 		stat.value = value;
@@ -66,9 +70,7 @@ export class Stats {
 	 */
 	async registerInteraction(interaction: AllInteractions) {
 		// we extract data from the interaction
-		const type = constantCase(
-			getTypeOfInteraction(interaction),
-		);
+		const type = constantCase(getTypeOfInteraction(interaction));
 
 		const value = resolveAction(interaction);
 		const additionalData = {
@@ -325,7 +327,10 @@ export class Stats {
 			cpu: pidUsage.cpu.toFixed(1),
 			memory: {
 				usedInMb: (pidUsage.memory / (1024 * 1024)).toFixed(1),
-				percentage: ((pidUsage.memory / nodeOsUtils.mem.totalMem()) * 100).toFixed(1),
+				percentage: (
+					(pidUsage.memory / nodeOsUtils.mem.totalMem()) *
+					100
+				).toFixed(1),
 			},
 		};
 	}

@@ -16,11 +16,7 @@ import {
 
 import { type TranslationFunctions } from '@/i18n';
 import { Slash } from '@/utils/decorators';
-import {
-	chunkArray,
-	resolveGuild,
-	validString,
-} from '@/utils/functions';
+import { chunkArray, resolveGuild, validString } from '@/utils/functions';
 import type { CommandCategory, InteractionData } from '@/utils/types';
 import { colorsConfig } from '@/configs';
 

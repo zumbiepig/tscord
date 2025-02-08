@@ -1,6 +1,6 @@
-import { Colors } from "discord.js";
+import { Colors } from 'discord.js';
 
-import type { ColorsConfigType } from "@/utils/types";
+import type { ColorsConfigType } from '@/utils/types';
 
 /**
  * @typedef {Object} Colors
@@ -27,7 +27,7 @@ import type { ColorsConfigType } from "@/utils/types";
  * @property {number} Greyple 0x99AAb5 | rgb(153,170,181)
  * @property {number} LightGrey 0xBCC0C0 | rgb(188,192,192)
  * @property {number} LuminousVividPink 0xE91E63 | rgb(233,30,99)
- * @property {number} Navy 0x34495E | rgb(52,73,94) 
+ * @property {number} Navy 0x34495E | rgb(52,73,94)
  * @property {number} NotQuiteBlack 0x23272A | rgb(35,39,42)
  * @property {number} Orange 0xE67E22 | rgb(230,126,34)
  * @property {number} Purple 0x9B59B6 | rgb(155,89,182)
@@ -35,7 +35,7 @@ import type { ColorsConfigType } from "@/utils/types";
  * @property {number} White 0xFFFFFF | rgb(255,255,255)
  * @property {number} Yellow 0xFEE75C | rgb(254,231,92)
  */
-export const colorsConfig: ColorsConfigType = {
+export const colorsConfig = {
 	primary: Colors.DarkButNotBlack, // #2C2F33
 	success: Colors.Green, // #57F287
 	error: Colors.Red, // #ED4245
@@ -48,4 +48,4 @@ export const colorsConfig: ColorsConfigType = {
 	logGuildNew: Colors.Green, // #57F287
 	logGuildDelete: Colors.Red, // #ED4245
 	logGuildRecover: Colors.Yellow, // #FEE75C
-};
+} satisfies ColorsConfigType;

@@ -7,10 +7,7 @@ import {
 	getCallerFile,
 	setOptionsLocalization,
 } from '@/utils/functions';
-import type {
-	ContextMenuOptions,
-	TranslationPath,
-} from '@/utils/types';
+import type { ContextMenuOptions, TranslationPath } from '@/utils/types';
 
 /**
  * Interact with context menu with a defined identifier

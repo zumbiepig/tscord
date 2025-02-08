@@ -8,7 +8,7 @@ import {
 	storeTranslationsToDisk,
 } from 'typesafe-i18n/importer';
 
-import { type Locales, locales as i18nLocales,type Translation } from '@/i18n';
+import { type Locales, locales as i18nLocales, type Translation } from '@/i18n';
 import { BaseController, Plugin } from '@/utils/classes';
 import { Service } from '@/utils/decorators';
 

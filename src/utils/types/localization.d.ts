@@ -23,7 +23,9 @@ export type TranslationPath = Paths<
 	{ maxRecursionDepth: PositiveInfinity }
 >;
 
-export type TranslationType<K extends TranslationPath> = Simplify<Get<Translations, K>>;
+export type TranslationType<K extends TranslationPath> = Simplify<
+	Get<Translations, K>
+>;
 
 type LocalizationMap = Partial<Record<Locales, string>>;
 

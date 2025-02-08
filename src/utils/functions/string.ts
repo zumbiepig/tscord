@@ -1,4 +1,4 @@
-import {constantCase} from 'change-case';
+import { constantCase } from 'change-case';
 
 /**
  * Ensures value(s) strings and has a size after trim

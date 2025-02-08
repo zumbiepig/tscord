@@ -4,8 +4,11 @@ import { join } from 'node:path';
 
 import boxen from 'boxen';
 import chalk from 'chalk';
+import { constantCase } from 'change-case';
 import {
+	BaseInteraction,
 	type BaseMessageOptions,
+	CommandInteraction,
 	type Snowflake,
 	TextChannel,
 	ThreadChannel,
@@ -33,8 +36,6 @@ import {
 	resolveUser,
 	timeAgo,
 } from '@/utils/functions';
-import type { AllInteractions } from '@/utils/types';
-import { constantCase } from 'change-case';
 
 @Service()
 export class Logger {
@@ -126,8 +127,10 @@ export class Logger {
 		// set default values
 		logLocation.console = logLocation.console ?? logsConfig.system.console;
 		logLocation.file = logLocation.file ?? logsConfig.system.file;
-		logLocation.channelId = logLocation.channelId ?? logsConfig.system.channelId;
-		logLocation.discordEmbed = logLocation.discordEmbed ?? this.embedLevelBuilder[level](logMessage);
+		logLocation.channelId =
+			logLocation.channelId ?? logsConfig.system.channelId;
+		logLocation.discordEmbed =
+			logLocation.discordEmbed ?? this.embedLevelBuilder[level](logMessage);
 
 		// log to console
 		if (logLocation.console) {
@@ -149,7 +152,7 @@ export class Logger {
 
 		// save log to file
 		if (logLocation.file) {
-			await mkdir(this.logPath, {recursive: true});
+			await mkdir(this.logPath, { recursive: true });
 			await appendFile(
 				join(this.logPath, `${formattedDate}.log`),
 				logMessage + '\n',
@@ -218,8 +221,8 @@ export class Logger {
 				'info',
 				'Error embed was too long, uploaded error to pastebin: ' +
 					(paste?.getLink() ?? ''),
-					null,
-					logsConfig.error
+				null,
+				logsConfig.error,
 			);
 			embedMessage = `[Pastebin of the error](https://rentry.co/${paste?.getLink() ?? ''})`;
 		}
@@ -246,10 +249,8 @@ export class Logger {
 	 * Logs all interactions.
 	 * @param interaction
 	 */
-	async logInteraction(interaction: AllInteractions): Promise<void> {
-		const type = constantCase(
-			getTypeOfInteraction(interaction),
-		);
+	async logInteraction(interaction: BaseInteraction): Promise<void> {
+		const type = constantCase(getTypeOfInteraction(interaction));
 
 		const action = resolveAction(interaction);
 		const channel = resolveChannel(interaction);
@@ -421,21 +422,22 @@ export class Logger {
 	async archiveLogs(): Promise<void> {
 		if (!logsConfig.archive.enabled) return;
 
-		await mkdir(this.logArchivePath, {recursive: true});
+		await mkdir(this.logArchivePath, { recursive: true });
 
 		const archive = tar.create({
 			portable: true,
 			gzip: {
 				level: 9,
-			}
-		},
-	)
+			},
+		});
 
 		archive.pipe(
-			createWriteStream(join(
-				this.logArchivePath,
-				`logs-${formatDate(dayjsTimezone().subtract(1, 'day'), 'onlyDateFileName')}.tar.gz`,
-			),)
+			createWriteStream(
+				join(
+					this.logArchivePath,
+					`logs-${formatDate(dayjsTimezone().subtract(1, 'day'), 'onlyDateFileName')}.tar.gz`,
+				),
+			),
 		);
 
 		// add files to the archive
@@ -598,25 +600,22 @@ export class Logger {
 				'info',
 				`API Server listening on port ${apiConfig.port.toString()}`,
 				chalk.gray(
-					boxen(
-						`API Server listening on port ${chalk.bold(apiConfig.port)}`,
-						{
-							padding: {
-								top: 0,
-								bottom: 0,
-								left: 1,
-								right: 1,
-							},
-							margin: {
-								top: 1,
-								bottom: 0,
-								left: 1,
-								right: 1,
-							},
-							borderStyle: 'round',
-							dimBorder: true,
+					boxen(`API Server listening on port ${chalk.bold(apiConfig.port)}`, {
+						padding: {
+							top: 0,
+							bottom: 0,
+							left: 1,
+							right: 1,
 						},
-					),
+						margin: {
+							top: 1,
+							bottom: 0,
+							left: 1,
+							right: 1,
+						},
+						borderStyle: 'round',
+						dimBorder: true,
+					}),
 				),
 			);
 		}

@@ -7,9 +7,9 @@ import type {
 } from 'discord.js';
 import type { ValueOf } from 'type-fest';
 
+import type env from '@/env';
 import type { Locales } from '@/i18n';
 import type { Timezone } from '@/utils/types';
-import env from '@/env'
 
 export interface GeneralConfigType {
 	name: string;

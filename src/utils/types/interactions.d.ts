@@ -1,9 +1,10 @@
 import type { ICategory } from '@discordx/utilities';
 import type {
 	ButtonInteraction,
-	CommandInteraction,
+	ChatInputCommandInteraction,
 	ModalSubmitInteraction,
 	StringSelectMenuInteraction,
+	UserContextMenuCommandInteraction,
 } from 'discord.js';
 import type { DApplicationCommand, SimpleCommandMessage } from 'discordx';
 import type { ScreamingSnakeCase } from 'type-fest';
@@ -11,8 +12,9 @@ import type { ScreamingSnakeCase } from 'type-fest';
 import type { TranslationFunctions } from '@/i18n';
 
 export type EmittedInteractions =
-	| CommandInteraction
-	| SimpleCommandMessage
+	| ChatInputCommandInteraction
+	| UserContextMenuCommandInteraction
+	| SimpleCommandMessage;
 export type OnTheFlyInteractions =
 	| ButtonInteraction
 	| ModalSubmitInteraction
@@ -20,15 +22,17 @@ export type OnTheFlyInteractions =
 
 export type AllInteractions = EmittedInteractions | OnTheFlyInteractions;
 
-/*export type InteractionsConstants =
+export type InteractionsConstants =
 	| 'ChatInputCommandInteraction'
 	| 'SimpleCommandMessage'
 	| 'MessageContextMenuCommandInteraction'
 	| 'UserContextMenuCommandInteraction'
 	| 'ButtonInteraction'
 	| 'ModalSubmitInteraction'
-	| 'StringSelectMenuInteraction';*/
-export type InteractionsConstants = ScreamingSnakeCase<AllInteractions['constructor']['name']>;
+	| 'StringSelectMenuInteraction';
+export type InteractionsConstants = ScreamingSnakeCase<
+	AllInteractions['constructor']['name']
+>;
 
 export type CommandCategory = DApplicationCommand & ICategory;
 

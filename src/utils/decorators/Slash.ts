@@ -9,10 +9,7 @@ import {
 	setFallbackDescription,
 	setOptionsLocalization,
 } from '@/utils/functions';
-import type {
-	ApplicationCommandOptions,
-	TranslationPath,
-} from '@/utils/types';
+import type { ApplicationCommandOptions, TranslationPath } from '@/utils/types';
 
 /**
  * Handle a slash command

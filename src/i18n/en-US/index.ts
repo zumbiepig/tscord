@@ -37,7 +37,8 @@ export default {
 		MAINTENANCE: {
 			DESCRIPTION: 'Set the maintenance mode of the bot.',
 			EMBED: {
-				DESCRIPTION: 'Maintenance mode has been {status | {enabled: enabled, disabled: disabled}}.',
+				DESCRIPTION:
+					'Maintenance mode has been {status | {enabled: enabled, disabled: disabled}}.',
 			},
 		},
 		STATS: {

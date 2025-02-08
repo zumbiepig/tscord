@@ -30,10 +30,7 @@ export class Server {
 	}
 
 	$beforeRoutesInit() {
-		this.app
-			.use(json())
-			.use(Log)
-			.use(PlatformAcceptMimesMiddleware);
+		this.app.use(json()).use(Log).use(PlatformAcceptMimesMiddleware);
 
 		return null;
 	}

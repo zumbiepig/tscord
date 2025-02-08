@@ -10,10 +10,7 @@ import {
 	setFallbackDescription,
 	setOptionsLocalization,
 } from '@/utils/functions';
-import type {
-	SlashOptionOptions,
-	TranslationPath,
-} from '@/utils/types';
+import type { SlashOptionOptions, TranslationPath } from '@/utils/types';
 
 /**
  * Add a slash command option

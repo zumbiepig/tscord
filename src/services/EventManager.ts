@@ -13,6 +13,7 @@ export class EventManager {
 
 	async emit(eventName: string, ...args: unknown[]): Promise<void> {
 		const callbacks = this._events.get(eventName);
-		if (callbacks) await Promise.all(callbacks.map(callback => callback(...args)));
+		if (callbacks)
+			await Promise.all(callbacks.map((callback) => callback(...args)));
 	}
 }

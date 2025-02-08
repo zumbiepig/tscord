@@ -82,5 +82,5 @@ export function setFallbackDescription<K extends SanitizedOptions>(
 }
 
 export function getLocaleFromInteraction(interaction: AllInteractions) {
-	return resolveLocale(interaction) ?? generalConfig.defaultLocale
+	return resolveLocale(interaction) ?? generalConfig.defaultLocale;
 }

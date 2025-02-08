@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 
-import {BetterSqliteDriver} from '@mikro-orm/better-sqlite';
+import { BetterSqliteDriver } from '@mikro-orm/better-sqlite';
 
 import type { DatabaseConfigType, MikroORMConfigType } from '@/utils/types';
 

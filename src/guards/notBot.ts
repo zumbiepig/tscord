@@ -10,9 +10,7 @@ export const NotBot: GuardFunction<
 	| AllInteractions
 	| ArgsOf<'messageCreate' | 'messageReactionAdd' | 'voiceStateUpdate'>
 > = async (arg, _client, next) => {
-	const user = resolveUser(
-		(Array.isArray(arg) ? arg[0] : arg),
-	);
+	const user = resolveUser(Array.isArray(arg) ? arg[0] : arg);
 	if (!user?.bot) return next();
 	return;
 };

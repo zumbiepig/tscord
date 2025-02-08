@@ -44,7 +44,7 @@ export class ImagesUpload {
 	}
 
 	async syncWithDatabase() {
-		await mkdir(this.imageFolderPath, {recursive: true});
+		await mkdir(this.imageFolderPath, { recursive: true });
 
 		// get all images inside the assets folder
 		const files = await glob(join('**', '*'), {
@@ -131,7 +131,9 @@ export class ImagesUpload {
 			name: imageFilename,
 		});
 		const uploadResponse = await this.imgurClient.upload({
-			image: Readable.toWeb(createReadStream(join(this.imageFolderPath, imagePath))),
+			image: Readable.toWeb(
+				createReadStream(join(this.imageFolderPath, imagePath)),
+			),
 			type: 'stream',
 		});
 

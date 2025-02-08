@@ -47,10 +47,7 @@ export function timeAgo(
  * @param date
  * @param timezone
  */
-export function convertTZ(
-	date: Date,
-	timezone: Timezone,
-): Date {
+export function convertTZ(date: Date, timezone: Timezone): Date {
 	return new Date(
 		date.toLocaleString(generalConfig.defaultLocale, {
 			timeZone: timezone,

@@ -1,7 +1,9 @@
 import type { RepliableInteraction } from 'discord.js';
 import { SimpleCommandMessage } from 'discordx';
 
-export function getTypeOfInteraction(interaction: object): typeof interaction['constructor']['name'] {
+export function getTypeOfInteraction(
+	interaction: object,
+): (typeof interaction)['constructor']['name'] {
 	return interaction.constructor.name;
 }
 
