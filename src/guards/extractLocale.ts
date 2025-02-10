@@ -1,8 +1,8 @@
 import {
-	BaseInteraction,
 	ButtonInteraction,
 	CommandInteraction,
 	ContextMenuCommandInteraction,
+	type Interaction,
 	StringSelectMenuInteraction,
 } from 'discord.js';
 import { type GuardFunction, SimpleCommandMessage } from 'discordx';
@@ -15,7 +15,7 @@ import type { InteractionData } from '@/utils/types';
  * Extract locale from any interaction and pass it as guard data
  */
 export const ExtractLocale: GuardFunction<
-	BaseInteraction,
+	Interaction,
 	InteractionData
 > = async (interaction, _client, next, guardData) => {
 	if (
@@ -25,8 +25,7 @@ export const ExtractLocale: GuardFunction<
 		interaction instanceof StringSelectMenuInteraction ||
 		interaction instanceof ButtonInteraction
 	) {
-		const locale = getLocaleFromInteraction(interaction);
-		guardData.localize = L[locale];
+		guardData.locale = getLocaleFromInteraction(interaction);
 	}
 
 	return next(guardData);

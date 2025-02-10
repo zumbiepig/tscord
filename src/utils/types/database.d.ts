@@ -1,9 +1,4 @@
-export interface DatabaseSize {
-	db: number | null;
-	backups: number | null;
-}
-
-export interface DataType {
+export interface DataRepositoryType {
 	maintenance: boolean;
 	lastMaintenance: number;
 	lastStartup: number;

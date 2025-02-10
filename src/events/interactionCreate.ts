@@ -7,7 +7,6 @@ import { Maintenance } from '@/guards';
 import { Database, Logger, Stats } from '@/services';
 import { Injectable, On } from '@/utils/decorators';
 import { syncUser } from '@/utils/functions';
-import type { AllInteractions } from '@/utils/types';
 
 @Discord()
 @Injectable()
@@ -39,8 +38,8 @@ export default class InteractionCreateEvent {
 		await this.db.get(Guild).updateLastInteract(interaction.guild?.id);
 
 		// register logs and stats
-		await this.stats.registerInteraction(interaction as AllInteractions);
-		await this.logger.logInteraction(interaction as AllInteractions);
+		await this.stats.registerInteraction(interaction);
+		await this.logger.logInteraction(interaction);
 
 		client.executeInteraction(interaction);
 	}

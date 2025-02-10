@@ -4,6 +4,7 @@ import { Discord, Guard } from 'discordx';
 
 import { generalConfig } from '@/configs';
 import { Guild } from '@/entities';
+import { L } from '@/i18n';
 import { Database } from '@/services';
 import { Injectable, Slash, SlashOption } from '@/utils/decorators';
 import { ReplyUnknownErrorError } from '@/utils/errors';
@@ -25,7 +26,7 @@ export default class PrefixCommand {
 		})
 		prefix: string | undefined,
 		interaction: CommandInteraction,
-		{ localize }: InteractionData,
+		{ interactionLocale }: InteractionData,
 	) {
 		const guild = resolveGuild(interaction);
 		const guildData = await this.db.get(Guild).findOne({ id: guild?.id ?? '' });
@@ -36,7 +37,7 @@ export default class PrefixCommand {
 
 			await simpleSuccessEmbed(
 				interaction,
-				localize.COMMANDS.PREFIX.EMBED.DESCRIPTION({
+				L[interactionLocale].COMMANDS.PREFIX.EMBED.DESCRIPTION({
 					prefix: prefix ?? generalConfig.simpleCommandsPrefix,
 				}),
 			);

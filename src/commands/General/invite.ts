@@ -3,6 +3,7 @@ import { CommandInteraction, EmbedBuilder } from 'discord.js';
 import { Discord, Guard } from 'discordx';
 
 import { colorsConfig, generalConfig } from '@/configs';
+import { L } from '@/i18n';
 import { Slash } from '@/utils/decorators';
 import type { InteractionData } from '@/utils/types';
 
@@ -13,12 +14,12 @@ export default class InviteCommand {
 		name: 'invite',
 	})
 	@Guard()
-	async invite(interaction: CommandInteraction, { localize }: InteractionData) {
+	async invite(interaction: CommandInteraction, { interactionLocale }: InteractionData) {
 		const embed = new EmbedBuilder()
-			.setTitle(localize.COMMANDS.INVITE.EMBED.TITLE())
+			.setTitle(L[interactionLocale].COMMANDS.INVITE.EMBED.TITLE())
 			.setDescription(
-				localize.COMMANDS.INVITE.EMBED.DESCRIPTION({
-					link: generalConfig.links?.botInvite,
+				L[interactionLocale].COMMANDS.INVITE.EMBED.DESCRIPTION({
+					link: generalConfig.links.botInvite,
 				}),
 			)
 			.setColor(colorsConfig.primary)

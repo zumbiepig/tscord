@@ -1,41 +1,14 @@
-import type { ICategory } from '@discordx/utilities';
-import type {
-	ButtonInteraction,
-	ChatInputCommandInteraction,
-	ModalSubmitInteraction,
-	StringSelectMenuInteraction,
-	UserContextMenuCommandInteraction,
-} from 'discord.js';
-import type { DApplicationCommand, SimpleCommandMessage } from 'discordx';
-import type { ScreamingSnakeCase } from 'type-fest';
-
-import type { TranslationFunctions } from '@/i18n';
-
-export type EmittedInteractions =
-	| ChatInputCommandInteraction
-	| UserContextMenuCommandInteraction
-	| SimpleCommandMessage;
-export type OnTheFlyInteractions =
-	| ButtonInteraction
-	| ModalSubmitInteraction
-	| StringSelectMenuInteraction;
-
-export type AllInteractions = EmittedInteractions | OnTheFlyInteractions;
+import type { Locale } from 'discord.js';
 
 export type InteractionsConstants =
-	| 'ChatInputCommandInteraction'
-	| 'SimpleCommandMessage'
-	| 'MessageContextMenuCommandInteraction'
-	| 'UserContextMenuCommandInteraction'
-	| 'ButtonInteraction'
-	| 'ModalSubmitInteraction'
-	| 'StringSelectMenuInteraction';
-export type InteractionsConstants = ScreamingSnakeCase<
-	AllInteractions['constructor']['name']
->;
-
-export type CommandCategory = DApplicationCommand & ICategory;
+	| 'CHAT_INPUT_COMMAND_INTERACTION'
+	| 'CONTEXT_MENU_COMMAND_INTERACTION'
+	| 'AUTOCOMPLETE_INTERACTION'
+	| 'SELECT_MENU_INTERACTION'
+	| 'BUTTON_INTERACTION'
+	| 'MODAL_SUBMIT_INTERACTION'
+	| 'SIMPLE_COMMAND_MESSAGE';
 
 export interface InteractionData {
-	localize: TranslationFunctions;
+	interactionLocale: Locale;
 }

@@ -4,11 +4,9 @@ import { join } from 'node:path';
 
 import boxen from 'boxen';
 import chalk from 'chalk';
-import { constantCase } from 'change-case';
 import {
-	BaseInteraction,
 	type BaseMessageOptions,
-	CommandInteraction,
+	type Interaction,
 	type Snowflake,
 	TextChannel,
 	ThreadChannel,
@@ -113,7 +111,7 @@ export class Logger {
 			console?: boolean;
 			file?: boolean;
 			channelId?: Snowflake | null;
-			discordEmbed?: BaseMessageOptions | null;
+			discordEmbed?: BaseMessageOptions;
 		} = {},
 	): Promise<void> {
 		const date = dayjsTimezone();
@@ -128,7 +126,9 @@ export class Logger {
 		logLocation.console = logLocation.console ?? logsConfig.system.console;
 		logLocation.file = logLocation.file ?? logsConfig.system.file;
 		logLocation.channelId =
-			logLocation.channelId ?? logsConfig.system.channelId;
+			logLocation.channelId !== undefined
+				? logLocation.channelId
+				: logsConfig.system.channelId;
 		logLocation.discordEmbed =
 			logLocation.discordEmbed ?? this.embedLevelBuilder[level](logMessage);
 
@@ -249,16 +249,16 @@ export class Logger {
 	 * Logs all interactions.
 	 * @param interaction
 	 */
-	async logInteraction(interaction: BaseInteraction): Promise<void> {
-		const type = constantCase(getTypeOfInteraction(interaction));
+	async logInteraction(interaction: Interaction): Promise<void> {
+		const type = getTypeOfInteraction(interaction);
 
 		const action = resolveAction(interaction);
 		const channel = resolveChannel(interaction);
 		const guild = resolveGuild(interaction);
 		const user = resolveUser(interaction);
 
-		const message = `(${type}) "${action ?? ''}" ${channel instanceof TextChannel || channel instanceof ThreadChannel ? `in channel #${channel.name}` : ''} ${guild ? `in guild ${guild.name}` : ''} ${user ? `by ${user.username}#${user.discriminator}` : ''}`;
-		const chalkedMessage = `(${chalk.bold.white(type)}) "${chalk.bold.green(action)}" ${channel instanceof TextChannel || channel instanceof ThreadChannel ? `${chalk.dim.italic.gray('in channel')} ${chalk.bold.blue(`#${channel.name}`)}` : ''} ${guild ? `${chalk.dim.italic.gray('in guild')} ${chalk.bold.blue(guild.name)}` : ''} ${user ? `${chalk.dim.italic.gray('by')} ${chalk.bold.blue(`${user.username}#${user.discriminator}`)}` : ''}`;
+		const message = `(${type}) "${action}" ${channel instanceof TextChannel || channel instanceof ThreadChannel ? `in channel #${channel.name}` : ''} ${guild ? `in guild ${guild.name}` : ''} by ${user.username}#${user.discriminator}`;
+		const chalkedMessage = `(${chalk.bold.white(type)}) "${chalk.bold.green(action)}" ${channel instanceof TextChannel || channel instanceof ThreadChannel ? `${chalk.dim.italic.gray('in channel')} ${chalk.bold.blue(`#${channel.name}`)}` : ''} ${guild ? `${chalk.dim.italic.gray('in guild')} ${chalk.bold.blue(guild.name)}` : ''} ${chalk.dim.italic.gray('by')} ${chalk.bold.blue(`${user.username}#${user.discriminator}`)}`;
 
 		await this.log('info', message, chalkedMessage, {
 			...logsConfig.interaction,
@@ -266,10 +266,8 @@ export class Logger {
 				embeds: [
 					{
 						author: {
-							name: user
-								? `${user.username}#${user.discriminator}`
-								: 'Unknown user',
-							icon_url: user?.avatar
+							name: `${user.username}#${user.discriminator}`,
+							icon_url: user.avatar
 								? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`
 								: '',
 						},
@@ -290,12 +288,12 @@ export class Logger {
 							},
 							{
 								name: 'Action',
-								value: action ?? 'Unknown',
+								value: action,
 								inline: true,
 							},
 							{
 								name: 'Guild',
-								value: guild ? guild.name : 'Unknown',
+								value: guild?.name ?? 'Unknown',
 								inline: true,
 							},
 							{

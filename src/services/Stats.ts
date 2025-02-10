@@ -1,8 +1,7 @@
 import process from 'node:process';
 
 import { EntityRepository } from '@mikro-orm/core';
-import { constantCase } from 'change-case';
-import { Client } from 'discordx';
+import { Client, SimpleCommandMessage } from 'discordx';
 import nodeOsUtils from 'node-os-utils';
 import pidusage from 'pidusage';
 import { delay, inject } from 'tsyringe';
@@ -20,10 +19,10 @@ import {
 	resolveUser,
 } from '@/utils/functions';
 import type {
-	AllInteractions,
 	InteractionsConstants,
 	StatPerInterval,
 } from '@/utils/types';
+import type { Interaction } from 'discord.js';
 
 const allInteractions = {
 	$or: [
@@ -68,13 +67,13 @@ export class Stats {
 	 * Record an interaction and add it to the database.
 	 * @param interaction
 	 */
-	async registerInteraction(interaction: AllInteractions) {
+	async registerInteraction(interaction: Interaction | SimpleCommandMessage) {
 		// we extract data from the interaction
-		const type = constantCase(getTypeOfInteraction(interaction));
+		const type = getTypeOfInteraction(interaction);
 
 		const value = resolveAction(interaction);
 		const additionalData = {
-			user: resolveUser(interaction)?.id,
+			user: resolveUser(interaction).id,
 			guild: resolveGuild(interaction)?.id,
 			channel: resolveChannel(interaction)?.id,
 		};

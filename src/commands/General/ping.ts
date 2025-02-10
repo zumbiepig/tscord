@@ -1,9 +1,11 @@
 import { Category } from '@discordx/utilities';
-import { CommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction, CommandInteraction, type RepliableInteraction } from 'discord.js';
 import { Client, Discord } from 'discordx';
 
+import { L } from '@/i18n';
 import { Slash } from '@/utils/decorators';
 import type { InteractionData } from '@/utils/types';
+import { replyToInteraction } from '@/utils/functions';
 
 @Discord()
 @Category('General')
@@ -14,17 +16,17 @@ export default class PingCommand {
 	async ping(
 		interaction: CommandInteraction,
 		client: Client,
-		{ localize }: InteractionData,
+		{ interactionLocale }: InteractionData,
 	) {
-		const msg = await interaction.followUp({
+		await replyToInteraction(interaction as RepliableInteraction, {
 			content: 'Pinging...',
-		});
+		})
 
-		const content = localize.COMMANDS.PING.MESSAGE({
+		const content = L[interactionLocale].COMMANDS.PING.MESSAGE({
 			time: msg.createdTimestamp - interaction.createdTimestamp,
 			heartbeat: Math.floor(client.ws.ping).toString(),
 		});
 
-		await msg.edit(content);
+		await replyToInteraction(interaction as RepliableInteraction, content)
 	}
 }

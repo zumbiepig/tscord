@@ -19,7 +19,6 @@ import {
 	getFolderSize,
 	restoreDatabase,
 } from '@/utils/functions';
-import type { DatabaseSize } from '@/utils/types';
 
 @Service()
 export class Database {
@@ -166,7 +165,7 @@ export class Database {
 		return backupList;
 	}
 
-	async getSize(): Promise<DatabaseSize> {
+	async getSize() {
 		const dbName = mikroORMConfig[env.NODE_ENV].dbName;
 		const backupPath = join(databaseConfig.path, 'backups');
 		return {
@@ -179,7 +178,7 @@ export class Database {
 					return null;
 				else throw err;
 			}),
-		} satisfies DatabaseSize;
+		};
 	}
 
 	isSQLiteDatabase(): boolean {

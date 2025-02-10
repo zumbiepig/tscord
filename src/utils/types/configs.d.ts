@@ -21,9 +21,9 @@ export interface GeneralConfigType {
 	simpleCommandsPrefix: string | null;
 	automaticDeferring: boolean;
 
-	ownerId?: Snowflake | null;
-	devs?: Snowflake[];
-	testGuildId?: Snowflake | null;
+	ownerId: Snowflake | null;
+	devs: Snowflake[];
+	testGuildId: Snowflake | null;
 
 	activities: ActivitiesOptions[] & { status: PresenceStatusData }[];
 

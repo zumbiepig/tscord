@@ -10,13 +10,13 @@ import chalk from 'chalk';
 import { Data } from '@/entities';
 import { Database, Logger } from '@/services';
 import { resolveDependency } from '@/utils/functions';
-import type { DataType } from '@/utils/types';
+import type { DataRepositoryType } from '@/utils/types';
 
 /**
  * Initiate the EAV Data table with the default data (dynamic EAV key/value pattern).
  */
 export async function initDataTable() {
-	const defaultData: DataType = {
+	const defaultData: DataRepositoryType = {
 		maintenance: false,
 		lastMaintenance: Date.now(),
 		lastStartup: Date.now(),
@@ -26,8 +26,8 @@ export async function initDataTable() {
 		const db = await resolveDependency(Database);
 		const dataRepository = db.get(Data);
 		await dataRepository.add(
-			key as keyof DataType,
-			defaultData[key as keyof DataType],
+			key as keyof DataRepositoryType,
+			defaultData[key as keyof DataRepositoryType],
 		);
 	}
 }

@@ -2,10 +2,11 @@ import { generalConfig } from '@/configs';
 import { L, loadedLocales, type Locales, locales } from '@/i18n';
 import { resolveLocale } from '@/utils/functions';
 import type {
-	AllInteractions,
 	SanitizedOptions,
 	TranslationPath,
 } from '@/utils/types';
+import type { Interaction } from 'discord.js';
+import type { SimpleCommandMessage } from 'discordx';
 
 export function getLocalizedInfo(
 	target: 'NAME' | 'DESCRIPTION',
@@ -81,6 +82,6 @@ export function setFallbackDescription<K extends SanitizedOptions>(
 	return options;
 }
 
-export function getLocaleFromInteraction(interaction: AllInteractions) {
+export function getLocaleFromInteraction(interaction: Interaction | SimpleCommandMessage) {
 	return resolveLocale(interaction) ?? generalConfig.defaultLocale;
 }

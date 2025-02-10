@@ -1,19 +1,16 @@
 import {
 	type APIInteractionGuildMember,
 	AutocompleteInteraction,
-	Base,
 	BaseInteraction,
-	type Channel,
-	ChatInputCommandInteraction,
 	CommandInteraction,
-	ContextMenuCommandInteraction,
 	Guild,
 	GuildMember,
-	type Interaction,
+	Locale,
 	Message,
 	MessageComponentInteraction,
 	MessageReaction,
 	ModalSubmitInteraction,
+	type PartialMessageReaction,
 	type TextBasedChannel,
 	User,
 	VoiceState,
@@ -21,12 +18,25 @@ import {
 import { SimpleCommandMessage } from 'discordx';
 
 export function resolveUser(
+	interaction: BaseInteraction | SimpleCommandMessage | Message,
+): User;
+export function resolveUser(
 	interaction:
-		| Interaction
+		| BaseInteraction
 		| SimpleCommandMessage
 		| Message
 		| VoiceState
-		| MessageReaction,
+		| MessageReaction
+		| PartialMessageReaction,
+): User | null;
+export function resolveUser(
+	interaction:
+		| BaseInteraction
+		| SimpleCommandMessage
+		| Message
+		| VoiceState
+		| MessageReaction
+		| PartialMessageReaction,
 ): User | null {
 	return interaction instanceof BaseInteraction
 		? interaction.user
@@ -42,7 +52,18 @@ export function resolveUser(
 
 export function resolveMember(
 	interaction:
-		| Interaction
+		| BaseInteraction
+		| SimpleCommandMessage
+		| Message
+		| VoiceState
+		| MessageReaction,
+): GuildMember | APIInteractionGuildMember | null;
+export function resolveMember(
+	interaction: SimpleCommandMessage | Message | VoiceState | MessageReaction,
+): GuildMember | null;
+export function resolveMember(
+	interaction:
+		| BaseInteraction
 		| SimpleCommandMessage
 		| Message
 		| VoiceState
@@ -59,7 +80,7 @@ export function resolveMember(
 }
 
 export function resolveGuild(
-	interaction: Interaction | SimpleCommandMessage,
+	interaction: BaseInteraction | SimpleCommandMessage,
 ): Guild | null {
 	return interaction instanceof BaseInteraction
 		? interaction.guild
@@ -69,7 +90,13 @@ export function resolveGuild(
 }
 
 export function resolveChannel(
-	interaction: Interaction | SimpleCommandMessage,
+	interaction: SimpleCommandMessage,
+): TextBasedChannel;
+export function resolveChannel(
+	interaction: BaseInteraction | SimpleCommandMessage,
+): TextBasedChannel | null;
+export function resolveChannel(
+	interaction: BaseInteraction | SimpleCommandMessage,
 ): TextBasedChannel | null {
 	return interaction instanceof BaseInteraction
 		? interaction.channel
@@ -78,35 +105,27 @@ export function resolveChannel(
 			: (null as never);
 }
 
-export function resolveCommandName(
-	interaction:
-		| CommandInteraction
-		| AutocompleteInteraction
-		| SimpleCommandMessage,
+export function resolveAction(
+	interaction: BaseInteraction | SimpleCommandMessage,
 ): string {
 	return interaction instanceof CommandInteraction ||
 		interaction instanceof AutocompleteInteraction
 		? interaction.commandName
-		: interaction instanceof SimpleCommandMessage
-			? interaction.name
-			: (null as never);
+		: interaction instanceof MessageComponentInteraction ||
+			  interaction instanceof ModalSubmitInteraction
+			? interaction.customId
+			: interaction instanceof SimpleCommandMessage
+				? interaction.name
+				: (null as never);
 }
 
-export function resolveAction(interaction: Interaction | SimpleCommandMessage) {
-	return interaction instanceof ChatInputCommandInteraction
-		? `${interaction.commandName} ${interaction.options.getSubcommandGroup(false) ?? ''} ${interaction.options.getSubcommand(false) ?? ''}`.trimEnd()
-		: interaction instanceof CommandInteraction ||
-			  interaction instanceof AutocompleteInteraction
-			? interaction.commandName
-			: interaction instanceof MessageComponentInteraction ||
-				  interaction instanceof ModalSubmitInteraction
-				? interaction.customId
-				: interaction instanceof SimpleCommandMessage
-					? interaction.name
-					: (null as never);
-}
-
-export function resolveLocale(interaction: Interaction | SimpleCommandMessage) {
+export function resolveLocale(interaction: BaseInteraction): Locale;
+export function resolveLocale(
+	interaction: BaseInteraction | SimpleCommandMessage,
+): Locale | null;
+export function resolveLocale(
+	interaction: BaseInteraction | SimpleCommandMessage,
+): Locale | null {
 	return interaction instanceof BaseInteraction
 		? interaction.locale
 		: interaction instanceof SimpleCommandMessage

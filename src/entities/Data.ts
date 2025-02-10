@@ -7,7 +7,7 @@ import {
 } from '@mikro-orm/core';
 
 import { BaseEntity } from '@/utils/classes';
-import type { DataType } from '@/utils/types';
+import type { DataRepositoryType } from '@/utils/types';
 
 @Entity({ repository: () => DataRepository })
 export class Data extends BaseEntity {
@@ -21,15 +21,15 @@ export class Data extends BaseEntity {
 }
 
 export class DataRepository extends EntityRepository<Data> {
-	async get<T extends keyof DataType>(key: T): Promise<DataType[T]> {
+	async get<T extends keyof DataRepositoryType>(key: T): Promise<DataRepositoryType[T]> {
 		return JSON.parse(
 			(await this.findOne({ key }))?.value ?? '',
-		) as DataType[T];
+		) as DataRepositoryType[T];
 	}
 
-	async set<T extends keyof DataType>(
+	async set<T extends keyof DataRepositoryType>(
 		key: T,
-		value: DataType[T],
+		value: DataRepositoryType[T],
 	): Promise<void> {
 		const data = await this.findOne({ key });
 
@@ -45,9 +45,9 @@ export class DataRepository extends EntityRepository<Data> {
 		}
 	}
 
-	async add<T extends keyof DataType>(
+	async add<T extends keyof DataRepositoryType>(
 		key: T,
-		value: DataType[T],
+		value: DataRepositoryType[T],
 	): Promise<void> {
 		const data = await this.findOne({ key });
 
