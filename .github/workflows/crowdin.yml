@@ -31,8 +31,9 @@ jobs:
           localization_branch_name: crowdin/${{ github.ref_name }}
           commit_message: 'crowdin[bot]: New translations from Crowdin'
           pull_request_title: 'crowdin[bot]: New Crowdin updates'
-          pull_request_labels: 'crowdin'
+          pull_request_labels: crowdin
           crowdin_branch_name: ${{ github.ref_name }}
+          config: crowdin.json
         env:
           GITHUB_TOKEN: ${{ github.token }}
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
