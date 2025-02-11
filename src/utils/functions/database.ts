@@ -144,7 +144,7 @@ export async function restoreDatabase(targetDb: string, snapshotFile: string) {
 	);
 
 	// get object files from snapshot file
-	const hashes = (await readFile(snapshotFile, 'utf-8'))
+	const hashes = (await readFile(snapshotFile, 'utf8'))
 		.split('\n')
 		.map((hash) => join(hash.slice(0, 2), hash.slice(2)));
 

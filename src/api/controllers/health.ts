@@ -62,6 +62,6 @@ export class HealthController extends BaseController {
 	@Get('/logs')
 	@UseBefore(DevAuthenticated)
 	logs() {
-		return this.logger.getLastLogs();
+		return this.logger.lastLogsTail;
 	}
 }

@@ -1,8 +1,9 @@
 import process from 'node:process';
+import os from 'node:os'
 
 import { EntityRepository } from '@mikro-orm/core';
 import { Client, SimpleCommandMessage } from 'discordx';
-import nodeOsUtils from 'node-os-utils';
+import nodeOsUtils, { os } from 'node-os-utils';
 import pidusage from 'pidusage';
 import { delay, inject } from 'tsyringe';
 
@@ -323,7 +324,10 @@ export class Stats {
 
 		return {
 			...pidUsage,
-			cpu: pidUsage.cpu.toFixed(1),
+			pid: process.pid,
+			ppid: process.ppid,
+			cpu2: pidUsage.cpu.toFixed(1),
+			cpu: os.cpus().,
 			memory: {
 				usedInMb: (pidUsage.memory / (1024 * 1024)).toFixed(1),
 				percentage: (

@@ -40,7 +40,7 @@ export class Plugin {
 		// read plugin.json
 		const pluginDotJson = await readFile(
 			join(this._path, 'plugin.json'),
-			'utf-8',
+			'utf8',
 		).catch(() => null);
 		if (pluginDotJson === null) {
 			await this.stopLoad('plugin.json not found');

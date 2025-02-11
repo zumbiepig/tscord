@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import boxen from 'boxen';
 import chalk from 'chalk';
 import {
+	AttachmentBuilder,
 	type BaseMessageOptions,
 	type Interaction,
 	type Snowflake,
@@ -14,14 +15,13 @@ import {
 } from 'discord.js';
 import { Client, MetadataStorage } from 'discordx';
 import ora from 'ora';
-import { parse, type StackFrame } from 'stacktrace-parser';
 import * as tar from 'tar';
 import { delay, inject } from 'tsyringe';
 
 import * as controllers from '@/api/controllers';
 import { apiConfig, colorsConfig, logsConfig } from '@/configs';
 import { locales } from '@/i18n';
-import { Pastebin, PluginsManager, Scheduler } from '@/services';
+import { PluginsManager, Scheduler } from '@/services';
 import { Schedule, Service } from '@/utils/decorators';
 import {
 	dayjsTimezone,
@@ -86,12 +86,11 @@ export class Logger {
 
 	private spinner = ora();
 
-	private lastLogsTail: string[] = [];
+	private _lastLogsTail: string[] = [];
 
 	constructor(
 		@inject(delay(() => Client)) private client: Client,
 		@inject(delay(() => Scheduler)) private scheduler: Scheduler,
-		@inject(delay(() => Pastebin)) private pastebin: Pastebin,
 		@inject(delay(() => PluginsManager))
 		private pluginsManager: PluginsManager,
 	) {}
@@ -175,9 +174,9 @@ export class Logger {
 		}
 
 		// save the last logs tail queue
-		this.lastLogsTail.push(message);
-		while (this.lastLogsTail.length > logsConfig.logTailMaxSize)
-			this.lastLogsTail.shift();
+		this._lastLogsTail.push(message);
+		while (this._lastLogsTail.length > logsConfig.logTailMaxSize)
+			this._lastLogsTail.shift();
 	}
 
 	/**
@@ -189,43 +188,9 @@ export class Logger {
 	async logError(
 		type: 'uncaughtException' | 'unhandledRejection',
 		error: Error,
-		trace: StackFrame[] = parse(error.stack ?? ''),
 	): Promise<void> {
-		let message = '(ERROR)';
-		let chalkedMessage = `(${chalk.bold.white('ERROR')})`;
-		let embedTitle = '';
-		let embedMessage = '';
-
-		if (trace[0]) {
-			message += ` ${type === 'uncaughtException' ? 'Exception' : 'Unhandled rejection'} : ${error.message}\n${trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n')}`;
-			chalkedMessage += ` ${chalk.dim.italic.gray(type === 'uncaughtException' ? 'Exception' : 'Unhandled rejection')} : ${error.message}\n${chalk.dim.italic(trace.map((frame: StackFrame) => `\t> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n'))}`;
-			embedTitle += `***${type === 'uncaughtException' ? 'Exception' : 'Unhandled rejection'}* : ${error.message}**`;
-			embedMessage += `\`\`\`\n${trace.map((frame: StackFrame) => `> ${frame.file ?? ''}:${frame.lineNumber?.toString() ?? ''}`).join('\n')}\n\`\`\``;
-		} else {
-			if (type === 'uncaughtException') {
-				message += `An exception as occurred in a unknown file\n\t> ${error.message}`;
-				chalkedMessage += `An exception as occurred in a unknown file\n\t> ${error.message}`;
-				embedMessage += `An exception as occurred in a unknown file\n${error.message}`;
-			} else {
-				message += `An unhandled rejection as occurred in a unknown file\n\t> ${error}`;
-				chalkedMessage += `An unhandled rejection as occurred in a unknown file\n\t> ${error}`;
-				embedMessage += `An unhandled rejection as occurred in a unknown file\n${error}`;
-			}
-		}
-
-		if (embedMessage.length > 4096) {
-			const paste = await this.pastebin.createPaste(
-				`${embedTitle}\n${embedMessage}`,
-			);
-			await this.log(
-				'info',
-				'Error embed was too long, uploaded error to pastebin: ' +
-					(paste?.getLink() ?? ''),
-				null,
-				logsConfig.error,
-			);
-			embedMessage = `[Pastebin of the error](https://rentry.co/${paste?.getLink() ?? ''})`;
-		}
+		const message = `(ERROR) ${error.stack ?? error.message}`;
+		const chalkedMessage = `(${chalk.bold.white('ERROR')}) ${chalk.dim.italic(error.stack ?? error.message)}`;
 
 		await this.log('error', message, chalkedMessage, {
 			...logsConfig.error,
@@ -233,13 +198,19 @@ export class Logger {
 				embeds: [
 					{
 						title:
-							embedTitle.length > 256
-								? `${embedTitle.substring(0, 252)}...`
-								: embedTitle,
-						description: embedMessage,
+							type === 'uncaughtException'
+								? 'Uncaught Exception'
+								: 'Unhandled Rejection',
+						description:
+							error.message.length > 4096
+								? `${error.message.slice(0, 4093)}...`
+								: error.message,
 						color: colorsConfig.logError,
 						timestamp: dayjsTimezone().toISOString(),
 					},
+				],
+				files: [
+					new AttachmentBuilder(Buffer.from(error.stack ?? error.message)),
 				],
 			},
 		});
@@ -272,35 +243,13 @@ export class Logger {
 								: '',
 						},
 						title: `Interaction`,
-						thumbnail: {
-							url: guild?.iconURL({ forceStatic: true }) ?? '',
-						},
+						thumbnail: { url: guild?.iconURL({ forceStatic: true }) ?? '' },
 						fields: [
-							{
-								name: 'Type',
-								value: type,
-								inline: true,
-							},
-							{
-								name: '\u200B',
-								value: '\u200B',
-								inline: true,
-							},
-							{
-								name: 'Action',
-								value: action,
-								inline: true,
-							},
-							{
-								name: 'Guild',
-								value: guild?.name ?? 'Unknown',
-								inline: true,
-							},
-							{
-								name: '\u200B',
-								value: '\u200B',
-								inline: true,
-							},
+							{ name: 'Type', value: type, inline: true },
+							{ name: '\u200B', value: '\u200B', inline: true },
+							{ name: 'Action', value: action, inline: true },
+							{ name: 'Guild', value: guild?.name ?? 'Unknown', inline: true },
+							{ name: '\u200B', value: '\u200B', inline: true },
 							{
 								name: 'Channel',
 								value:
@@ -334,14 +283,10 @@ export class Logger {
 					{
 						title: 'New user',
 						description: `**${user.tag}**`,
-						thumbnail: {
-							url: user.displayAvatarURL({ forceStatic: false }),
-						},
+						thumbnail: { url: user.displayAvatarURL({ forceStatic: false }) },
 						color: colorsConfig.logNewUser,
 						timestamp: dayjsTimezone().toISOString(),
-						footer: {
-							text: user.id,
-						},
+						footer: { text: user.id },
 					},
 				],
 			},
@@ -384,12 +329,8 @@ export class Logger {
 								value: `${guild?.memberCount.toString() ?? 'N/A'} members`,
 							},
 						],
-						footer: {
-							text: guild?.id ?? 'Unknown',
-						},
-						thumbnail: {
-							url: guild?.iconURL() ?? '',
-						},
+						footer: { text: guild?.id ?? 'Unknown' },
+						thumbnail: { url: guild?.iconURL() ?? '' },
 						color:
 							type === 'NEW_GUILD'
 								? colorsConfig.logGuildNew
@@ -403,8 +344,8 @@ export class Logger {
 		});
 	}
 
-	getLastLogs(): string[] {
-		return this.lastLogsTail;
+	get lastLogsTail(): string[] {
+		return this._lastLogsTail;
 	}
 
 	async startSpinner(text: string): Promise<void> {
@@ -422,12 +363,7 @@ export class Logger {
 
 		await mkdir(this.logArchivePath, { recursive: true });
 
-		const archive = tar.create({
-			portable: true,
-			gzip: {
-				level: 9,
-			},
-		});
+		const archive = tar.create({ portable: true, gzip: { level: 9 } });
 
 		archive.pipe(
 			createWriteStream(
@@ -599,18 +535,8 @@ export class Logger {
 				`API Server listening on port ${apiConfig.port.toString()}`,
 				chalk.gray(
 					boxen(`API Server listening on port ${chalk.bold(apiConfig.port)}`, {
-						padding: {
-							top: 0,
-							bottom: 0,
-							left: 1,
-							right: 1,
-						},
-						margin: {
-							top: 1,
-							bottom: 0,
-							left: 1,
-							right: 1,
-						},
+						padding: { top: 0, bottom: 0, left: 1, right: 1 },
+						margin: { top: 1, bottom: 0, left: 1, right: 1 },
 						borderStyle: 'round',
 						dimBorder: true,
 					}),
@@ -625,18 +551,8 @@ export class Logger {
 				boxen(
 					`${chalk.bold(this.client.user?.tag ?? 'Bot')} is ${chalk.green('connected')}!`,
 					{
-						padding: {
-							top: 0,
-							bottom: 0,
-							left: 1,
-							right: 1,
-						},
-						margin: {
-							top: 1,
-							bottom: 1,
-							left: 1 * 3,
-							right: 1 * 3,
-						},
+						padding: { top: 0, bottom: 0, left: 1, right: 1 },
+						margin: { top: 1, bottom: 1, left: 1 * 3, right: 1 * 3 },
 						borderStyle: 'round',
 						dimBorder: true,
 					},
