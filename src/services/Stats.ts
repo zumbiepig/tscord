@@ -1,10 +1,9 @@
 import process from 'node:process';
-import os from 'node:os'
+import os from 'node:os';
 
 import { EntityRepository } from '@mikro-orm/core';
 import { Client, SimpleCommandMessage } from 'discordx';
 import nodeOsUtils, { os } from 'node-os-utils';
-import pidusage from 'pidusage';
 import { delay, inject } from 'tsyringe';
 
 import { Guild, Stat, User } from '@/entities';
@@ -19,11 +18,9 @@ import {
 	resolveGuild,
 	resolveUser,
 } from '@/utils/functions';
-import type {
-	InteractionsConstants,
-	StatPerInterval,
-} from '@/utils/types';
+import type { InteractionsConstants, StatPerInterval } from '@/utils/types';
 import type { Interaction } from 'discord.js';
+import { get } from 'node:http';
 
 const allInteractions = {
 	$or: [
@@ -320,20 +317,15 @@ export class Stats {
 	 * Get the current process usage (CPU, RAM, etc).
 	 */
 	async getPidUsage() {
-		const pidUsage = await pidusage(process.pid);
+		const usedMemory = process.memoryUsage().heapUsed;
 
 		return {
-			...pidUsage,
 			pid: process.pid,
 			ppid: process.ppid,
-			cpu2: pidUsage.cpu.toFixed(1),
-			cpu: os.cpus().,
+			cpu: getProcessCPUUsage(),
 			memory: {
-				usedInMb: (pidUsage.memory / (1024 * 1024)).toFixed(1),
-				percentage: (
-					(pidUsage.memory / nodeOsUtils.mem.totalMem()) *
-					100
-				).toFixed(1),
+				usedInMb: usedMemory / (1024 * 1024),
+				percentage: ((usedMemory / os.totalmem()) * 100).toFixed(1),
 			},
 		};
 	}
