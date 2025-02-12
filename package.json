@@ -50,7 +50,7 @@
     "dayjs": "^1.11.13",
     "discord-logs": "^2.2.1",
     "discord-oauth2": "^2.12.1",
-    "discord.js": "^14.17.3",
+    "discord.js": "^14.18.0",
     "discordx": "^11.12.2",
     "dotenv": "^16.4.7",
     "envalid": "^8.0.0",
