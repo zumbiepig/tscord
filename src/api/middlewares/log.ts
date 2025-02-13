@@ -1,11 +1,11 @@
 import { Context, Middleware, PlatformContext } from '@tsed/common';
 import chalk from 'chalk';
+import { injectable } from 'tsyringe';
 
 import { Logger } from '@/services';
-import { Injectable } from '@/utils/decorators';
 
 @Middleware()
-@Injectable()
+@injectable()
 export class Log {
 	constructor(private logger: Logger) {}
 

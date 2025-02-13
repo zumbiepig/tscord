@@ -10,7 +10,7 @@ import {
 import { Guild, User } from '@/entities';
 import { Maintenance } from '@/guards';
 import { Database, EventManager, Logger, Stats } from '@/services';
-import { Injectable, OnCustom } from '@/utils/decorators';
+import {  OnCustom } from '@/utils/decorators';
 import { getPrefixFromMessage, syncUser } from '@/utils/functions';
 
 @Discord()

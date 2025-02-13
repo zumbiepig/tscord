@@ -9,7 +9,7 @@ import {
 import { Discord } from 'discordx';
 
 import { Stats } from '@/services';
-import { Injectable, Slash, SlashOption } from '@/utils/decorators';
+import { Slash, SlashOption } from '@/utils/decorators';
 import type {
 	InteractionData,
 	StatPerInterval,
@@ -62,7 +62,7 @@ const statsResolver: StatsResolverType = [
 ];
 
 @Discord()
-@Injectable()
+@injectable()
 @Category('General')
 export default class StatsCommand {
 	constructor(private stats: Stats) {}

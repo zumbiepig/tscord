@@ -6,7 +6,7 @@ async function getProcessCPUUsage() {
 	const startUsage = process.cpuUsage();
 	const startTime = process.hrtime.bigint(); // High-resolution real time
 
-	await setTimeout(500); // Measure over 500 ms
+	await setTimeout(50); // Measure over 500 ms
 
 	const endUsage = process.cpuUsage(startUsage); // Delta since startUsage
 	const elapsedTime = process.hrtime.bigint() - startTime; // elapsed nanoseconds

@@ -1,19 +1,16 @@
 import { Context, Middleware, PlatformContext } from '@tsed/common';
 import { BadRequest, Unauthorized } from '@tsed/exceptions';
 import DiscordOauth2 from 'discord-oauth2';
+import { injectable } from 'tsyringe';
 
 import env from '@/env';
 import { Store } from '@/services';
-import { Injectable } from '@/utils/decorators';
 import { isDev } from '@/utils/functions';
 
 const discordOauth2 = new DiscordOauth2();
 
-// const fmaTokenRegex = /mfa\.[\w-]{84}/
-// const nonFmaTokenRegex = /[\w-]{24}\.[\w-]{6}\.[\w-]{27}/
-
 @Middleware()
-@Injectable()
+@injectable()
 export class DevAuthenticated {
 	constructor(private store: Store) {}
 

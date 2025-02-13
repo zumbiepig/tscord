@@ -5,11 +5,10 @@ import { DevAuthenticated } from '@/api/middlewares';
 import { Data } from '@/entities';
 import { Database, Logger, Stats } from '@/services';
 import { BaseController } from '@/utils/classes';
-import { Injectable } from '@/utils/decorators';
 import { isInMaintenance } from '@/utils/functions';
 
 @Controller('/health')
-@Injectable()
+@injectable()
 export class HealthController extends BaseController {
 	constructor(
 		private client: Client,

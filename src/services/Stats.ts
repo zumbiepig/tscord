@@ -1,9 +1,9 @@
-import process from 'node:process';
 import os from 'node:os';
+import process from 'node:process';
 
 import { EntityRepository } from '@mikro-orm/core';
+import type { Interaction } from 'discord.js';
 import { Client, SimpleCommandMessage } from 'discordx';
-import nodeOsUtils, { os } from 'node-os-utils';
 import { delay, inject } from 'tsyringe';
 
 import { Guild, Stat, User } from '@/entities';
@@ -12,6 +12,8 @@ import { Schedule, Service } from '@/utils/decorators';
 import {
 	dayjsTimezone,
 	formatDate,
+	getHostCPUUsage,
+	getProcessCPUUsage,
 	getTypeOfInteraction,
 	resolveAction,
 	resolveChannel,
@@ -19,8 +21,6 @@ import {
 	resolveUser,
 } from '@/utils/functions';
 import type { InteractionsConstants, StatPerInterval } from '@/utils/types';
-import type { Interaction } from 'discord.js';
-import { get } from 'node:http';
 
 const allInteractions = {
 	$or: [
@@ -322,7 +322,7 @@ export class Stats {
 		return {
 			pid: process.pid,
 			ppid: process.ppid,
-			cpu: getProcessCPUUsage(),
+			cpu: (await getProcessCPUUsage()).toFixed(1),
 			memory: {
 				usedInMb: usedMemory / (1024 * 1024),
 				percentage: ((usedMemory / os.totalmem()) * 100).toFixed(1),
@@ -335,12 +335,12 @@ export class Stats {
 	 */
 	async getHostUsage() {
 		return {
-			cpu: await nodeOsUtils.cpu.usage(),
-			memory: await nodeOsUtils.mem.info(),
-			os: await nodeOsUtils.os.oos()(),
-			uptime: nodeOsUtils.os.uptime(),
-			hostname: nodeOsUtils.os.hostname(),
-			platform: nodeOsUtils.os.platform(),
+			cpu: (await getHostCPUUsage()).toFixed(1),
+			memory: os.totalmem() - os.freemem(),
+			os: os.type() + os.release(),
+			uptime: os.uptime(),
+			hostname: os.hostname(),
+			platform: process.platform,
 		};
 	}
 

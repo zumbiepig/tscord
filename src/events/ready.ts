@@ -1,13 +1,14 @@
 import { Client, Discord, On } from 'discordx';
+import { injectable } from 'tsyringe';
 
 import { generalConfig } from '@/configs';
 import { Data } from '@/entities';
 import { Database, Logger, Scheduler, Store } from '@/services';
-import { Injectable, Schedule } from '@/utils/decorators';
+import { Schedule } from '@/utils/decorators';
 import { syncAllGuilds } from '@/utils/functions';
 
-@Discord
-@Injectable
+@Discord()
+@injectable()
 export default class ReadyEvent {
 	constructor(
 		private db: Database,

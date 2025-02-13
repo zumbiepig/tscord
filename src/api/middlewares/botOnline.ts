@@ -2,10 +2,10 @@ import { Middleware } from '@tsed/common';
 import { InternalServerError } from '@tsed/exceptions';
 import { Client } from 'discordx';
 
-import { Injectable } from '@/utils/decorators';
+
 
 @Middleware()
-@Injectable()
+@injectable()
 export class BotOnline {
 	constructor(private client: Client) {}
 

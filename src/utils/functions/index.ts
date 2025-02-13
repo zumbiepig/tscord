@@ -12,6 +12,7 @@ export * from './interactions.js';
 export * from './localization.js';
 export * from './maintenance.js';
 export * from './miscellaneous.js';
+export * from './os.js';
 export * from './prefix.js';
 export * from './resolvers.js';
 export * from './string.js';

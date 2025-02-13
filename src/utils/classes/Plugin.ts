@@ -5,15 +5,15 @@ import { join } from 'node:path';
 import { type AnyEntity, type EntityClass } from '@mikro-orm/core';
 import { glob } from 'glob';
 import { coerce, satisfies, valid } from 'semver';
+import { autoInjectable } from 'tsyringe';
 
 import { generalConfig } from '@/configs';
 import { type Locales, locales as i18nLocales, type Translation } from '@/i18n';
 import { Logger } from '@/services';
 import { BaseController } from '@/utils/classes';
-import { AutoInjectable } from '@/utils/decorators';
 import { getTscordVersion, resolveDependency } from '@/utils/functions';
 
-@AutoInjectable()
+@autoInjectable()
 export class Plugin {
 	// Common values
 	private _path: string;

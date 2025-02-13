@@ -9,27 +9,28 @@ import {
 } from 'discord.js';
 import { Client, Discord } from 'discordx';
 import { Guard } from 'discordx';
+import { injectable } from 'tsyringe';
 
 import { colorsConfig, generalConfig } from '@/configs';
 import { Stats } from '@/services';
-import { Injectable, Slash } from '@/utils/decorators';
+import { Slash } from '@/utils/decorators';
 import { dayjsTimezone, isValidUrl } from '@/utils/functions';
 import { getPackageJson, getTscordVersion } from '@/utils/functions';
 
 const links = [
-	...(generalConfig.links?.botInvite
+	...(generalConfig.links.botInvite
 		? [{ label: 'Invite me!', url: generalConfig.links.botInvite }]
 		: []),
-	...(generalConfig.links?.supportServer
+	...(generalConfig.links.supportServer
 		? [{ label: 'Support server', url: generalConfig.links.supportServer }]
 		: []),
-	...(generalConfig.links?.gitRepo
+	...(generalConfig.links.gitRepo
 		? [{ label: 'GitHub', url: generalConfig.links.gitRepo }]
 		: []),
 ];
 
 @Discord()
-@Injectable()
+@injectable()
 @Category('General')
 export default class InfoCommand {
 	constructor(private stats: Stats) {}

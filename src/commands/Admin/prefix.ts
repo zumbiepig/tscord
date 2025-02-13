@@ -6,13 +6,14 @@ import { generalConfig } from '@/configs';
 import { Guild } from '@/entities';
 import { L } from '@/i18n';
 import { Database } from '@/services';
-import { Injectable, Slash, SlashOption } from '@/utils/decorators';
+import { Slash, SlashOption } from '@/utils/decorators';
 import { ReplyUnknownErrorError } from '@/utils/errors';
 import { resolveGuild, simpleSuccessEmbed } from '@/utils/functions';
 import type { InteractionData } from '@/utils/types';
+import { injectable } from 'tsyringe';
 
 @Discord()
-@Injectable()
+@injectable()
 @Category('Admin')
 export default class PrefixCommand {
 	constructor(private db: Database) {}

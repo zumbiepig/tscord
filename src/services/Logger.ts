@@ -2,6 +2,7 @@ import { createReadStream, createWriteStream } from 'node:fs';
 import { appendFile, mkdir, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 
+import archiver from 'archiver';
 import boxen from 'boxen';
 import chalk from 'chalk';
 import {
@@ -15,7 +16,6 @@ import {
 } from 'discord.js';
 import { Client, MetadataStorage } from 'discordx';
 import ora from 'ora';
-import * as tar from 'tar';
 import { delay, inject } from 'tsyringe';
 
 import * as controllers from '@/api/controllers';
@@ -363,7 +363,10 @@ export class Logger {
 
 		await mkdir(this.logArchivePath, { recursive: true });
 
-		const archive = tar.create({ portable: true, gzip: { level: 9 } });
+		const archive = archiver.create('tar', {
+			gzip: true,
+			gzipOptions: { level: 9 },
+		});
 
 		archive.pipe(
 			createWriteStream(
@@ -375,16 +378,20 @@ export class Logger {
 		);
 
 		// add files to the archive
+		const logPaths = [];
 		for (const currentLogPath of (await readdir(this.logPath)).filter((file) =>
 			file.endsWith('.log'),
 		)) {
 			const path = join(this.logPath, currentLogPath);
-			archive.add(createReadStream(path), { name: currentLogPath });
-			await rm(path);
+			archive.append(createReadStream(path), { name: currentLogPath });
+			logPaths.push(path);
 		}
 
 		// create archive
-		archive.end();
+		await archive.finalize();
+
+		// delete archived logs
+		await Promise.all(logPaths.map((path) => rm(path)));
 
 		// retention policy
 		for (const file of await readdir(this.logArchivePath)) {

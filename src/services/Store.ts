@@ -14,9 +14,6 @@ export class RxStore<T> {
 	private _state: BehaviorSubject<T>;
 
 	constructor(initialState: T) {
-		if (initialState === null || initialState === undefined) {
-			throw new Error('Initial state cannot be null or undefined');
-		}
 		this._state = new BehaviorSubject<T>(initialState);
 	}
 
@@ -64,7 +61,10 @@ export class RxStore<T> {
 	 * @returns
 	 */
 	select<K extends keyof T>(key: K): Observable<T[K]> {
-		return this._state.pipe(distinctUntilKeyChanged(key), map(x => x?.[key]));
+		return this._state.pipe(
+			distinctUntilKeyChanged(key),
+			map((x) => x[key]),
+		);
 	}
 
 	/**
