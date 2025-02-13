@@ -33,7 +33,7 @@
     "@mikro-orm/better-sqlite": "^6.4.5",
     "@mikro-orm/core": "^6.4.5",
     "@mikro-orm/entity-generator": "^6.4.5",
-    "@mikro-orm/migrations": "^6.4.5",
+    "@mikro-orm/migrations": "^6.4.6",
     "@mikro-orm/sql-highlighter": "^1.0.1",
     "@tsed/common": "^8.4.7",
     "@tsed/exceptions": "^8.4.7",
