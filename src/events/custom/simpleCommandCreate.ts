@@ -3,17 +3,18 @@ import {
 	Client,
 	Discord,
 	Guard,
+	On,
 	SimpleCommandMessage,
 } from 'discordx';
 
 import { Guild, User } from '@/entities';
 import { Maintenance } from '@/guards';
 import { Database, EventManager, Logger, Stats } from '@/services';
-import { Injectable, On, OnCustom } from '@/utils/decorators';
+import { Injectable, OnCustom } from '@/utils/decorators';
 import { getPrefixFromMessage, syncUser } from '@/utils/functions';
 
 @Discord()
-@Injectable()
+@injectable()
 export default class SimpleCommandCreateEvent {
 	constructor(
 		private stats: Stats,
@@ -35,7 +36,7 @@ export default class SimpleCommandCreateEvent {
 		await this.logger.logInteraction(command);
 	}
 
-	@On('messageCreate')
+	@On({ event: 'messageCreate' })
 	@Guard(Maintenance)
 	async simpleCommandCreateEmitter(
 		[message]: ArgsOf<'messageCreate'>,
@@ -45,9 +46,6 @@ export default class SimpleCommandCreateEvent {
 		const command = await client.parseCommand(prefix, message, false);
 
 		if (command && command instanceof SimpleCommandMessage) {
-			/**
-			 * @param {SimpleCommandMessage} command
-			 */
 			await this.eventManager.emit('simpleCommandCreate', command);
 		}
 	}

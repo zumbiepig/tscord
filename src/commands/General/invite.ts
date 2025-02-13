@@ -14,7 +14,10 @@ export default class InviteCommand {
 		name: 'invite',
 	})
 	@Guard()
-	async invite(interaction: CommandInteraction, { interactionLocale }: InteractionData) {
+	async invite(
+		interaction: CommandInteraction,
+		{ interactionLocale }: InteractionData,
+	) {
 		const embed = new EmbedBuilder()
 			.setTitle(L[interactionLocale].COMMANDS.INVITE.EMBED.TITLE())
 			.setDescription(

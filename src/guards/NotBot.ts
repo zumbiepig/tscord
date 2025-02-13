@@ -1,11 +1,11 @@
 import type { Interaction } from 'discord.js';
 import {
+	SimpleCommandMessage,
 	type ArgsOf,
 	type GuardFunction,
-	SimpleCommandMessage,
 } from 'discordx';
 
-import { resolveUser } from '@/utils/functions';
+import { resolveMember, resolveUser } from '@/utils/functions';
 
 /**
  * Prevent other bots to interact with this bot

@@ -1,5 +1,9 @@
 import { Category } from '@discordx/utilities';
-import { ChatInputCommandInteraction, CommandInteraction, type RepliableInteraction } from 'discord.js';
+import {
+	ChatInputCommandInteraction,
+	CommandInteraction,
+	type RepliableInteraction,
+} from 'discord.js';
 import { Client, Discord } from 'discordx';
 
 import { L } from '@/i18n';
@@ -20,13 +24,13 @@ export default class PingCommand {
 	) {
 		await replyToInteraction(interaction as RepliableInteraction, {
 			content: 'Pinging...',
-		})
+		});
 
 		const content = L[interactionLocale].COMMANDS.PING.MESSAGE({
 			time: msg.createdTimestamp - interaction.createdTimestamp,
 			heartbeat: Math.floor(client.ws.ping).toString(),
 		});
 
-		await replyToInteraction(interaction as RepliableInteraction, content)
+		await replyToInteraction(interaction as RepliableInteraction, content);
 	}
 }

@@ -1,15 +1,15 @@
-import { Message } from 'discord.js';
-import { Discord } from 'discordx';
+import { Discord, On } from 'discordx';
 
 import { Logger } from '@/services';
-import { Injectable, On } from '@/utils/decorators';
+import { injectable } from 'tsyringe';
+import type { Message } from 'discord.js';
 
 @Discord()
-@Injectable()
+@injectable()
 export default class messagePinnedEvent {
 	constructor(private logger: Logger) {}
 
-	@On('messagePinned')
+	@On({ event: 'messagePinned' })
 	async messagePinnedHandler([message]: [Message]) {
 		await this.logger.log(
 			'info',

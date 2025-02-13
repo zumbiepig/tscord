@@ -1,15 +1,15 @@
 import { AutocompleteInteraction } from 'discord.js';
-import { type ArgsOf, Client, Discord, Guard } from 'discordx';
+import { type ArgsOf, Client, Discord, Guard, On } from 'discordx';
+import { injectable } from 'tsyringe';
 
 import { generalConfig } from '@/configs';
 import { Guild, User } from '@/entities';
 import { Maintenance } from '@/guards';
 import { Database, Logger, Stats } from '@/services';
-import { Injectable, On } from '@/utils/decorators';
 import { syncUser } from '@/utils/functions';
 
 @Discord()
-@Injectable()
+@injectable()
 export default class InteractionCreateEvent {
 	constructor(
 		private stats: Stats,
@@ -17,7 +17,7 @@ export default class InteractionCreateEvent {
 		private db: Database,
 	) {}
 
-	@On('interactionCreate')
+	@On({ event: 'interactionCreate'})
 	@Guard(Maintenance)
 	async interactionCreateHandler(
 		[interaction]: ArgsOf<'interactionCreate'>,

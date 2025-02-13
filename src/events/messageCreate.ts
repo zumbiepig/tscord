@@ -1,11 +1,10 @@
-import { type ArgsOf, Client, Discord, Guard } from 'discordx';
+import { type ArgsOf, Client, Discord, Guard, On } from 'discordx';
 
 import { Maintenance } from '@/guards';
-import { On } from '@/utils/decorators';
 
 @Discord()
 export default class MessageCreateEvent {
-	@On('messageCreate')
+	@On({ event: 'messageCreate'})
 	@Guard(Maintenance)
 	async messageCreateHandler(
 		[message]: ArgsOf<'messageCreate'>,

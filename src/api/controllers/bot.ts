@@ -25,17 +25,17 @@ import { generalConfig } from '@/configs';
 import { Guild, User } from '@/entities';
 import { Database } from '@/services';
 import { BaseController } from '@/utils/classes';
-import { Injectable } from '@/utils/decorators';
 import {
 	getDevs,
 	isDev,
 	isInMaintenance,
 	setMaintenance,
 } from '@/utils/functions';
+import { injectable } from 'tsyringe';
 
 @Controller('/bot')
 @UseBefore(BotOnline, DevAuthenticated)
-@Injectable()
+@injectable()
 export class BotController extends BaseController {
 	constructor(
 		private client: Client,

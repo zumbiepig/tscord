@@ -21,7 +21,9 @@ export class Data extends BaseEntity {
 }
 
 export class DataRepository extends EntityRepository<Data> {
-	async get<T extends keyof DataRepositoryType>(key: T): Promise<DataRepositoryType[T]> {
+	async get<T extends keyof DataRepositoryType>(
+		key: T,
+	): Promise<DataRepositoryType[T]> {
 		return JSON.parse(
 			(await this.findOne({ key }))?.value ?? '',
 		) as DataRepositoryType[T];

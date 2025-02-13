@@ -1,11 +1,11 @@
-import { type ArgsOf, Client, Discord } from 'discordx';
+import { type ArgsOf, Client, On } from 'discordx';
 
-import { On } from '@/utils/decorators';
+import { Discord } from '@/utils/decorators';
 import { syncGuild } from '@/utils/functions';
 
-@Discord()
+@Discord
 export default class GuildCreateEvent {
-	@On('guildCreate')
+	@On({ event: 'guildCreate' })
 	async guildCreateHandler([newGuild]: ArgsOf<'guildCreate'>, client: Client) {
 		await syncGuild(newGuild.id, client);
 	}

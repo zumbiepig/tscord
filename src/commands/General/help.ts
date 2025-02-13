@@ -196,11 +196,11 @@ export default class HelpCommand {
 		});
 
 		for (const [category] of this._categories) {
-			const description = L[locale].COMMANDS.HELP.SELECT_MENU.CATEGORY_DESCRIPTION(
-				{
-					category,
-				},
-			);
+			const description = L[
+				locale
+			].COMMANDS.HELP.SELECT_MENU.CATEGORY_DESCRIPTION({
+				category,
+			});
 			optionsForEmbed.push({
 				description,
 				label: category,
@@ -219,8 +219,7 @@ export default class HelpCommand {
 	}
 
 	loadCategories(): void {
-		const commands = MetadataStorage.instance
-			.applicationCommandSlashesFlat;
+		const commands = MetadataStorage.instance.applicationCommandSlashesFlat;
 
 		for (const command of commands) {
 			const { group } = command;

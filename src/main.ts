@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { RequestContext } from '@mikro-orm/core';
 import chalk from 'chalk';
 import chokidar from 'chokidar';
-import { GatewayIntentBits, Partials, Client as DJSClient } from 'discord.js';
+import { GatewayIntentBits, Partials } from 'discord.js';
 import discordLogs from 'discord-logs';
 import {
 	Client,

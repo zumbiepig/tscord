@@ -1,13 +1,13 @@
-import { Client, Discord } from 'discordx';
+import { Client, Discord, On } from 'discordx';
 
 import { generalConfig } from '@/configs';
 import { Data } from '@/entities';
 import { Database, Logger, Scheduler, Store } from '@/services';
-import { Injectable, On, Schedule } from '@/utils/decorators';
+import { Injectable, Schedule } from '@/utils/decorators';
 import { syncAllGuilds } from '@/utils/functions';
 
-@Discord()
-@Injectable()
+@Discord
+@Injectable
 export default class ReadyEvent {
 	constructor(
 		private db: Database,
@@ -19,7 +19,7 @@ export default class ReadyEvent {
 
 	private activityIndex = 0;
 
-	@On('ready')
+	@On({ event: 'ready'})
 	async readyHandler([client]: [Client]) {
 		// make sure all guilds are cached
 		await client.guilds.fetch();
