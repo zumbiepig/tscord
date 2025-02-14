@@ -1,6 +1,7 @@
 {
   "extends": "@tsconfig/strictest",
   "include": ["src/**/*"],
+  //"include": ["src/**/*", "dashboard/**/*", "website/**/*"],
   "compilerOptions": {
     "declaration": true,
     "declarationMap": true,
@@ -8,9 +9,10 @@
     "rootDir": "src",
     "outDir": "dist",
 
-    "lib": ["ESNext", "Decorators", "Decorators.Legacy"],
+    "lib": ["ESNext"],
     "target": "ESNext",
     "module": "NodeNext",
+    //"jsx": "preserve",
 
     "verbatimModuleSyntax": true,
     "resolveJsonModule": true,

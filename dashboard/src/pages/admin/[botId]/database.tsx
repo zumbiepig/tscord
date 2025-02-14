@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react';
 import type { GetServerSideProps, NextPage } from 'next';
-import { unstable_getServerSession } from 'next-auth/next';
+import { getServerSession } from 'next-auth/next';
 import {
   Box,
   Button,
@@ -184,7 +184,7 @@ const DatabasePage: NextPage<AdminDashboardProps> = ({
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { botId } = ctx.query;
-  const session = await unstable_getServerSession(
+  const session = await getServerSession(
     ctx.req,
     ctx.res,
     authOptions,

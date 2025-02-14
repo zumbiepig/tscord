@@ -1,4 +1,4 @@
-import { CommandInteraction, EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, type RepliableInteraction } from 'discord.js';
 
 import { colorsConfig } from '@/configs';
 import { replyToInteraction } from '@/utils/functions';
@@ -9,7 +9,7 @@ import { replyToInteraction } from '@/utils/functions';
  * @param message - message to log
  */
 export async function simpleSuccessEmbed(
-	interaction: CommandInteraction,
+	interaction: RepliableInteraction,
 	message: string,
 ) {
 	const embed = new EmbedBuilder()
@@ -25,7 +25,7 @@ export async function simpleSuccessEmbed(
  * @param message - message to log
  */
 export async function simpleErrorEmbed(
-	interaction: CommandInteraction,
+	interaction: RepliableInteraction,
 	message: string,
 ) {
 	const embed = new EmbedBuilder()

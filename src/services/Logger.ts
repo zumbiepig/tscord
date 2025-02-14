@@ -14,7 +14,7 @@ import {
 	ThreadChannel,
 	User,
 } from 'discord.js';
-import { Client, MetadataStorage } from 'discordx';
+import { Client, MetadataStorage, SimpleCommandMessage } from 'discordx';
 import ora from 'ora';
 import { delay, inject } from 'tsyringe';
 
@@ -220,7 +220,7 @@ export class Logger {
 	 * Logs all interactions.
 	 * @param interaction
 	 */
-	async logInteraction(interaction: Interaction): Promise<void> {
+	async logInteraction(interaction: Interaction | SimpleCommandMessage): Promise<void> {
 		const type = getTypeOfInteraction(interaction);
 
 		const action = resolveAction(interaction);

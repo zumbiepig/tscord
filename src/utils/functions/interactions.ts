@@ -1,17 +1,14 @@
 import { constantCase } from 'change-case';
 import {
 	AutocompleteInteraction,
-	type BaseMessageOptions,
 	type BaseMessageOptionsWithPoll,
 	ButtonInteraction,
 	ChannelSelectMenuInteraction,
 	ChatInputCommandInteraction,
 	ContextMenuCommandInteraction,
 	type Interaction,
-	type InteractionReplyOptions,
 	MentionableSelectMenuInteraction,
 	MessagePayload,
-	type MessageReplyOptions,
 	ModalSubmitInteraction,
 	type RepliableInteraction,
 	RoleSelectMenuInteraction,

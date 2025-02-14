@@ -6,7 +6,9 @@ import {
 	On,
 	SimpleCommandMessage,
 } from 'discordx';
+import { injectable } from 'tsyringe';
 
+import { generalConfig } from '@/configs';
 import { Guild, User } from '@/entities';
 import { Maintenance } from '@/guards';
 import { Database, EventManager, Logger, Stats } from '@/services';
@@ -42,11 +44,13 @@ export default class SimpleCommandCreateEvent {
 		[message]: ArgsOf<'messageCreate'>,
 		client: Client,
 	) {
-		const prefix = await getPrefixFromMessage(message);
-		const command = await client.parseCommand(prefix, message, false);
+		if (generalConfig.simpleCommandsPrefix) {
+			const prefix = await getPrefixFromMessage(message);
+			const command = await client.parseCommand(prefix ?? '', message, false);
 
-		if (command && command instanceof SimpleCommandMessage) {
-			await this.eventManager.emit('simpleCommandCreate', command);
+			if (command && command instanceof SimpleCommandMessage) {
+				await this.eventManager.emit('simpleCommandCreate', command);
+			}
 		}
 	}
 }
