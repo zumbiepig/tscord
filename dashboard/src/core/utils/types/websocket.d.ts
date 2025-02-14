@@ -1,5 +1,5 @@
 type BotsList = {
-    id: string
-    name: string
-    socketId: string
-}[]
+	id: string;
+	name: string;
+	socketId: string;
+}[];

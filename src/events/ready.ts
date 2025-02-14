@@ -20,7 +20,7 @@ export default class ReadyEvent {
 
 	private activityIndex = 0;
 
-	@On({ event: 'ready'})
+	@On({ event: 'ready' })
 	async readyHandler([client]: [Client]) {
 		// make sure all guilds are cached
 		await client.guilds.fetch();

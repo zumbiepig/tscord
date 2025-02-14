@@ -1,58 +1,66 @@
-import React from 'react'
-import { Image, Flex, Menu, MenuButton, MenuItem, MenuList, Text, useColorModeValue } from '@chakra-ui/react'
-import { signOut, useSession } from 'next-auth/react'
+import React from 'react';
+import {
+  Image,
+  Flex,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Text,
+  useColorModeValue,
+} from '@chakra-ui/react';
+import { signOut, useSession } from 'next-auth/react';
 
-import { SidebarResponsive } from '@components/modules'
-import { sidebarConfig } from '@config/sidebar'
-import { ThemeToggler } from '@components/shared'
+import { SidebarResponsive } from '@components/modules';
+import { sidebarConfig } from '@config/sidebar';
+import { ThemeToggler } from '@components/shared';
 
 const signOutHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault()
-    signOut()
-}
+  e.preventDefault();
+  signOut();
+};
 
-type Props = {}
+type Props = {};
 
 export const AdminNavbarLinks: React.FC<Props> = () => {
+  const { data: session } = useSession();
 
-    const { data: session } = useSession()
+  let menuBg = useColorModeValue('white', 'gray.800');
+  const navbarIcon = useColorModeValue('gray.400', 'white');
+  const textColor = useColorModeValue('secondaryGray.900', 'white');
+  const shadow = useColorModeValue(
+    '14px 17px 40px 4px rgba(112, 144, 176, 0.18)',
+    '14px 17px 40px 4px rgba(112, 144, 176, 0.04)',
+  );
 
-    let menuBg = useColorModeValue("white", "gray.800");
-    const navbarIcon = useColorModeValue("gray.400", "white");
-    const textColor = useColorModeValue("secondaryGray.900", "white");
-    const shadow = useColorModeValue(
-        "14px 17px 40px 4px rgba(112, 144, 176, 0.18)",
-        "14px 17px 40px 4px rgba(112, 144, 176, 0.04)"
-    );
+  return (
+    <>
+      <Flex
+        w={{ sm: '100%', md: 'auto' }}
+        alignItems="center"
+        flexDirection="row"
+        justifyContent="space-between"
+        bg={menuBg}
+        flexWrap="unset"
+        p="10px"
+        borderRadius="30px"
+        boxShadow={shadow}
+      >
+        {/* Searchbar */}
 
-	return (<>
-        <Flex
-            w={{ sm: "100%", md: "auto" }}
-            alignItems='center'
-            flexDirection='row'
-            justifyContent='space-between'
-            bg={menuBg}
-            flexWrap="unset"
-            p='10px'
-            borderRadius='30px'
-            boxShadow={shadow}
-        >
-
-            {/* Searchbar */}
-
-            {/* <SearchBar
+        {/* <SearchBar
                 mb={secondary ? { base: "10px", md: "unset" } : "unset"}
                 me='10px'
                 borderRadius='30px'
             /> */}
 
-            {/* Sidebar toggler (when screen width is too small) */}
+        {/* Sidebar toggler (when screen width is too small) */}
 
-            <SidebarResponsive tabs={sidebarConfig.tabs} />
+        <SidebarResponsive tabs={sidebarConfig.tabs} />
 
-            {/* Notifications */}
+        {/* Notifications */}
 
-            {/* <Menu>
+        {/* <Menu>
                 <MenuButton p='0px'>
                     <Icon
                         mt='6px'
@@ -93,67 +101,65 @@ export const AdminNavbarLinks: React.FC<Props> = () => {
                 </MenuList>
             </Menu> */}
 
-            {/* Dark/Light mode toggler button */}
+        {/* Dark/Light mode toggler button */}
 
-            <ThemeToggler mx='1em !important'/>
+        <ThemeToggler mx="1em !important" />
 
-            {/* User */}
+        {/* User */}
 
-            <Menu>
+        <Menu>
+          <MenuButton p="0px">
+            <Image
+              src={session?.user?.image || undefined}
+              alt={session?.user?.name || undefined}
+              w="40px"
+              h="40px"
+              borderRadius="50%"
+            />
+          </MenuButton>
 
-                <MenuButton p='0px'>
-                    <Image
-                        src={session?.user?.image || undefined}
-                        alt={session?.user?.name || undefined}
-                        w='40px'
-                        h='40px'
-                        borderRadius='50%'
-                    />
-                </MenuButton>
+          <MenuList
+            boxShadow={shadow}
+            p="0px"
+            mt="10px"
+            borderRadius="20px"
+            bg={menuBg}
+            border="none"
+          >
+            <Flex w="100%" mb="0px">
+              <Text
+                ps="20px"
+                pt="16px"
+                pb="10px"
+                w="100%"
+                borderBottom="1px solid"
+                borderColor={useColorModeValue(
+                  '#E6ECFA',
+                  'rgba(135, 140, 189, 0.3)',
+                )}
+                fontSize="sm"
+                fontWeight="700"
+                color={textColor}
+              >
+                👋&nbsp; Hey, {session?.user?.name}
+              </Text>
+            </Flex>
 
-                <MenuList
-                    boxShadow={shadow}
-                    p='0px'
-                    mt='10px'
-                    borderRadius='20px'
-                    bg={menuBg}
-                    border='none'
-                >
-                    <Flex w='100%' mb='0px'>
-                        <Text
-                            ps='20px'
-                            pt='16px'
-                            pb='10px'
-                            w='100%'
-                            borderBottom='1px solid'
-                            borderColor={useColorModeValue("#E6ECFA", "rgba(135, 140, 189, 0.3)")}
-                            fontSize='sm'
-                            fontWeight='700'
-                            color={textColor}
-                        >
-                            👋&nbsp; Hey, {session?.user?.name}
-                        </Text>
-                    </Flex>
-
-                    <Flex flexDirection='column' p='10px'>
-
-                        <MenuItem
-                            _hover={{ bg: "none" }}
-                            _focus={{ bg: "none" }}
-                            color='red.400'
-                            borderRadius='8px'
-                            px='14px'
-                            onClick={signOutHandler}
-                        >
-                            <Text fontSize='sm'>Log out</Text>
-                        </MenuItem>
-
-                    </Flex>
-
-                </MenuList>
-
-            </Menu>
-            
-        </Flex>
-    </>)
-}
+            <Flex flexDirection="column" p="10px">
+              <MenuItem
+                _hover={{ bg: 'none' }}
+                _focus={{ bg: 'none' }}
+                color="red.400"
+                borderRadius="8px"
+                px="14px"
+                onClick={signOutHandler}
+              >
+                <Text fontSize="sm">Log out</Text>
+              </MenuItem>
+            </Flex>
+          </MenuList>
+        </Menu>
+      </Flex>
+    </>
+  );
+};

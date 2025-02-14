@@ -1,1 +1,1 @@
-export * from './FetchError'
+export * from './FetchError';

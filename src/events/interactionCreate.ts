@@ -17,7 +17,7 @@ export default class InteractionCreateEvent {
 		private db: Database,
 	) {}
 
-	@On({ event: 'interactionCreate'})
+	@On({ event: 'interactionCreate' })
 	@Guard(Maintenance)
 	async interactionCreateHandler(
 		[interaction]: ArgsOf<'interactionCreate'>,

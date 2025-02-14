@@ -1,8 +1,7 @@
-import Card from './card'
+import Card from './card';
 
 const components = {
+	Card,
+};
 
-    Card,
-}
-
-export default components
+export default components;

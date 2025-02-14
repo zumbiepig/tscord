@@ -1,9 +1,9 @@
 type Rest = {
-    [x: string]: any
-}
+	[x: string]: any;
+};
 
 type AdminDashboardProps = {
-    bots: SanitizededBotConfig[]
-    authorizedBots: BotsState
-    currentBot: SanitizededBotConfig
-}
+	bots: SanitizededBotConfig[];
+	authorizedBots: BotsState;
+	currentBot: SanitizededBotConfig;
+};

@@ -1,7 +1,9 @@
-import { createContext } from 'react'
+import { createContext } from 'react';
 
 type HomePageContextType = {
-    botData: BotData
-}
+	botData: BotData;
+};
 
-export const HomePageContext = createContext<HomePageContextType>({} as HomePageContextType)
+export const HomePageContext = createContext<HomePageContextType>(
+	{} as HomePageContextType,
+);

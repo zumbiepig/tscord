@@ -1,12 +1,11 @@
-import { NextApiRequest, NextApiResponse } from "next"
+import { NextApiRequest, NextApiResponse } from 'next';
 
-import { authorizationCache } from '@core/utils/cache'
+import { authorizationCache } from '@core/utils/cache';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+	authorizationCache.invalidate();
 
-    authorizationCache.invalidate()
+	res.status(200).send('Authorization cache invalidated');
+};
 
-    res.status(200).send('Authorization cache invalidated')
-} 
-
-export default handler
+export default handler;

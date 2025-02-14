@@ -4,7 +4,7 @@ import { Maintenance } from '@/guards';
 
 @Discord()
 export default class MessageCreateEvent {
-	@On({ event: 'messageCreate'})
+	@On({ event: 'messageCreate' })
 	@Guard(Maintenance)
 	async messageCreateHandler(
 		[message]: ArgsOf<'messageCreate'>,

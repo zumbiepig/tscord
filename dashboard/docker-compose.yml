@@ -1,9 +1,8 @@
 version: '3'
 
 services:
-  
   tscord-dashboard:
-    container_name: tscord-dashboard 
+    container_name: tscord-dashboard
     build:
       context: .
       dockerfile: ./Dockerfile

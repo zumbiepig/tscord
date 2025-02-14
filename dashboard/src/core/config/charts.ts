@@ -1,9 +1,9 @@
-import { type ApexOptions } from 'apexcharts'
+import { type ApexOptions } from 'apexcharts';
 
 // const colors = ['#4318FF', '#39B8FF', '#FF9F43', '#FF9F43'],
-export const colors = ['#6247aa', '#815ac0', '#a06cd5', '#c19ee0', '#dac3e8']
-const showGrid = false
-const dropShadow= false
+export const colors = ['#6247aa', '#815ac0', '#a06cd5', '#c19ee0', '#dac3e8'];
+const showGrid = false;
+const dropShadow = false;
 
 export const pieChartOptions: ApexOptions = {
 	colors: colors,
@@ -17,8 +17,8 @@ export const pieChartOptions: ApexOptions = {
 	legend: {
 		show: true,
 		labels: {
-			colors: '#A3AED0'
-		}
+			colors: '#A3AED0',
+		},
 	},
 	dataLabels: {
 		enabled: false,
@@ -41,7 +41,7 @@ export const pieChartOptions: ApexOptions = {
 		enabled: true,
 		theme: 'dark',
 	},
-}
+};
 
 export const barChartOptions: ApexOptions = {
 	chart: {
@@ -50,13 +50,13 @@ export const barChartOptions: ApexOptions = {
 			show: false,
 		},
 		dropShadow: {
-            enabled: dropShadow,
-            top: 5,
-            left: 0,
-            blur: 5,
-            opacity: 0.1,
-            color: '#000000',
-        },
+			enabled: dropShadow,
+			top: 5,
+			left: 0,
+			blur: 5,
+			opacity: 0.1,
+			color: '#000000',
+		},
 	},
 	tooltip: {
 		style: {
@@ -98,7 +98,7 @@ export const barChartOptions: ApexOptions = {
 		yaxis: {
 			lines: {
 				show: true,
-				
+
 				// opacity: 0.5,
 			},
 		},
@@ -112,16 +112,16 @@ export const barChartOptions: ApexOptions = {
 		},
 	},
 	fill: {
-		type: 'solid'
+		type: 'solid',
 	},
 	legend: {
 		labels: {
-            colors: '#A3AED0',
-        },
+			colors: '#A3AED0',
+		},
 		markers: {
 			radius: 100,
-			offsetX: -2
-		}
+			offsetX: -2,
+		},
 	},
 	colors: colors,
 	dataLabels: {
@@ -133,67 +133,67 @@ export const barChartOptions: ApexOptions = {
 			columnWidth: '30px',
 		},
 	},
-}
+};
 
 export const lineChartOptions: ApexOptions = {
-    chart: {
-        toolbar: {
-            show: false
-        },
-    },
-    colors: colors,
-    markers: {
-        size: 0,
-    },
-    tooltip: {
-        theme: 'dark',
-    },
-    dataLabels: {
-        enabled: false,
-    },
-    stroke: {
-        curve: 'smooth',
+	chart: {
+		toolbar: {
+			show: false,
+		},
+	},
+	colors: colors,
+	markers: {
+		size: 0,
+	},
+	tooltip: {
+		theme: 'dark',
+	},
+	dataLabels: {
+		enabled: false,
+	},
+	stroke: {
+		curve: 'smooth',
 		width: 2,
-    },
-    yaxis: {
-        min: 0,
-        forceNiceScale: true,
-        labels: {
-          style: {
-            colors: '#A3AED0',
-            fontSize: '12px',
-            fontWeight: '500',
-          },
-        },
-        axisBorder: {
-          show: false,
-        },
-        axisTicks: {
-          show: false,
-        },
-    },
-    xaxis: {
-        // type: 'numeric',
-        labels: {
-          style: {
-            colors: '#A3AED0',
-            fontSize: '12px',
-            fontWeight: '500',
-          },
-        },
-        axisBorder: {
-          show: false,
-        },
-        axisTicks: {
-          show: false,
-        },
-    },
-    grid: {
-        show: showGrid,
-    },
-    legend: {
-        labels: {
-            colors: '#A3AED0',
-        }
-    }
-}
+	},
+	yaxis: {
+		min: 0,
+		forceNiceScale: true,
+		labels: {
+			style: {
+				colors: '#A3AED0',
+				fontSize: '12px',
+				fontWeight: '500',
+			},
+		},
+		axisBorder: {
+			show: false,
+		},
+		axisTicks: {
+			show: false,
+		},
+	},
+	xaxis: {
+		// type: 'numeric',
+		labels: {
+			style: {
+				colors: '#A3AED0',
+				fontSize: '12px',
+				fontWeight: '500',
+			},
+		},
+		axisBorder: {
+			show: false,
+		},
+		axisTicks: {
+			show: false,
+		},
+	},
+	grid: {
+		show: showGrid,
+	},
+	legend: {
+		labels: {
+			colors: '#A3AED0',
+		},
+	},
+};

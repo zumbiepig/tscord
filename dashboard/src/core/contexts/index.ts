@@ -1,2 +1,2 @@
-export * from './adminDashboard'
-export * from './homePage'
+export * from './adminDashboard';
+export * from './homePage';

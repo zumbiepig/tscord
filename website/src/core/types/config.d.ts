@@ -1,16 +1,14 @@
 type Config = {
+	site: {
+		title: string | null;
+		description: string;
+		icon: string | null;
+	};
 
-    site: {
-        title: string | null
-        description: string
-        icon: string | null
-    }
+	links: {
+		discordInvite: string;
+		footer: { name: string; url: string }[];
+	};
 
-    links: {
-        discordInvite: string
-        footer: { name: string, url: string }[]
-    }
-
-    articlesPath: string
-
-}
+	articlesPath: string;
+};

@@ -4,7 +4,6 @@ import { DevAuthenticated } from '@/api/middlewares';
 import { Stats } from '@/services';
 import { BaseController } from '@/utils/classes';
 
-
 @Controller('/stats')
 @UseBefore(DevAuthenticated)
 @injectable()
