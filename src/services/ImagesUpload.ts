@@ -17,7 +17,7 @@ import { base64Encode, getFileHash } from '@/utils/functions';
 @Service()
 export class ImagesUpload {
 	private validImageExtensions = ['.png', '.jpeg', '.jpg', '.gif'];
-	private imageFolderPath = join('images');
+	private imageFolderPath = join('assets', 'images');
 
 	private imgurClient: ImgurClient | null =
 		generalConfig.automaticUploadImagesToImgur
@@ -122,14 +122,7 @@ export class ImagesUpload {
 	async addNewImageToImgur(imagePath: string, imageHash: string) {
 		if (!this.imgurClient) return;
 
-		const imageFilename = basename(imagePath);
-
 		// upload the image to imgur
-		const uploadResponse = await this.imgurClient.upload({
-			image: await base64Encode(join(this.imageFolderPath, imagePath)),
-			type: 'base64',
-			name: imageFilename,
-		});
 		const uploadResponse = await this.imgurClient.upload({
 			image: Readable.toWeb(
 				createReadStream(join(this.imageFolderPath, imagePath)),
@@ -140,7 +133,7 @@ export class ImagesUpload {
 		if (!uploadResponse.success) {
 			await this.logger.log(
 				'error',
-				`Error uploading image ${imageFilename} to Imgur: ${uploadResponse.status.toString()} ${JSON.stringify(uploadResponse.data)}`,
+				`Error uploading image ${basename(imagePath)} to Imgur: ${uploadResponse.status.toString()} ${JSON.stringify(uploadResponse.data)}`,
 			);
 			return;
 		}
@@ -148,7 +141,7 @@ export class ImagesUpload {
 		// add the image to the database
 		const image = new Image();
 		image.basePath = dirname(imagePath);
-		image.fileName = imageFilename;
+		image.fileName = basename(imagePath);
 		image.url = uploadResponse.data.link;
 		image.size = uploadResponse.data.size;
 		image.hash = imageHash;
