@@ -1,4 +1,5 @@
 import { EmbedBuilder, type RepliableInteraction } from 'discord.js';
+import type { SimpleCommandMessage } from 'discordx';
 
 import { colorsConfig } from '@/configs';
 import { replyToInteraction } from '@/utils/functions';
@@ -9,7 +10,7 @@ import { replyToInteraction } from '@/utils/functions';
  * @param message - message to log
  */
 export async function simpleSuccessEmbed(
-	interaction: RepliableInteraction,
+	interaction: RepliableInteraction | SimpleCommandMessage,
 	message: string,
 ) {
 	const embed = new EmbedBuilder()
@@ -25,7 +26,7 @@ export async function simpleSuccessEmbed(
  * @param message - message to log
  */
 export async function simpleErrorEmbed(
-	interaction: RepliableInteraction,
+	interaction: RepliableInteraction | SimpleCommandMessage,
 	message: string,
 ) {
 	const embed = new EmbedBuilder()

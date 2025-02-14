@@ -1,5 +1,6 @@
 import { constantCase } from 'change-case';
 import {
+	type ApplicationCommandOptionChoiceData,
 	AutocompleteInteraction,
 	type BaseMessageOptionsWithPoll,
 	ButtonInteraction,
@@ -7,8 +8,12 @@ import {
 	ChatInputCommandInteraction,
 	ContextMenuCommandInteraction,
 	type Interaction,
+	type InteractionEditReplyOptions,
+	type InteractionReplyOptions,
 	MentionableSelectMenuInteraction,
+	Message,
 	MessagePayload,
+	type MessageReplyOptions,
 	ModalSubmitInteraction,
 	type RepliableInteraction,
 	RoleSelectMenuInteraction,
@@ -55,15 +60,74 @@ export function getTypeOfInteraction(
  * @param editMessage Whether to edit the original reply or send a new reply.
  */
 export async function replyToInteraction(
-	interaction: RepliableInteraction | SimpleCommandMessage,
+	interaction: RepliableInteraction,
+	message: string | MessagePayload | InteractionEditReplyOptions,
+	editMessage: true,
+): Promise<Message>;
+export async function replyToInteraction(
+	interaction: RepliableInteraction,
+	message: string | MessagePayload | InteractionReplyOptions,
+	editMessage: false,
+): Promise<Message>;
+export async function replyToInteraction(
+	interaction: SimpleCommandMessage | Message,
+	message: string | MessagePayload | MessageReplyOptions,
+): Promise<Message>;
+export async function replyToInteraction(
+	interaction: RepliableInteraction | SimpleCommandMessage | Message,
 	message: string | MessagePayload | BaseMessageOptionsWithPoll,
+	editMessage?: boolean,
+): Promise<Message>;
+export async function replyToInteraction(
+	interaction: AutocompleteInteraction,
+	message: string | ApplicationCommandOptionChoiceData[],
+): Promise<undefined>;
+export async function replyToInteraction(
+	interaction: Interaction | SimpleCommandMessage | Message,
+	message: string,
+	editMessage?: boolean,
+): Promise<Message | undefined>;
+export async function replyToInteraction(
+	interaction: Interaction | SimpleCommandMessage | Message,
+	message:
+		| string
+		| MessagePayload
+		| InteractionReplyOptions
+		| InteractionEditReplyOptions
+		| MessageReplyOptions
+		| BaseMessageOptionsWithPoll
+		| ApplicationCommandOptionChoiceData[],
 	editMessage = true,
 ) {
 	if (interaction instanceof SimpleCommandMessage) {
-		return await interaction.message.reply(message);
+		return await interaction.message.reply(
+			message as string | MessagePayload | MessageReplyOptions,
+		);
+	} else if (interaction instanceof Message) {
+		return await interaction.reply(
+			message as string | MessagePayload | MessageReplyOptions,
+		);
+	} else if (interaction instanceof AutocompleteInteraction) {
+		await interaction.respond(
+			Array.isArray(message)
+				? message
+				: [{ name: message as string, value: message as string }],
+		);
+		return;
 	} else if (editMessage) {
-		return await interaction.editReply(message);
+		return await interaction.editReply(
+			message as string | MessagePayload | InteractionEditReplyOptions,
+		);
 	} else {
-		return await interaction.followUp(message);
+		return await interaction.followUp(
+			message as string | MessagePayload | InteractionReplyOptions,
+		);
 	}
+}
+
+export async function replyToAutocompleteInteraction(
+	interaction: AutocompleteInteraction,
+	options: ApplicationCommandOptionChoiceData[],
+) {
+	await interaction.respond(options);
 }

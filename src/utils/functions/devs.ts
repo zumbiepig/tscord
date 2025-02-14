@@ -18,6 +18,6 @@ export function getDevs(): Snowflake[] {
  * Check if a given user is a dev with its ID
  * @param id Discord user id
  */
-export function isDev(id: string): boolean {
+export function isDev(id: Snowflake): boolean {
 	return getDevs().includes(id);
 }

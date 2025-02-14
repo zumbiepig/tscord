@@ -1,10 +1,11 @@
 import {
 	Entity,
+	EntityRepository,
 	EntityRepositoryType,
 	PrimaryKey,
 	Property,
 } from '@mikro-orm/core';
-import { EntityRepository } from '@mikro-orm/better-sqlite';
+import type { Locale } from 'discord.js';
 
 import { BaseEntity } from '@/utils/classes';
 import { dayjsTimezone } from '@/utils/functions';
@@ -18,11 +19,14 @@ export class User extends BaseEntity {
 
 	@Property()
 	lastInteract: Date = dayjsTimezone().toDate();
+
+	@Property()
+	locale!: Locale;
 }
 
 export class UserRepository extends EntityRepository<User> {
-	async updateLastInteract(userId?: string): Promise<void> {
-		const user = await this.findOne({ id: userId ?? '' });
+	async updateLastInteract(userId: string): Promise<void> {
+		const user = await this.findOne({ id: userId });
 
 		if (user) {
 			user.lastInteract = dayjsTimezone().toDate();

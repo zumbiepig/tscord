@@ -4,7 +4,6 @@ import { ContextMenu as ContextMenuX } from 'discordx';
 
 import {
 	constantPreserveDots,
-	getCallerFile,
 	setOptionsLocalization,
 } from '@/utils/functions';
 import type { ContextMenuOptions, TranslationPath } from '@/utils/types';

@@ -1,6 +1,6 @@
-import { EntityRepository } from '@mikro-orm/better-sqlite';
 import {
 	Entity,
+	EntityRepository,
 	EntityRepositoryType,
 	PrimaryKey,
 	Property,
@@ -16,19 +16,19 @@ export class Guild extends BaseEntity {
 	@PrimaryKey({ autoincrement: false })
 	id!: string;
 
-	@Property({ nullable: true, type: 'string' })
-	prefix!: string | null;
+	@Property()
+	lastInteract: Date = dayjsTimezone().toDate();
 
 	@Property()
 	deleted = false;
 
-	@Property()
-	lastInteract: Date = dayjsTimezone().toDate();
+	@Property({ nullable: true, type: 'string' })
+	prefix!: string | null;
 }
 
 export class GuildRepository extends EntityRepository<Guild> {
-	async updateLastInteract(guildId?: string): Promise<void> {
-		const guild = await this.findOne({ id: guildId ?? '' });
+	async updateLastInteract(guildId: string): Promise<void> {
+		const guild = await this.findOne({ id: guildId });
 
 		if (guild) {
 			guild.lastInteract = dayjsTimezone().toDate();

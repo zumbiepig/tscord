@@ -48,11 +48,7 @@ export class Stats {
 	 * @param value
 	 * @param additionalData in JSON format
 	 */
-	async register(
-		type: InteractionsConstants,
-		value: string,
-		additionalData?: unknown,
-	) {
+	async register(type: string, value: string, additionalData?: unknown) {
 		const stat = new Stat();
 		stat.type = type;
 		stat.value = value;
@@ -77,7 +73,7 @@ export class Stats {
 		};
 
 		// add it to the db
-		await this.register(type, value ?? '', additionalData);
+		await this.register(type, value, additionalData);
 	}
 
 	/**
@@ -137,11 +133,7 @@ export class Stats {
 
 			return slashCommands.sort((a, b) => b.count - a.count);
 		} else if ('aggregate' in this.db.em) {
-			const slashCommands: StatPerInterval = await (
-				this.db.em as keyof typeof this.db.em & {
-					aggregate: (_: unknown, __: unknown) => Promise<StatPerInterval>;
-				}
-			).aggregate(Stat, [
+			const slashCommands: StatPerInterval = await this.db.em.aggregate(Stat, [
 				{
 					$match: allInteractions,
 				},

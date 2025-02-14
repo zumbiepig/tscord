@@ -12,7 +12,7 @@ import { Image, ImageRepository } from '@/entities';
 import env from '@/env';
 import { Database, Logger } from '@/services';
 import { Service } from '@/utils/decorators';
-import { base64Encode, getFileHash } from '@/utils/functions';
+import { getFileHash } from '@/utils/functions';
 
 @Service()
 export class ImagesUpload {

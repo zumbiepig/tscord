@@ -1,7 +1,10 @@
-import { ApplicationCommandOptionType, CommandInteraction } from 'discord.js';
+import {
+	ApplicationCommandOptionType,
+	type RepliableInteraction,
+} from 'discord.js';
 import { Discord, Guard } from 'discordx';
 
-import { Disabled } from '@/guards';
+import { DevsOnly } from '@/guards';
 import { Slash, SlashOption } from '@/utils/decorators';
 import { setMaintenance, simpleSuccessEmbed } from '@/utils/functions';
 import type { InteractionData } from '@/utils/types';
@@ -11,7 +14,7 @@ export default class MaintenanceCommand {
 	@Slash({
 		name: 'maintenance',
 	})
-	@Guard(Disabled)
+	@Guard(DevsOnly)
 	async maintenance(
 		@SlashOption({
 			name: 'state',
@@ -19,7 +22,7 @@ export default class MaintenanceCommand {
 			required: true,
 		})
 		state: boolean,
-		interaction: CommandInteraction,
+		interaction: RepliableInteraction,
 		{ localize }: InteractionData,
 	) {
 		await setMaintenance(state);
@@ -27,7 +30,7 @@ export default class MaintenanceCommand {
 		await simpleSuccessEmbed(
 			interaction,
 			localize.COMMANDS.MAINTENANCE.EMBED.DESCRIPTION({
-				status: state,
+				status: state.toString() as 'true' | 'false',
 			}),
 		);
 	}

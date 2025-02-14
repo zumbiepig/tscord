@@ -1,4 +1,4 @@
-import type { Locale } from 'discord.js';
+import type { TranslationFunctions } from '@/i18n';
 
 export type InteractionsConstants =
 	| 'CHAT_INPUT_COMMAND_INTERACTION'
@@ -10,5 +10,5 @@ export type InteractionsConstants =
 	| 'SIMPLE_COMMAND_MESSAGE';
 
 export interface InteractionData {
-	interactionLocale: Locale;
+	localize: TranslationFunctions;
 }

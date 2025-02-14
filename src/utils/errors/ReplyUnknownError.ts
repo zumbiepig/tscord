@@ -1,16 +1,15 @@
-import { CommandInteraction } from 'discord.js';
+import { type RepliableInteraction } from 'discord.js';
+import type { SimpleCommandMessage } from 'discordx';
 
 import { L } from '@/i18n';
 import { BaseError } from '@/utils/classes';
 import { getLocaleFromInteraction, simpleErrorEmbed } from '@/utils/functions';
 
 export class ReplyUnknownErrorError extends BaseError {
-	private interaction: CommandInteraction;
-
-	constructor(interaction: CommandInteraction, message?: string) {
-		super(message);
-
-		this.interaction = interaction;
+	constructor(
+		private interaction: RepliableInteraction | SimpleCommandMessage,
+	) {
+		super();
 	}
 
 	override async handle() {

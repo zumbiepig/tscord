@@ -1,9 +1,10 @@
+import type { Interaction } from 'discord.js';
+import type { SimpleCommandMessage } from 'discordx';
+
 import { generalConfig } from '@/configs';
 import { L, loadedLocales, type Locales, locales } from '@/i18n';
 import { resolveLocale } from '@/utils/functions';
 import type { SanitizedOptions, TranslationPath } from '@/utils/types';
-import type { Interaction } from 'discord.js';
-import type { SimpleCommandMessage } from 'discordx';
 
 export function getLocalizedInfo(
 	target: 'NAME' | 'DESCRIPTION',

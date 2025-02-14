@@ -1,10 +1,9 @@
 import { AutocompleteInteraction } from 'discord.js';
-import { type ArgsOf, Client, Discord, Guard, On } from 'discordx';
+import { type ArgsOf, Client, Discord, On } from 'discordx';
 import { injectable } from 'tsyringe';
 
 import { generalConfig } from '@/configs';
 import { Guild, User } from '@/entities';
-import { Maintenance } from '@/guards';
 import { Database, Logger, Stats } from '@/services';
 import { syncUser } from '@/utils/functions';
 
@@ -18,7 +17,6 @@ export default class InteractionCreateEvent {
 	) {}
 
 	@On({ event: 'interactionCreate' })
-	@Guard(Maintenance)
 	async interactionCreateHandler(
 		[interaction]: ArgsOf<'interactionCreate'>,
 		client: Client,
@@ -35,7 +33,7 @@ export default class InteractionCreateEvent {
 
 		// update last interaction time of both user and guild
 		await this.db.get(User).updateLastInteract(interaction.user.id);
-		await this.db.get(Guild).updateLastInteract(interaction.guild?.id);
+		await this.db.get(Guild).updateLastInteract(interaction.guild?.id ?? '');
 
 		// register logs and stats
 		await this.stats.registerInteraction(interaction);

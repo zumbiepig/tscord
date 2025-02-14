@@ -10,9 +10,9 @@ import {
 	MessageComponentInteraction,
 	MessageReaction,
 	ModalSubmitInteraction,
-	type PartialMessageReaction,
 	type TextBasedChannel,
 	User,
+	type VoiceBasedChannel,
 	VoiceState,
 } from 'discord.js';
 import { SimpleCommandMessage } from 'discordx';
@@ -26,8 +26,7 @@ export function resolveUser(
 		| SimpleCommandMessage
 		| Message
 		| VoiceState
-		| MessageReaction
-		| PartialMessageReaction,
+		| MessageReaction,
 ): User | null;
 export function resolveUser(
 	interaction:
@@ -35,8 +34,7 @@ export function resolveUser(
 		| SimpleCommandMessage
 		| Message
 		| VoiceState
-		| MessageReaction
-		| PartialMessageReaction,
+		| MessageReaction,
 ): User | null {
 	return interaction instanceof BaseInteraction
 		? interaction.user
@@ -79,28 +77,68 @@ export function resolveMember(
 			: (null as never);
 }
 
+export function resolveGuild(interaction: VoiceState): Guild;
 export function resolveGuild(
-	interaction: BaseInteraction | SimpleCommandMessage,
+	interaction:
+		| BaseInteraction
+		| SimpleCommandMessage
+		| Message
+		| VoiceState
+		| MessageReaction,
+): Guild | null;
+export function resolveGuild(
+	interaction:
+		| BaseInteraction
+		| SimpleCommandMessage
+		| Message
+		| VoiceState
+		| MessageReaction,
 ): Guild | null {
 	return interaction instanceof BaseInteraction
 		? interaction.guild
-		: interaction instanceof SimpleCommandMessage
+		: interaction instanceof SimpleCommandMessage ||
+			  interaction instanceof MessageReaction
 			? interaction.message.guild
-			: (null as never);
+			: interaction instanceof Message || interaction instanceof VoiceState
+				? interaction.guild
+				: (null as never);
 }
 
 export function resolveChannel(
-	interaction: SimpleCommandMessage,
+	interaction: SimpleCommandMessage | Message | MessageReaction,
 ): TextBasedChannel;
 export function resolveChannel(
-	interaction: BaseInteraction | SimpleCommandMessage,
+	interaction:
+		| BaseInteraction
+		| SimpleCommandMessage
+		| Message
+		| MessageReaction,
 ): TextBasedChannel | null;
 export function resolveChannel(
-	interaction: BaseInteraction | SimpleCommandMessage,
-): TextBasedChannel | null {
-	return interaction instanceof BaseInteraction
+	interaction: VoiceState,
+): VoiceBasedChannel | null;
+export function resolveChannel(
+	interaction:
+		| BaseInteraction
+		| SimpleCommandMessage
+		| Message
+		| VoiceState
+		| MessageReaction,
+): TextBasedChannel | VoiceBasedChannel | null;
+export function resolveChannel(
+	interaction:
+		| BaseInteraction
+		| SimpleCommandMessage
+		| Message
+		| VoiceState
+		| MessageReaction,
+): TextBasedChannel | VoiceBasedChannel | null {
+	return interaction instanceof BaseInteraction ||
+		interaction instanceof Message ||
+		interaction instanceof VoiceState
 		? interaction.channel
-		: interaction instanceof SimpleCommandMessage
+		: interaction instanceof SimpleCommandMessage ||
+			  interaction instanceof MessageReaction
 			? interaction.message.channel
 			: (null as never);
 }

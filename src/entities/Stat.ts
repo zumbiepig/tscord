@@ -1,10 +1,10 @@
 import {
 	Entity,
+	EntityRepository,
 	EntityRepositoryType,
 	PrimaryKey,
 	Property,
 } from '@mikro-orm/core';
-import { EntityRepository } from '@mikro-orm/better-sqlite';
 
 import { dayjsTimezone } from '@/utils/functions';
 

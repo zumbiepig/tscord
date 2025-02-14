@@ -1,41 +1,19 @@
-import { CommandInteraction, ContextMenuCommandInteraction } from 'discord.js';
-import {
-	type ArgsOf,
-	type GuardFunction,
-	SimpleCommandMessage,
-} from 'discordx';
+import { type ArgsOf, type GuardFunction } from 'discordx';
 
-import { L } from '@/i18n';
 import {
-	getLocaleFromInteraction,
 	isDev,
 	isInMaintenance,
 	replyToInteraction,
 	resolveUser,
 } from '@/utils/functions';
+import type { InteractionData } from '@/utils/types';
 
 /**
  * Prevent interactions from running when bot is in maintenance
  */
 export const Maintenance: GuardFunction<
-	ArgsOf<'messageCreate' | 'interactionCreate'>
-> = async (arg, _client, next) => {
-	if (
-		(await isInMaintenance()) &&
-		(arg instanceof CommandInteraction ||
-			arg instanceof SimpleCommandMessage ||
-			arg instanceof ContextMenuCommandInteraction)
-	) {
-		const user = resolveUser(arg);
-		if (user?.id && !isDev(user.id)) {
-			await replyToInteraction(
-				arg,
-				L[getLocaleFromInteraction(arg)].GUARDS.MAINTENANCE(),
-			);
-			return;
-		}
-	} else;
-	{
-		return next();
-	}
+	ArgsOf<'interactionCreate' | 'messageCreate'>
+> = async ([arg], _client, next, { localize }: InteractionData) => {
+	if (!(await isInMaintenance()) || isDev(resolveUser(arg).id)) await next();
+	else await replyToInteraction(arg, localize.GUARDS.MAINTENANCE());
 };

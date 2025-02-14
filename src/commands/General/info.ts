@@ -38,7 +38,6 @@ export default class InfoCommand {
 	@Slash({
 		name: 'info',
 	})
-	@Guard()
 	async info(interaction: CommandInteraction, client: Client) {
 		const embed = new EmbedBuilder()
 			.setAuthor({

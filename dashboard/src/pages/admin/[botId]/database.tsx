@@ -184,11 +184,7 @@ const DatabasePage: NextPage<AdminDashboardProps> = ({
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { botId } = ctx.query;
-  const session = await getServerSession(
-    ctx.req,
-    ctx.res,
-    authOptions,
-  );
+  const session = await getServerSession(ctx.req, ctx.res, authOptions);
 
   return await adminDashboardServerSideProps(botId as string, session, ctx.req);
 };

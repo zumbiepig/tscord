@@ -1,28 +1,30 @@
-import { CommandInteraction } from 'discord.js';
-import { type GuardFunction, SimpleCommandMessage } from 'discordx';
-
-import { L } from '@/i18n';
 import {
-	getLocaleFromInteraction,
-	replyToInteraction,
-} from '@/utils/functions';
+	type ArgsOf,
+	type GuardFunction,
+	SimpleCommandMessage,
+} from 'discordx';
+
+import { replyToInteraction } from '@/utils/functions';
+import type { InteractionData } from '@/utils/types';
 
 /**
- * Prevent the command from running on DM
+ * Prevent the command from running in DMs
+ * @param invert Only allow the command to run in DMs
  */
-export const GuildOnly: GuardFunction<
-	CommandInteraction | SimpleCommandMessage
-> = async (arg, _client, next) => {
-	const isInGuild =
-		arg instanceof CommandInteraction ? arg.inGuild() : arg.message.guild;
+export function GuildOnly(
+	invert = false,
+): GuardFunction<ArgsOf<'interactionCreate' | 'messageCreate'>> {
+	return async ([arg], _client, next, { localize }: InteractionData) => {
+		const inGuild =
+			arg instanceof SimpleCommandMessage
+				? arg.message.inGuild()
+				: arg.inGuild();
 
-	if (isInGuild) {
-		return next();
-	} else {
-		await replyToInteraction(
-			arg,
-			L[getLocaleFromInteraction(arg)].GUARDS.GUILD_ONLY(),
-		);
-		return;
-	}
-};
+		if (inGuild === !invert) await next();
+		else
+			await replyToInteraction(
+				arg,
+				localize.GUARDS[invert ? 'DM_ONLY' : 'GUILD_ONLY'](),
+			);
+	};
+}

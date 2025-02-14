@@ -5,10 +5,10 @@ import { Database } from '@/services';
 import { resolveDependency } from '@/utils/functions';
 
 /**
- * Isolate all the handling pipeline to prevent any MikrORM global identity map issues
+ * Isolate all the handling pipeline to prevent any MikroORM global identity map issues
  */
 export const RequestContextIsolator: GuardFunction = async (
-	_,
+	_arg,
 	_client,
 	next,
 ) => {

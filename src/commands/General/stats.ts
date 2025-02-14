@@ -7,7 +7,9 @@ import {
 	User,
 } from 'discord.js';
 import { Discord } from 'discordx';
+import { injectable } from 'tsyringe';
 
+import { colorsConfig } from '@/configs';
 import { Stats } from '@/services';
 import { Slash, SlashOption } from '@/utils/decorators';
 import type {
@@ -15,7 +17,6 @@ import type {
 	StatPerInterval,
 	StatsResolverType,
 } from '@/utils/types';
-import { colorsConfig } from '@/configs';
 
 const statsResolver: StatsResolverType = [
 	{
@@ -147,9 +148,7 @@ export default class StatsCommand {
 			},
 		};
 
-		return `https://quickchart.io/chart?c=${JSON.stringify(obj)}&format=png`
-			.split(' ')
-			.join('%20');
+		return `https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(obj))}&format=png`;
 	}
 
 	getEmbed(author: User, link: string): EmbedBuilder {

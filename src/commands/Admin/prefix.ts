@@ -1,16 +1,18 @@
 import { Category, PermissionGuard } from '@discordx/utilities';
-import { ApplicationCommandOptionType, CommandInteraction } from 'discord.js';
-import { Discord, Guard } from 'discordx';
+import {
+	ApplicationCommandOptionType,
+	type RepliableInteraction,
+} from 'discord.js';
+import { Discord, Guard, SimpleCommandMessage } from 'discordx';
+import { injectable } from 'tsyringe';
 
 import { generalConfig } from '@/configs';
 import { Guild } from '@/entities';
-import { L } from '@/i18n';
 import { Database } from '@/services';
 import { Slash, SlashOption } from '@/utils/decorators';
 import { ReplyUnknownErrorError } from '@/utils/errors';
 import { resolveGuild, simpleSuccessEmbed } from '@/utils/functions';
 import type { InteractionData } from '@/utils/types';
-import { injectable } from 'tsyringe';
 
 @Discord()
 @injectable()
@@ -26,8 +28,8 @@ export default class PrefixCommand {
 			type: ApplicationCommandOptionType.String,
 		})
 		prefix: string | undefined,
-		interaction: CommandInteraction,
-		{ interactionLocale }: InteractionData,
+		interaction: RepliableInteraction | SimpleCommandMessage,
+		{ localize }: InteractionData,
 	) {
 		const guild = resolveGuild(interaction);
 		const guildData = await this.db.get(Guild).findOne({ id: guild?.id ?? '' });
@@ -38,12 +40,10 @@ export default class PrefixCommand {
 
 			await simpleSuccessEmbed(
 				interaction,
-				L[interactionLocale].COMMANDS.PREFIX.EMBED.DESCRIPTION({
-					prefix: prefix ?? generalConfig.simpleCommandsPrefix,
+				localize.COMMANDS.PREFIX.EMBED.DESCRIPTION({
+					prefix: prefix ?? generalConfig.simpleCommandsPrefix ?? '',
 				}),
 			);
-		} else {
-			throw new ReplyUnknownErrorError(interaction);
-		}
+		} else throw new ReplyUnknownErrorError(interaction);
 	}
 }

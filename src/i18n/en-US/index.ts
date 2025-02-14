@@ -3,8 +3,10 @@ import type { Translation } from '../i18n-types.js';
 export default {
 	GUARDS: {
 		DISABLED_COMMAND: 'This command is currently disabled.',
+		DEVS_ONLY: 'This command can only be used by the bot developers.',
 		MAINTENANCE: 'This bot is currently in maintenance mode.',
 		GUILD_ONLY: 'This command can only be used in a server.',
+		DM_ONLY: 'This command can only be used in DMs.',
 		NSFW: 'This command can only be used in a NSFW channel.',
 	},
 	ERRORS: {
@@ -18,7 +20,7 @@ export default {
 			DESCRIPTION: 'Invite the bot to your server!',
 			EMBED: {
 				TITLE: 'Invite me on your server!',
-				DESCRIPTION: '[Click here]({link:string}) to invite me!',
+				DESCRIPTION: '[Click here]({link}) to invite me!',
 			},
 		},
 		PREFIX: {
@@ -31,14 +33,14 @@ export default {
 				},
 			},
 			EMBED: {
-				DESCRIPTION: 'Prefix changed to `{prefix:string}`.',
+				DESCRIPTION: 'Prefix changed to `{prefix}`.',
 			},
 		},
 		MAINTENANCE: {
 			DESCRIPTION: 'Set the maintenance mode of the bot.',
 			EMBED: {
 				DESCRIPTION:
-					'Maintenance mode has been {status | {enabled: enabled, disabled: disabled}}.',
+					'Maintenance mode has been {status|{true:enabled,false:disabled}}.',
 			},
 		},
 		STATS: {

@@ -220,7 +220,9 @@ export class Logger {
 	 * Logs all interactions.
 	 * @param interaction
 	 */
-	async logInteraction(interaction: Interaction | SimpleCommandMessage): Promise<void> {
+	async logInteraction(
+		interaction: Interaction | SimpleCommandMessage,
+	): Promise<void> {
 		const type = getTypeOfInteraction(interaction);
 
 		const action = resolveAction(interaction);

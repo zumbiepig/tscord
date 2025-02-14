@@ -2,11 +2,9 @@ import { Category } from '@discordx/utilities';
 import {
 	ActionRowBuilder,
 	type APISelectMenuOption,
-	ApplicationCommand,
 	CommandInteraction,
 	EmbedBuilder,
 	type Interaction,
-	Locale,
 	StringSelectMenuBuilder,
 	type StringSelectMenuInteraction,
 } from 'discord.js';
@@ -19,7 +17,7 @@ import {
 } from 'discordx';
 
 import { colorsConfig } from '@/configs';
-import { L, type TranslationFunctions } from '@/i18n';
+import { type TranslationFunctions } from '@/i18n';
 import { Slash } from '@/utils/decorators';
 import { chunkArray, resolveGuild, validString } from '@/utils/functions';
 import type { InteractionData } from '@/utils/types';
@@ -39,16 +37,16 @@ export default class HelpCommand {
 	async help(
 		interaction: CommandInteraction,
 		client: Client,
-		{ interactionLocale }: InteractionData,
+		{ localize }: InteractionData,
 	) {
 		const embed = await this.getEmbed({
 			client,
 			interaction,
-			locale: interactionLocale,
+			localize: localize,
 		});
 
 		const components: ActionRowBuilder<StringSelectMenuBuilder>[] = [];
-		components.push(this.getSelectDropdown('categories', interactionLocale));
+		components.push(this.getSelectDropdown('categories', localize));
 
 		await interaction.followUp({
 			embeds: [embed],
@@ -62,7 +60,7 @@ export default class HelpCommand {
 	async selectCategory(
 		interaction: StringSelectMenuInteraction,
 		client: Client,
-		{ interactionLocale }: InteractionData,
+		{ localize }: InteractionData,
 	) {
 		const category = interaction.values[0] ?? '';
 
@@ -70,10 +68,10 @@ export default class HelpCommand {
 			client,
 			interaction,
 			category,
-			locale: interactionLocale,
+			localize: localize,
 		});
 		const components: ActionRowBuilder<StringSelectMenuBuilder>[] = [];
-		components.push(this.getSelectDropdown(category, interactionLocale));
+		components.push(this.getSelectDropdown(category, localize));
 
 		await interaction.update({
 			embeds: [embed],
@@ -86,13 +84,13 @@ export default class HelpCommand {
 		interaction,
 		category = '',
 		pageNumber = 0,
-		locale,
+		localize,
 	}: {
 		client: Client;
 		interaction: CommandInteraction | StringSelectMenuInteraction;
 		category?: string;
 		pageNumber?: number;
-		locale: Locale;
+		localize: TranslationFunctions;
 	}): Promise<EmbedBuilder> {
 		const commands = this._categories.get(category);
 
@@ -105,7 +103,7 @@ export default class HelpCommand {
 						forceStatic: false,
 					}),
 				})
-				.setTitle(L[locale].COMMANDS.HELP.EMBED.TITLE())
+				.setTitle(localize.COMMANDS.HELP.EMBED.TITLE())
 				.setThumbnail(
 					'https://upload.wikimedia.org/wikipedia/commons/a/a4/Cute-Ball-Help-icon.png',
 				)
@@ -147,7 +145,7 @@ export default class HelpCommand {
 					forceStatic: false,
 				}),
 			})
-			.setTitle(L[locale].COMMANDS.HELP.EMBED.CATEGORY_TITLE({ category }))
+			.setTitle(localize.COMMANDS.HELP.EMBED.CATEGORY_TITLE({ category }))
 			.setFooter({
 				text: `${client.user?.username ?? ''} • Page ${(pageNumber + 1).toString()} of ${maxPage.toString()}`,
 			});
@@ -184,23 +182,22 @@ export default class HelpCommand {
 
 	private getSelectDropdown(
 		defaultValue = 'categories',
-		locale: Locale,
+		localize: TranslationFunctions,
 	): ActionRowBuilder<StringSelectMenuBuilder> {
 		const optionsForEmbed: APISelectMenuOption[] = [];
 
 		optionsForEmbed.push({
-			description: L[locale].COMMANDS.HELP.SELECT_MENU.TITLE(),
+			description: localize.COMMANDS.HELP.SELECT_MENU.TITLE(),
 			label: 'Categories',
 			value: 'categories',
 			default: defaultValue === 'categories',
 		});
 
 		for (const [category] of this._categories) {
-			const description = L[
-				locale
-			].COMMANDS.HELP.SELECT_MENU.CATEGORY_DESCRIPTION({
-				category,
-			});
+			const description =
+				localize.COMMANDS.HELP.SELECT_MENU.CATEGORY_DESCRIPTION({
+					category,
+				});
 			optionsForEmbed.push({
 				description,
 				label: category,
