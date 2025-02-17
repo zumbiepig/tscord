@@ -81,7 +81,7 @@
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.10",
-    "type-fest": "^4.34.1",
+    "type-fest": "^4.35.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.24.0"
   },
