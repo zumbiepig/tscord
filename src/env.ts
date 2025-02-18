@@ -1,12 +1,13 @@
 import 'dotenv/config';
 
-import { env } from 'node:process';
+import { env as processEnv } from 'node:process';
 
 import { cleanEnv, host, port, str } from 'envalid';
 
-import { apiConfig, generalConfig, mikroORMConfig } from '@/configs';
+import { apiConfig, generalConfig } from '@/configs';
+import { isSQLiteDatabase } from '@/utils/functions';
 
-export default cleanEnv(env, {
+export const env = cleanEnv(processEnv, {
 	NODE_ENV: str({ choices: ['production', 'development'] }),
 
 	BOT_TOKEN: str(),
@@ -23,23 +24,19 @@ export default cleanEnv(env, {
 	IMGUR_CLIENT_ID: str({ default: '' }),
 });
 
-export const validateEnv = function () {
-	const config =
-		mikroORMConfig[env['NODE_ENV'] as 'production' | 'development'];
-
-	cleanEnv(process.env, {
+export function validateEnv() {
+	cleanEnv(processEnv, {
 		NODE_ENV: str({ choices: ['production', 'development'] }),
 
 		BOT_TOKEN: str(),
 
-		...(!config.dbName &&
-			config.port && {
-				DATABASE_HOST: host(),
-				DATABASE_PORT: port(),
-				DATABASE_NAME: str(),
-				DATABASE_USER: str(),
-				DATABASE_PASSWORD: str(),
-			}),
+		...(!isSQLiteDatabase() && {
+			DATABASE_HOST: host(),
+			DATABASE_PORT: port(),
+			DATABASE_NAME: str(),
+			DATABASE_USER: str(),
+			DATABASE_PASSWORD: str(),
+		}),
 
 		...(apiConfig.enabled && {
 			API_PORT: port(),
@@ -50,4 +47,4 @@ export const validateEnv = function () {
 			IMGUR_CLIENT_ID: str(),
 		}),
 	});
-};
+}

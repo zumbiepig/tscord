@@ -10,7 +10,7 @@ import type {
 	TranslationPath,
 } from '@/utils/types';
 
-export const SlashChoice =(...options: SanitizedOptions[]) =>{
+export const SlashChoice = (...options: SanitizedOptions[]) => {
 	for (let i = 0; i < options.length; i++) {
 		let option = options[i];
 
@@ -44,4 +44,4 @@ export const SlashChoice =(...options: SanitizedOptions[]) =>{
 	else if (typeof options[0] === 'number')
 		return SlashChoiceX(...(options as number[]));
 	else return SlashChoiceX(...(options as SlashChoiceType[]));
-}
+};

@@ -26,7 +26,7 @@ export async function syncUser(user: DUser) {
 		// add user to the db
 		const newUser = new User();
 		newUser.id = user.id;
-		await db.em.persistAndFlush(newUser);
+		await db.orm.em.persistAndFlush(newUser);
 
 		// record new user both in logs and stats
 		await stats.register('NEW_USER', user.id);
@@ -62,7 +62,7 @@ export async function syncGuild(guildId: Snowflake, client: Client) {
 			// recover deleted guild
 
 			deletedGuildData.deleted = false;
-			await db.em.persistAndFlush(deletedGuildData);
+			await db.orm.em.persistAndFlush(deletedGuildData);
 
 			await stats.register('RECOVER_GUILD', guildId);
 			await logger.logGuild('RECOVER_GUILD', guildId);
@@ -71,7 +71,7 @@ export async function syncGuild(guildId: Snowflake, client: Client) {
 
 			const newGuild = new Guild();
 			newGuild.id = guildId;
-			await db.em.persistAndFlush(newGuild);
+			await db.orm.em.persistAndFlush(newGuild);
 
 			await stats.register('NEW_GUILD', guildId);
 			await logger.logGuild('NEW_GUILD', guildId);
@@ -80,7 +80,7 @@ export async function syncGuild(guildId: Snowflake, client: Client) {
 		// guild is deleted but still exists in the database
 
 		guildData.deleted = true;
-		await db.em.persistAndFlush(guildData);
+		await db.orm.em.persistAndFlush(guildData);
 
 		await stats.register('DELETE_GUILD', guildId);
 		await logger.logGuild('DELETE_GUILD', guildId);

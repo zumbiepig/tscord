@@ -1,43 +1,27 @@
 import '@tsed/swagger';
 
-import { CreateRequestContext, MikroORM } from '@mikro-orm/core';
+import { CreateRequestContext } from '@mikro-orm/core';
 import {
 	Inject,
 	PlatformAcceptMimesMiddleware,
 	PlatformApplication,
 } from '@tsed/common';
 import { PlatformExpress } from '@tsed/platform-express';
-import { json, urlencoded } from 'body-parser';
 
 import * as controllers from '@/api/controllers';
 import { Log } from '@/api/middlewares';
 import { apiConfig } from '@/configs';
-import { Database, PluginsManager, Store } from '@/services';
+import { PluginsManager, Store } from '@/services';
 import { Service } from '@/utils/decorators';
 
 @Service()
 export class Server {
 	@Inject() app!: PlatformApplication;
 
-	orm: MikroORM;
-
 	constructor(
 		private pluginsManager: PluginsManager,
 		private store: Store,
-		db: Database,
-	) {
-		this.orm = db.orm;
-	}
-
-	$beforeRoutesInit() {
-		this.app
-			.use(json())
-			.use(urlencoded())
-			.use(Log)
-			.use(PlatformAcceptMimesMiddleware);
-
-		return null;
-	}
+	) {}
 
 	@CreateRequestContext()
 	async start() {
@@ -46,6 +30,7 @@ export class Server {
 			httpPort: apiConfig.port,
 			httpsPort: false,
 			acceptMimes: ['application/json'],
+			middlewares: ['json-parser', Log, PlatformAcceptMimesMiddleware],
 			mount: {
 				'/': [
 					...Object.values(controllers),

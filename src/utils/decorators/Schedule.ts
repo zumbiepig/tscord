@@ -1,10 +1,8 @@
 import { type CronCommand, CronJob } from 'cron';
-import { isValidCron } from 'cron-validator';
 import { container, type InjectionToken } from 'tsyringe';
 
 import { generalConfig } from '@/configs';
 import { Scheduler } from '@/services';
-import { InvalidCronError } from '@/utils/errors';
 
 import { resolveDependency } from '../functions/dependency.js';
 
@@ -14,9 +12,6 @@ import { resolveDependency } from '../functions/dependency.js';
  * @param jobName - name of the job (the name of the function will be used if it is not provided)
  */
 export function Schedule(cronExpression: string) {
-	if (!isValidCron(cronExpression, { alias: true, seconds: true }))
-		throw new InvalidCronError(cronExpression);
-
 	return (
 		target: unknown,
 		propertyKey: string,

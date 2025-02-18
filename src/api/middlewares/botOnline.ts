@@ -1,6 +1,7 @@
 import { Middleware } from '@tsed/common';
 import { InternalServerError } from '@tsed/exceptions';
 import { Client } from 'discordx';
+import { injectable } from 'tsyringe';
 
 @Middleware()
 @injectable()

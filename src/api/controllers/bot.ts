@@ -19,6 +19,7 @@ import {
 	PermissionsBitField,
 } from 'discord.js';
 import { Client, MetadataStorage } from 'discordx';
+import { injectable } from 'tsyringe';
 
 import { BotOnline, DevAuthenticated } from '@/api/middlewares';
 import { generalConfig } from '@/configs';
@@ -31,7 +32,6 @@ import {
 	isInMaintenance,
 	setMaintenance,
 } from '@/utils/functions';
-import { injectable } from 'tsyringe';
 
 @Controller('/bot')
 @UseBefore(BotOnline, DevAuthenticated)

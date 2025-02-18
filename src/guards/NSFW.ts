@@ -9,10 +9,13 @@ import type { InteractionData } from '@/utils/types';
  */
 export function NSFW(
 	invert = false,
-): GuardFunction<ArgsOf<'interactionCreate' | 'messageCreate'>> {
-	return async ([arg], _client, next, { localize }: InteractionData) => {
+): GuardFunction<
+	ArgsOf<'interactionCreate' | 'messageCreate'>,
+	InteractionData
+> {
+	return async ([arg], _client, next, guardData) => {
 		const channel = resolveChannel(arg);
 		if (channel && 'nsfw' in channel && channel.nsfw === !invert) await next();
-		else await replyToInteraction(arg, localize.GUARDS.NSFW());
+		else await replyToInteraction(arg, guardData.localize.GUARDS.NSFW());
 	};
 }

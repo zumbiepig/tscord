@@ -4,7 +4,8 @@ import { Required } from '@tsed/schema';
 import { injectable } from 'tsyringe';
 
 import { DevAuthenticated } from '@/api/middlewares';
-import { databaseConfig } from '@/configs';
+import { databaseConfig, mikroORMConfig } from '@/configs';
+import { env } from '@/env';
 import { Database } from '@/services';
 import { BaseController } from '@/utils/classes';
 import { dayjsTimezone, formatDate } from '@/utils/functions';
@@ -19,14 +20,14 @@ export class DatabaseController extends BaseController {
 
 	@Post('/backup')
 	async generateBackup() {
-		const snapshotName = `snapshot-${formatDate(dayjsTimezone(), 'onlyDateFileName')}-manual-${Date.now().toString()}`;
+		const snapshotName = `snapshot_${formatDate(dayjsTimezone(), 'dbBackup')}_manual_${mikroORMConfig.dbName ?? ''}.backup`;
 		const success = await this.db.backup(snapshotName);
 
 		if (success) {
 			return {
 				message: 'Backup generated',
 				data: {
-					snapshotName: `${snapshotName}.txt`,
+					snapshotName: snapshotName,
 				},
 			};
 		} else {

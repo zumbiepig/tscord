@@ -1,13 +1,13 @@
-import type { Options } from '@mikro-orm/core';
+import type { ConnectionOptions, MikroORMOptions } from '@mikro-orm/core';
 import type {
 	ActivitiesOptions,
 	Colors,
 	PresenceStatusData,
 	Snowflake,
 } from 'discord.js';
-import type { ValueOf } from 'type-fest';
+import type { SetRequiredDeep, ValueOf } from 'type-fest';
 
-import type env from '@/env';
+import type { env } from '@/env';
 import type { Locales } from '@/i18n';
 import type { Timezone } from '@/utils/types';
 
@@ -41,7 +41,13 @@ export interface DatabaseConfigType {
 	enableBackups: boolean;
 }
 
-export type MikroORMConfigType = Record<typeof env.NODE_ENV, Options>;
+export type MikroORMConfigType = SetRequiredDeep<
+	Record<
+		typeof env.NODE_ENV,
+		Pick<MikroORMOptions, 'driver'> & ConnectionOptions
+	>,
+	'production.driver'
+>;
 
 interface LogsConfigCategoryType {
 	console: boolean;

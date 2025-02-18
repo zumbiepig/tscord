@@ -4,12 +4,18 @@ import { createWriteStream } from 'node:fs';
 import { mkdir, open, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
+import { BetterSqliteDriver } from '@mikro-orm/better-sqlite';
 import chalk from 'chalk';
 
+import { mikroORMConfig } from '@/configs';
 import { Data } from '@/entities';
 import { Database, Logger } from '@/services';
 import { resolveDependency } from '@/utils/functions';
 import type { DataRepositoryType } from '@/utils/types';
+
+export function isSQLiteDatabase() {
+	return mikroORMConfig.driver === BetterSqliteDriver;
+}
 
 /**
  * Initiate the EAV Data table with the default data (dynamic EAV key/value pattern).

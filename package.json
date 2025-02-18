@@ -7,14 +7,14 @@
   "type": "module",
   "main": "dist/main.js",
   "module": "src/main.ts",
+  "packageManager": "yarn@4.6.0",
   "engines": {
     "node": ">=22",
     "npm": ">=10"
   },
   "engineStrict": true,
   "scripts": {
-    "install": "installoop --rootDir=./src/plugins/*",
-    "postinstall": "npm run i18n",
+    "postinstall": "installoop --rootDir=./src/plugins/* && npm run i18n",
     "start": "cross-env NODE_ENV=production node .",
     "dev": "npm-run-all --parallel i18n:watch dev:dev",
     "dev:dev": "cross-env NODE_ENV=development ts-node src/main.ts",
@@ -35,13 +35,12 @@
     "@mikro-orm/entity-generator": "^6.4.6",
     "@mikro-orm/migrations": "^6.4.6",
     "@mikro-orm/sql-highlighter": "^1.0.1",
-    "@tsed/common": "^8.4.7",
-    "@tsed/exceptions": "^8.4.7",
-    "@tsed/platform-express": "^8.4.7",
-    "@tsed/schema": "^8.4.7",
-    "@tsed/swagger": "^8.4.7",
+    "@tsed/common": "^8.5.0",
+    "@tsed/exceptions": "^8.5.0",
+    "@tsed/platform-express": "^8.5.0",
+    "@tsed/schema": "^8.5.0",
+    "@tsed/swagger": "^8.5.0",
     "archiver": "^7.0.1",
-    "body-parser": "^1.20.3",
     "boxen": "^8.0.1",
     "chalk": "^5.4.1",
     "change-case": "^5.4.4",
@@ -66,9 +65,10 @@
   },
   "devDependencies": {
     "@tsconfig/node-lts": "^22.0.1",
+    "@tsconfig/node-ts": "^23.6.0",
     "@tsconfig/strictest": "^2.0.5",
     "@types/archiver": "^6.0.3",
-    "@types/node": "^22.13.3",
+    "@types/node": "^22.13.4",
     "@types/semver": "^7.5.8",
     "cross-env": "^7.0.3",
     "eslint": "^9.20.1",
@@ -81,9 +81,9 @@
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.10",
-    "type-fest": "^4.34.1",
+    "type-fest": "^4.35.0",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.24.0"
+    "typescript-eslint": "^8.24.1"
   },
   "tscord": {
     "version": "2.6"

@@ -13,8 +13,11 @@ import type { InteractionData } from '@/utils/types';
  */
 export function GuildOnly(
 	invert = false,
-): GuardFunction<ArgsOf<'interactionCreate' | 'messageCreate'>> {
-	return async ([arg], _client, next, { localize }: InteractionData) => {
+): GuardFunction<
+	ArgsOf<'interactionCreate' | 'messageCreate'>,
+	InteractionData
+> {
+	return async ([arg], _client, next, guardData) => {
 		const inGuild =
 			arg instanceof SimpleCommandMessage
 				? arg.message.inGuild()
@@ -24,7 +27,7 @@ export function GuildOnly(
 		else
 			await replyToInteraction(
 				arg,
-				localize.GUARDS[invert ? 'DM_ONLY' : 'GUILD_ONLY'](),
+				guardData.localize.GUARDS[invert ? 'DM_ONLY' : 'GUILD_ONLY'](),
 			);
 	};
 }

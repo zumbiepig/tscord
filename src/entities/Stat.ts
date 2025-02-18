@@ -6,26 +6,24 @@ import {
 	Property,
 } from '@mikro-orm/core';
 
-import { dayjsTimezone } from '@/utils/functions';
+import { BaseEntity } from '@/utils/classes';
+import type { StatType } from '@/utils/types';
 
 @Entity({ repository: () => StatRepository })
-export class Stat {
-	[EntityRepositoryType]?: StatRepository;
+export class Stat extends BaseEntity {
+	[EntityRepositoryType]!: StatRepository;
 
 	@PrimaryKey()
 	id!: number;
 
 	@Property()
-	type!: string;
+	type!: StatType;
 
 	@Property()
-	value = '';
+	value!: string;
 
 	@Property({ type: 'json', nullable: true })
 	additionalData?: unknown;
-
-	@Property()
-	createdAt: Date = dayjsTimezone().toDate();
 }
 
 export class StatRepository extends EntityRepository<Stat> {}

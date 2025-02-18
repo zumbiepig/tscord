@@ -11,13 +11,13 @@ import type { DataRepositoryType } from '@/utils/types';
 
 @Entity({ repository: () => DataRepository })
 export class Data extends BaseEntity {
-	[EntityRepositoryType]?: DataRepository;
+	[EntityRepositoryType]!: DataRepository;
 
 	@PrimaryKey()
 	key!: string;
 
 	@Property()
-	value = '';
+	value!: string;
 }
 
 export class DataRepository extends EntityRepository<Data> {

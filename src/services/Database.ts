@@ -9,7 +9,7 @@ import { delay, inject } from 'tsyringe';
 
 import { databaseConfig, mikroORMConfig } from '@/configs';
 import * as entities from '@/entities';
-import env from '@/env';
+import { env } from '@/env';
 import { Logger, PluginsManager, Store } from '@/services';
 import { Schedule, Service } from '@/utils/decorators';
 import {
@@ -17,23 +17,24 @@ import {
 	dayjsTimezone,
 	formatDate,
 	getFolderSize,
+	isSQLiteDatabase,
 	restoreDatabase,
 } from '@/utils/functions';
 
 @Service()
 export class Database {
-	private _orm!: MikroORM;
-	private mikroORMConfig!: Options;
+	private _orm!: MikroORM<InstanceType<(typeof mikroORMConfig)['driver']>>;
+	private mikroORMConfig!: Options<InstanceType<(typeof mikroORMConfig)['driver']>>;
 
 	constructor(
 		@inject(delay(() => Store)) private store: Store,
 		@inject(delay(() => Logger)) private logger: Logger,
 		@inject(delay(() => PluginsManager)) private pluginsManager: PluginsManager,
-	) {
+	) {}
+
+	async initialize() {
 		// set config
 		this.mikroORMConfig = {
-			...mikroORMConfig[env.NODE_ENV],
-
 			entities: [
 				...Object.values(entities),
 				...this.pluginsManager.getEntities(),
@@ -46,12 +47,14 @@ export class Database {
 			migrations: {
 				path: join(databaseConfig.path, 'migrations'),
 			},
-		};
-	}
 
-	async initialize() {
+			...mikroORMConfig,
+		};
+
 		// initialize the ORM using the configuration exported in `mikro-orm.config.ts`
-		this._orm = await MikroORM.init(this.mikroORMConfig);
+		this._orm = await MikroORM.init<
+			InstanceType<(typeof mikroORMConfig)['driver']>
+		>(this.mikroORMConfig);
 
 		if (!this.store.get('botHasBeenReloaded')) {
 			const migrator = this._orm.getMigrator();
@@ -77,10 +80,6 @@ export class Database {
 		return this._orm;
 	}
 
-	get em() {
-		return this._orm.em;
-	}
-
 	/**
 	 * Shorthand to get custom and natives repositories
 	 * @param entity Entity of the custom repository to get
@@ -97,7 +96,7 @@ export class Database {
 	async backup(snapshotFile?: string): Promise<boolean> {
 		if (!databaseConfig.enableBackups && !snapshotFile) return false;
 
-		if (!this.isSQLiteDatabase()) {
+		if (!isSQLiteDatabase()) {
 			await this.logger.log('warn', "Database is not SQLite, couldn't backup");
 			return false;
 		}
@@ -111,8 +110,9 @@ export class Database {
 		}
 
 		if (!snapshotFile)
-			snapshotFile = `snapshot-${formatDate(dayjsTimezone(), 'dbBackup')}_${mikroORMConfig[env.NODE_ENV].dbName ?? ''}.db.backup`;
+			snapshotFile = `snapshot_${formatDate(dayjsTimezone(), 'dbBackup')}_${mikroORMConfig[env.NODE_ENV].dbName ?? ''}.backup`;
 
+		await this._orm.em.flush();
 		await backupDatabase(
 			mikroORMConfig[env.NODE_ENV].dbName ?? '',
 			join(databaseConfig.path, 'backups', snapshotFile),
@@ -127,7 +127,7 @@ export class Database {
 	 * @returns true if the snapshot has been restored, false otherwise
 	 */
 	async restore(snapshotFile: string): Promise<boolean> {
-		if (!this.isSQLiteDatabase()) {
+		if (!isSQLiteDatabase()) {
 			await this.logger.log(
 				'error',
 				"Database is not SQLite, couldn't restore",
@@ -143,13 +143,15 @@ export class Database {
 			return false;
 		}
 
-		await stat(join(databaseConfig.path, 'backups', snapshotFile)).catch(async () => {
-			await this.logger.log(
-				'error',
-				`Snapshot ${snapshotFile} does not exist, couldn't restore backup`,
-			);
-			return false;
-		});
+		await stat(join(databaseConfig.path, 'backups', snapshotFile)).catch(
+			async () => {
+				await this.logger.log(
+					'error',
+					`Snapshot ${snapshotFile} does not exist, couldn't restore backup`,
+				);
+				return false;
+			},
+		);
 
 		await restoreDatabase(
 			mikroORMConfig[env.NODE_ENV].dbName ?? '',
@@ -176,10 +178,11 @@ export class Database {
 	}
 
 	async getSize() {
-		const dbName = mikroORMConfig[env.NODE_ENV].dbName;
 		const backupPath = join(databaseConfig.path, 'backups');
 		return {
-			db: this.isSQLiteDatabase() ? (await stat(dbName ?? '')).size : null,
+			db: isSQLiteDatabase()
+				? (await stat(mikroORMConfig.dbName ?? '')).size
+				: null,
 			backups: await getFolderSize(backupPath).catch((err: unknown) => {
 				if (
 					err instanceof Error &&
@@ -189,14 +192,5 @@ export class Database {
 				else throw err;
 			}),
 		};
-	}
-
-	isSQLiteDatabase(): boolean {
-		const config = mikroORMConfig[env.NODE_ENV];
-		return (
-			'dbName' in config &&
-			!!config.dbName &&
-			!('port' in config && !!config.port)
-		);
 	}
 }

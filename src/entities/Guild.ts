@@ -5,16 +5,17 @@ import {
 	PrimaryKey,
 	Property,
 } from '@mikro-orm/core';
+import type { Snowflake } from 'discord.js';
 
 import { BaseEntity } from '@/utils/classes';
 import { dayjsTimezone } from '@/utils/functions';
 
 @Entity({ repository: () => GuildRepository })
 export class Guild extends BaseEntity {
-	[EntityRepositoryType]?: GuildRepository;
+	[EntityRepositoryType]!: GuildRepository;
 
 	@PrimaryKey({ autoincrement: false })
-	id!: string;
+	id!: Snowflake;
 
 	@Property()
 	lastInteract: Date = dayjsTimezone().toDate();
@@ -27,7 +28,7 @@ export class Guild extends BaseEntity {
 }
 
 export class GuildRepository extends EntityRepository<Guild> {
-	async updateLastInteract(guildId: string): Promise<void> {
+	async updateLastInteract(guildId: Snowflake): Promise<void> {
 		const guild = await this.findOne({ id: guildId });
 
 		if (guild) {

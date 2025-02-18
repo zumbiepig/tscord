@@ -10,7 +10,7 @@ import { BaseEntity } from '@/utils/classes';
 
 @Entity({ repository: () => ImageRepository })
 export class Image extends BaseEntity {
-	[EntityRepositoryType]?: ImageRepository;
+	[EntityRepositoryType]!: ImageRepository;
 
 	@PrimaryKey()
 	id!: number;

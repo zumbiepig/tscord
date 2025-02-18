@@ -1,7 +1,6 @@
 import { join } from 'node:path';
 
-import { BetterSqliteDriver } from '@mikro-orm/better-sqlite';
-
+import { env } from '@/env';
 import type { DatabaseConfigType, MikroORMConfigType } from '@/utils/types';
 
 export const databaseConfig: DatabaseConfigType = {
@@ -9,46 +8,46 @@ export const databaseConfig: DatabaseConfigType = {
 	enableBackups: true, // enabling automated backups of the database (ONLY FOR SQLITE)
 };
 
-const envMikroORMConfig: MikroORMConfigType = {
+const envConfig: MikroORMConfigType = {
 	production: {
 		/**
 		 * SQLite
 		 */
-		driver: BetterSqliteDriver,
-		dbName: join(databaseConfig.path, 'db.sqlite'),
+		driver: (await import('@mikro-orm/better-sqlite')).BetterSqliteDriver,
+		dbName: join(databaseConfig.path, 'tscord.db'),
 
 		/**
 		 * MongoDB
 		 */
-		/* driver: MongoDriver,
-		clientUrl: env.DATABASE_HOST, */
+		// driver: (await import('@mikro-orm/mongodb')).MongoDriver,
+		// clientUrl: env.DATABASE_HOST,
 
 		/**
-		 * MariaDB (this will work with MySQL as well)
+		 * MariaDB (works with MySQL too)
 		 */
-		/* driver: MariaDbDriver,
-		dbName: env.DATABASE_NAME,
-		host: env.DATABASE_HOST,
-		port: env.DATABASE_PORT,
-		user: env.DATABASE_USER,
-		password: env.DATABASE_PASSWORD, */
+		// driver: (await import('@mikro-orm/mariadb')).MariaDbDriver,
+		// dbName: env.DATABASE_NAME,
+		// host: env.DATABASE_HOST,
+		// port: env.DATABASE_PORT,
+		// user: env.DATABASE_USER,
+		// password: env.DATABASE_PASSWORD,
 
 		/**
-		 * PostgreSQL
+		 * PostgreSQL (works with CockroachDB too)
 		 */
-		/* driver: PostgreSqlDriver,
-		dbName: env.DATABASE_NAME,
-		host: env.DATABASE_HOST,
-		port: env.DATABASE_PORT,
-		user: env.DATABASE_USER,
-		password: env.DATABASE_PASSWORD, */
+		// driver: (await import('@mikro-orm/postgresql')).PostgreSqlDriver,
+		// dbName: env.DATABASE_NAME,
+		// host: env.DATABASE_HOST,
+		// port: env.DATABASE_PORT,
+		// user: env.DATABASE_USER,
+		// password: env.DATABASE_PASSWORD,
 	},
 	development: {
-		// leave blank to autofill from production
+		// put development overrides here
 	},
 };
 
 export const mikroORMConfig =
-	Object.keys(envMikroORMConfig.development).length === 0
-		? { ...envMikroORMConfig, development: envMikroORMConfig.production }
-		: envMikroORMConfig;
+	env.NODE_ENV === 'development'
+		? { ...envConfig.production, ...envConfig.development }
+		: envConfig.production;

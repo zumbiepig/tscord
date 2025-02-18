@@ -1,5 +1,6 @@
 import { Controller, Get, UseBefore } from '@tsed/common';
 import { Client } from 'discordx';
+import { injectable } from 'tsyringe';
 
 import { DevAuthenticated } from '@/api/middlewares';
 import { Data } from '@/entities';

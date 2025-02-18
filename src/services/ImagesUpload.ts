@@ -9,7 +9,7 @@ import { ImgurClient } from 'imgur';
 
 import { generalConfig } from '@/configs';
 import { Image, ImageRepository } from '@/entities';
-import env from '@/env';
+import { env } from '@/env';
 import { Database, Logger } from '@/services';
 import { Service } from '@/utils/decorators';
 import { getFileHash } from '@/utils/functions';
@@ -72,7 +72,7 @@ export class ImagesUpload {
 			if (!images.includes(imagePath)) {
 				// delete the image if it is not in the filesystem anymore
 				await this.imageRepo.nativeDelete(image);
-				await this.db.em.flush();
+				await this.db.orm.em.flush();
 				await this.deleteImageFromImgur(image);
 			} else if (!(await this.isImgurImageValid(image.url))) {
 				// reupload if the image is not on imgur anymore
@@ -146,7 +146,7 @@ export class ImagesUpload {
 		image.size = uploadResponse.data.size;
 		image.hash = imageHash;
 		image.deleteHash = uploadResponse.data.deletehash ?? '';
-		await this.db.em.persistAndFlush(image);
+		await this.db.orm.em.persistAndFlush(image);
 
 		// log the success
 		await this.logger.log(

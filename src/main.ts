@@ -2,6 +2,7 @@ import 'reflect-metadata';
 
 import { join } from 'node:path';
 
+import { NotBot } from '@discordx/utilities';
 import { RequestContext } from '@mikro-orm/core';
 import chalk from 'chalk';
 import chokidar from 'chokidar';
@@ -18,7 +19,7 @@ import type { constructor } from 'tsyringe/dist/typings/types';
 
 import { Server } from '@/api/server';
 import { apiConfig, generalConfig } from '@/configs';
-import env, { validateEnv } from '@/env';
+import { env, validateEnv } from '@/env';
 import { ExtractLocale, Maintenance, RequestContextIsolator } from '@/guards';
 import {
 	Database,
@@ -31,7 +32,6 @@ import {
 } from '@/services';
 import { keptInstances } from '@/utils/decorators';
 import { initDataTable, resolveDependency } from '@/utils/functions';
-import { NotBot } from '@discordx/utilities';
 
 /** 0: Not reloading, 1: Reloading, 2: Reload requested */
 let reloadingState = 0;

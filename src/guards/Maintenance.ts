@@ -12,8 +12,9 @@ import type { InteractionData } from '@/utils/types';
  * Prevent interactions from running when bot is in maintenance
  */
 export const Maintenance: GuardFunction<
-	ArgsOf<'interactionCreate' | 'messageCreate'>
-> = async ([arg], _client, next, { localize }: InteractionData) => {
+	ArgsOf<'interactionCreate' | 'messageCreate'>,
+	InteractionData
+> = async ([arg], _client, next, guardData) => {
 	if (!(await isInMaintenance()) || isDev(resolveUser(arg).id)) await next();
-	else await replyToInteraction(arg, localize.GUARDS.MAINTENANCE());
+	else await replyToInteraction(arg, guardData.localize.GUARDS.MAINTENANCE());
 };

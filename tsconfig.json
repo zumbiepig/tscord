@@ -1,5 +1,5 @@
 {
-  "extends": "@tsconfig/strictest",
+  "extends": ["@tsconfig/node-lts", "@tsconfig/node-ts", "@tsconfig/strictest"],
   "include": ["src/**/*"],
   //"include": ["src/**/*", "dashboard/**/*", "website/**/*"],
   "compilerOptions": {

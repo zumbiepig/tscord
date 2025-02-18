@@ -20,7 +20,7 @@ import {
 	resolveGuild,
 	resolveUser,
 } from '@/utils/functions';
-import type { InteractionsConstants, StatPerInterval } from '@/utils/types';
+import type { StatPerInterval, StatType } from '@/utils/types';
 
 const allInteractions = {
 	$or: [
@@ -48,13 +48,13 @@ export class Stats {
 	 * @param value
 	 * @param additionalData in JSON format
 	 */
-	async register(type: string, value: string, additionalData?: unknown) {
+	async register(type: StatType, value: string, additionalData?: unknown) {
 		const stat = new Stat();
 		stat.type = type;
 		stat.value = value;
 		if (additionalData) stat.additionalData = additionalData;
 
-		await this.db.em.persistAndFlush(stat);
+		await this.db.orm.em.persistAndFlush(stat);
 	}
 
 	/**
@@ -122,8 +122,8 @@ export class Stats {
 	 * Get commands sorted by total amount of uses in DESC order.
 	 */
 	async getTopCommands() {
-		if ('createQueryBuilder' in this.db.em) {
-			const qb = this.db.em.createQueryBuilder(Stat);
+		if ('createQueryBuilder' in this.db.orm.em) {
+			const qb = this.db.orm.em.createQueryBuilder(Stat);
 			const query = qb
 				.select(['type', 'value as name', 'count(*) as count'])
 				.where(allInteractions)
@@ -132,8 +132,8 @@ export class Stats {
 			const slashCommands: StatPerInterval = await query.execute();
 
 			return slashCommands.sort((a, b) => b.count - a.count);
-		} else if ('aggregate' in this.db.em) {
-			const slashCommands: StatPerInterval = await this.db.em.aggregate(Stat, [
+		} else if ('aggregate' in this.db.orm.em) {
+			const slashCommands: StatPerInterval = await this.db.orm.em.aggregate(Stat, [
 				{
 					$match: allInteractions,
 				},
@@ -231,7 +231,7 @@ export class Stats {
 	 * @param days interval of days from now
 	 */
 	async countStatsPerDays(
-		type: InteractionsConstants,
+		type: string,
 		days: number,
 	): Promise<StatPerInterval> {
 		const stats: StatPerInterval = [];

@@ -1,4 +1,5 @@
 import { Controller, Get, QueryParams, UseBefore } from '@tsed/common';
+import { injectable } from 'tsyringe';
 
 import { DevAuthenticated } from '@/api/middlewares';
 import { Stats } from '@/services';

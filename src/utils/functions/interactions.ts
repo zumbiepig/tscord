@@ -12,12 +12,14 @@ import {
 	type InteractionReplyOptions,
 	MentionableSelectMenuInteraction,
 	Message,
+	MessageContextMenuCommandInteraction,
 	MessagePayload,
 	type MessageReplyOptions,
 	ModalSubmitInteraction,
 	type RepliableInteraction,
 	RoleSelectMenuInteraction,
 	StringSelectMenuInteraction,
+	UserContextMenuCommandInteraction,
 	UserSelectMenuInteraction,
 } from 'discord.js';
 import { SimpleCommandMessage } from 'discordx';
@@ -27,8 +29,10 @@ export function getTypeOfInteraction(
 ) {
 	if (interaction instanceof ChatInputCommandInteraction) {
 		return 'CHAT_INPUT_COMMAND_INTERACTION';
-	} else if (interaction instanceof ContextMenuCommandInteraction) {
-		return 'CONTEXT_MENU_COMMAND_INTERACTION';
+	} else if (interaction instanceof UserContextMenuCommandInteraction) {
+		return 'USER_CONTEXT_MENU_COMMAND_INTERACTION';
+	} else if (interaction instanceof MessageContextMenuCommandInteraction) {
+		return 'MESSAGE_CONTEXT_MENU_COMMAND_INTERACTION';
 	} else if (interaction instanceof AutocompleteInteraction) {
 		return 'AUTOCOMPLETE_INTERACTION';
 	} else if (

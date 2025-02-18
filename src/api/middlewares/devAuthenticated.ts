@@ -3,7 +3,7 @@ import { BadRequest, Unauthorized } from '@tsed/exceptions';
 import DiscordOauth2 from 'discord-oauth2';
 import { injectable } from 'tsyringe';
 
-import env from '@/env';
+import { env } from '@/env';
 import { Store } from '@/services';
 import { isDev } from '@/utils/functions';
 

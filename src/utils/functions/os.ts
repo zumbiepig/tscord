@@ -1,4 +1,5 @@
 import { cpus } from 'node:os';
+import process from 'node:process';
 import { setTimeout } from 'node:timers/promises';
 
 export async function getProcessCPUUsage() {
