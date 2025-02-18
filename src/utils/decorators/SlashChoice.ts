@@ -10,17 +10,7 @@ import type {
 	TranslationPath,
 } from '@/utils/types';
 
-/**
- * The slash command option can implement autocompletion for string and number types
- *
- * @param options - choices
- * ___
- *
- * [View Documentation](https://discordx.js.org/docs/decorators/commands/slash-choice)
- *
- * @category Decorator
- */
-export function SlashChoice(...options: SanitizedOptions[]) {
+export const SlashChoice =(...options: SanitizedOptions[]) =>{
 	for (let i = 0; i < options.length; i++) {
 		let option = options[i];
 

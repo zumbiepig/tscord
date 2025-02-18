@@ -16,7 +16,6 @@ import { getTscordVersion, resolveDependency } from '@/utils/functions';
 @autoInjectable()
 export class Plugin {
 	// Common values
-	private _path: string;
 	private _name!: string;
 	private _version!: string;
 	private _valid = true;
@@ -27,12 +26,9 @@ export class Plugin {
 	private _services!: Record<string, unknown>;
 	private _translations!: Record<Locales, Translation>;
 
-	constructor(
-		path: string,
-		private logger?: Logger,
-	) {
-		this._path = path;
-	}
+	private logger!: Logger;
+
+	constructor(private _path: string) {}
 
 	public async load(): Promise<boolean> {
 		this.logger = await resolveDependency(Logger);
@@ -111,7 +107,7 @@ export class Plugin {
 
 	private async stopLoad(error: string) {
 		this._valid = false;
-		await this.logger?.log(
+		await this.logger.log(
 			'error',
 			`Plugin ${this._name ? this._name : this._path} ${this._version ? `v${this._version}` : ''} is not valid: ${error}`,
 		);
@@ -161,7 +157,7 @@ export class Plugin {
 		}
 
 		if (missingLocales.length > 0) {
-			await this.logger?.log(
+			await this.logger.log(
 				'warn',
 				`Plugin ${this._name} v${this._version} is missing translations for locales: '${missingLocales.join("', '")}'`,
 			);

@@ -91,10 +91,11 @@ export class Database {
 
 	/**
 	 * Create a snapshot of the database each day at 00:00
+	 * @param snapshotFile name of the snapshot to create
 	 */
 	@Schedule('0 0 * * *')
-	async backup(snapshotName?: string): Promise<boolean> {
-		if (!databaseConfig.enableBackups && !snapshotName) return false;
+	async backup(snapshotFile?: string): Promise<boolean> {
+		if (!databaseConfig.enableBackups && !snapshotFile) return false;
 
 		if (!this.isSQLiteDatabase()) {
 			await this.logger.log('warn', "Database is not SQLite, couldn't backup");
@@ -109,23 +110,23 @@ export class Database {
 			return false;
 		}
 
-		if (!snapshotName)
-			snapshotName = `snapshot-${formatDate(dayjsTimezone().toDate(), 'onlyDateFileName')}`;
+		if (!snapshotFile)
+			snapshotFile = `snapshot-${formatDate(dayjsTimezone(), 'dbBackup')}_${mikroORMConfig[env.NODE_ENV].dbName ?? ''}.db.backup`;
 
 		await backupDatabase(
 			mikroORMConfig[env.NODE_ENV].dbName ?? '',
-			`${snapshotName}.txt`,
-			`${join(databaseConfig.path, 'backups', 'objects')}/`,
+			join(databaseConfig.path, 'backups', snapshotFile),
+			join(databaseConfig.path, 'backups', 'objects'),
 		);
 		return true;
 	}
 
 	/**
 	 * Restore the SQLite database from a snapshot file.
-	 * @param snapshotName name of the snapshot to restore
+	 * @param snapshotFile name of the snapshot to restore
 	 * @returns true if the snapshot has been restored, false otherwise
 	 */
-	async restore(snapshotName: string): Promise<boolean> {
+	async restore(snapshotFile: string): Promise<boolean> {
 		if (!this.isSQLiteDatabase()) {
 			await this.logger.log(
 				'error',
@@ -142,9 +143,18 @@ export class Database {
 			return false;
 		}
 
+		await stat(join(databaseConfig.path, 'backups', snapshotFile)).catch(async () => {
+			await this.logger.log(
+				'error',
+				`Snapshot ${snapshotFile} does not exist, couldn't restore backup`,
+			);
+			return false;
+		});
+
 		await restoreDatabase(
 			mikroORMConfig[env.NODE_ENV].dbName ?? '',
-			join(databaseConfig.path, 'backups', snapshotName),
+			join(databaseConfig.path, 'backups', snapshotFile),
+			join(databaseConfig.path, 'backups', 'objects'),
 		);
 		await this.refreshConnection();
 		return true;
@@ -160,7 +170,7 @@ export class Database {
 		}
 
 		const files = await readdir(join(databaseConfig.path, 'backups'));
-		const backupList = files.filter((file) => /^snapshot-.+\.txt/.exec(file));
+		const backupList = files.filter((file) => /^.+\.db\.backup$/.exec(file));
 
 		return backupList;
 	}

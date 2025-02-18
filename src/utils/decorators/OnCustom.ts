@@ -4,11 +4,11 @@ import { EventManager } from '@/services';
 import { resolveDependency } from '@/utils/functions';
 
 export function OnCustom(event: string) {
-	return function (
+	return (
 		target: unknown,
 		_propertyKey: string,
 		descriptor: PropertyDescriptor,
-	) {
+	) => {
 		// associate the context to the function, with the injected dependencies defined
 		const oldDescriptor = target as (...args: unknown[]) => unknown;
 		descriptor.value = function (...args: unknown[]) {

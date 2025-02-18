@@ -2,7 +2,6 @@ import {
 	type ArgsOf,
 	Client,
 	Discord,
-	Guard,
 	On,
 	SimpleCommandMessage,
 } from 'discordx';
@@ -10,7 +9,6 @@ import { injectable } from 'tsyringe';
 
 import { generalConfig } from '@/configs';
 import { Guild, User } from '@/entities';
-import { Maintenance } from '@/guards';
 import { Database, EventManager, Logger, Stats } from '@/services';
 import { OnCustom } from '@/utils/decorators';
 import { getPrefixFromMessage, syncUser } from '@/utils/functions';

@@ -17,7 +17,7 @@ export const dayjsTimezone = dayjs.tz;
 const dateMasks = {
 	default: 'DD/MM/YYYY - HH:mm:ss',
 	onlyDate: 'DD/MM/YYYY',
-	onlyDateFileName: 'YYYY-MM-DD',
+	dbBackup: 'YYYY-MM-DD_HH-mm-ss',
 	logs: 'YYYY-MM-DD HH:mm:ss',
 };
 

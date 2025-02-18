@@ -6,12 +6,14 @@ import { generalConfig } from '@/configs';
 import { Scheduler } from '@/services';
 import { InvalidCronError } from '@/utils/errors';
 
+import { resolveDependency } from '../functions/dependency.js';
+
 /**
  * Schedule a job to be executed at a specific time (cron)
  * @param cronExpression - cron expression to use (e.g: "0 0 * * *" will run each day at 00:00)
  * @param jobName - name of the job (the name of the function will be used if it is not provided)
  */
-export function Schedule(cronExpression: string, jobName?: string) {
+export function Schedule(cronExpression: string) {
 	if (!isValidCron(cronExpression, { alias: true, seconds: true }))
 		throw new InvalidCronError(cronExpression);
 
@@ -38,7 +40,8 @@ export function Schedule(cronExpression: string, jobName?: string) {
 			target,
 		);
 
-		const scheduler = container.resolve(Scheduler);
-		scheduler.addJob(jobName ?? propertyKey, job);
+		void resolveDependency(Scheduler).then((scheduler) => {
+			scheduler.addJob(propertyKey, job);
+		});
 	};
 }

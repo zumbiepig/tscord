@@ -11,16 +11,7 @@ import {
 } from '@/utils/functions';
 import type { ApplicationCommandOptions, TranslationPath } from '@/utils/types';
 
-/**
- * Handle a slash command
- * @param options - slash options
- * ___
- *
- * [View Documentation](https://discordx.js.org/docs/decorators/commands/slash)
- *
- * @category Decorator
- */
-export function Slash(options?: ApplicationCommandOptions) {
+export const Slash = (options?: ApplicationCommandOptions) => {
 	if (!options) options = {};
 	else if (typeof options === 'string') options = { name: options };
 
@@ -53,4 +44,4 @@ export function Slash(options?: ApplicationCommandOptions) {
 	return SlashX(
 		options as ApplicationCommandOptionsX<VerifyName<string>, string>,
 	);
-}
+};
