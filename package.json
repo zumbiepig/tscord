@@ -39,7 +39,7 @@
     "@tsed/exceptions": "^8.4.7",
     "@tsed/platform-express": "^8.4.7",
     "@tsed/schema": "^8.4.7",
-    "@tsed/swagger": "^8.4.7",
+    "@tsed/swagger": "^8.5.0",
     "archiver": "^7.0.1",
     "body-parser": "^1.20.3",
     "boxen": "^8.0.1",
