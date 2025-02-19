@@ -25,7 +25,7 @@ export class DataRepository extends EntityRepository<Data> {
 		key: T,
 	): Promise<DataRepositoryType[T]> {
 		return JSON.parse(
-			(await this.findOne({key }))?.value ?? '',
+			(await this.findOne({ key }))?.value ?? '',
 		) as DataRepositoryType[T];
 	}
 

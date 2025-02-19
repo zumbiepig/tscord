@@ -2,7 +2,12 @@ import { readdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import type { BetterSqliteDriver } from '@mikro-orm/better-sqlite';
-import { defineConfig, type EntityName, MikroORM, type Options } from '@mikro-orm/core';
+import {
+	defineConfig,
+	type EntityName,
+	MikroORM,
+	type Options,
+} from '@mikro-orm/core';
 import { EntityGenerator } from '@mikro-orm/entity-generator';
 import type { MariaDbDriver } from '@mikro-orm/mariadb';
 import { Migrator } from '@mikro-orm/migrations';
