@@ -1,9 +1,13 @@
 import { readdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import { type EntityName, MikroORM, type Options } from '@mikro-orm/core';
+import type { BetterSqliteDriver } from '@mikro-orm/better-sqlite';
+import { defineConfig, type EntityName, MikroORM, type Options } from '@mikro-orm/core';
 import { EntityGenerator } from '@mikro-orm/entity-generator';
+import type { MariaDbDriver } from '@mikro-orm/mariadb';
 import { Migrator } from '@mikro-orm/migrations';
+import type { MongoDriver } from '@mikro-orm/mongodb';
+import type { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import { delay, inject } from 'tsyringe';
 
@@ -23,8 +27,8 @@ import {
 
 @Service()
 export class Database {
-	private _orm!: MikroORM<InstanceType<(typeof mikroORMConfig)['driver']>>;
-	private mikroORMConfig!: Options<InstanceType<(typeof mikroORMConfig)['driver']>>;
+	private _orm!: MikroORM;
+	private mikroORMConfig!: Options;
 
 	constructor(
 		@inject(delay(() => Store)) private store: Store,
@@ -32,9 +36,9 @@ export class Database {
 		@inject(delay(() => PluginsManager)) private pluginsManager: PluginsManager,
 	) {}
 
-	async initialize() {
+	async init() {
 		// set config
-		this.mikroORMConfig = {
+		this.mikroORMConfig = defineConfig({
 			entities: [
 				...Object.values(entities),
 				...this.pluginsManager.getEntities(),
@@ -49,12 +53,10 @@ export class Database {
 			},
 
 			...mikroORMConfig,
-		};
+		});
 
-		// initialize the ORM using the configuration exported in `mikro-orm.config.ts`
-		this._orm = await MikroORM.init<
-			InstanceType<(typeof mikroORMConfig)['driver']>
-		>(this.mikroORMConfig);
+		// initialize the ORM using the exported configuration
+		this._orm = await MikroORM.init(this.mikroORMConfig);
 
 		if (!this.store.get('botHasBeenReloaded')) {
 			const migrator = this._orm.getMigrator();
@@ -71,13 +73,12 @@ export class Database {
 		}
 	}
 
-	async refreshConnection() {
-		await this._orm.close();
-		this._orm = await MikroORM.init(this.mikroORMConfig);
-	}
-
-	get orm() {
-		return this._orm;
+	get em() {
+		return (
+			this._orm as MikroORM<
+				BetterSqliteDriver | MongoDriver | MariaDbDriver | PostgreSqlDriver
+			>
+		).em;
 	}
 
 	/**
@@ -110,11 +111,11 @@ export class Database {
 		}
 
 		if (!snapshotFile)
-			snapshotFile = `snapshot_${formatDate(dayjsTimezone(), 'dbBackup')}_${mikroORMConfig[env.NODE_ENV].dbName ?? ''}.backup`;
+			snapshotFile = `snapshot_${formatDate(dayjsTimezone(), 'dbBackup')}_${mikroORMConfig.dbName ?? ''}.backup`;
 
 		await this._orm.em.flush();
 		await backupDatabase(
-			mikroORMConfig[env.NODE_ENV].dbName ?? '',
+			mikroORMConfig.dbName ?? '',
 			join(databaseConfig.path, 'backups', snapshotFile),
 			join(databaseConfig.path, 'backups', 'objects'),
 		);
@@ -153,12 +154,13 @@ export class Database {
 			},
 		);
 
+		await this._orm.close();
 		await restoreDatabase(
-			mikroORMConfig[env.NODE_ENV].dbName ?? '',
+			mikroORMConfig.dbName ?? '',
 			join(databaseConfig.path, 'backups', snapshotFile),
 			join(databaseConfig.path, 'backups', 'objects'),
 		);
-		await this.refreshConnection();
+		await this.init();
 		return true;
 	}
 

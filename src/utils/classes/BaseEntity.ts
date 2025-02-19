@@ -1,8 +1,9 @@
-import { Property } from '@mikro-orm/core';
+import { BaseEntity as MikroORMBaseEntity, Entity, Property } from '@mikro-orm/core';
 
 import { dayjsTimezone } from '@/utils/functions';
 
-export abstract class BaseEntity {
+@Entity({ abstract: true })
+export abstract class BaseEntity extends MikroORMBaseEntity {
 	@Property()
 	createdAt: Date = dayjsTimezone().toDate();
 

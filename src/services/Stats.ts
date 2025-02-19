@@ -2,7 +2,7 @@ import os from 'node:os';
 import process from 'node:process';
 
 import { EntityRepository } from '@mikro-orm/core';
-import type { Interaction } from 'discord.js';
+import type { Interaction, Snowflake } from 'discord.js';
 import { Client, SimpleCommandMessage } from 'discordx';
 import { delay, inject } from 'tsyringe';
 
@@ -54,7 +54,7 @@ export class Stats {
 		stat.value = value;
 		if (additionalData) stat.additionalData = additionalData;
 
-		await this.db.orm.em.persistAndFlush(stat);
+		await this.db.em.persistAndFlush(stat);
 	}
 
 	/**
@@ -122,18 +122,18 @@ export class Stats {
 	 * Get commands sorted by total amount of uses in DESC order.
 	 */
 	async getTopCommands() {
-		if ('createQueryBuilder' in this.db.orm.em) {
-			const qb = this.db.orm.em.createQueryBuilder(Stat);
+		let slashCommands: StatPerInterval;
+
+		if ('createQueryBuilder' in this.db.em) {
+			const qb = this.db.em.createQueryBuilder(Stat);
 			const query = qb
 				.select(['type', 'value as name', 'count(*) as count'])
 				.where(allInteractions)
 				.groupBy(['type', 'value']);
 
-			const slashCommands: StatPerInterval = await query.execute();
-
-			return slashCommands.sort((a, b) => b.count - a.count);
-		} else if ('aggregate' in this.db.orm.em) {
-			const slashCommands: StatPerInterval = await this.db.orm.em.aggregate(Stat, [
+			slashCommands = await query.execute();
+		} else if ('aggregate' in this.db.em) {
+			slashCommands = (await this.db.em.aggregate(Stat, [
 				{
 					$match: allInteractions,
 				},
@@ -150,12 +150,12 @@ export class Stats {
 						},
 					},
 				},
-			]);
-
-			return slashCommands.sort((a, b) => b.count - a.count);
+			])) as StatPerInterval;
 		} else {
-			return [];
+			throw new Error('Unsupported database driver');
 		}
+
+		return slashCommands.sort((a, b) => b.count - a.count);
 	}
 
 	/**
@@ -195,7 +195,7 @@ export class Stats {
 	 */
 	async getTopGuilds() {
 		const topGuilds: {
-			id: string;
+			id: Snowflake;
 			name: string;
 			totalCommands: number;
 		}[] = [];
@@ -231,7 +231,7 @@ export class Stats {
 	 * @param days interval of days from now
 	 */
 	async countStatsPerDays(
-		type: string,
+		type: StatType,
 		days: number,
 	): Promise<StatPerInterval> {
 		const stats: StatPerInterval = [];
@@ -354,7 +354,7 @@ export class Stats {
 
 		for (const type of Object.keys(totalStats)) {
 			const value = JSON.stringify(totalStats[type as keyof typeof totalStats]);
-			await this.register(type, value);
+			await this.register(type as keyof typeof totalStats, value);
 		}
 	}
 }

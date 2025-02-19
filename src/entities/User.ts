@@ -14,7 +14,7 @@ import { dayjsTimezone } from '@/utils/functions';
 export class User extends BaseEntity {
 	[EntityRepositoryType]!: UserRepository;
 
-	@PrimaryKey({ autoincrement: false })
+	@PrimaryKey()
 	id!: Snowflake;
 
 	@Property()
@@ -26,7 +26,7 @@ export class User extends BaseEntity {
 
 export class UserRepository extends EntityRepository<User> {
 	async updateLastInteract(userId: Snowflake): Promise<void> {
-		const user = await this.findOne({ id: userId });
+		const user = await this.findOne(userId);
 
 		if (user) {
 			user.lastInteract = dayjsTimezone().toDate();

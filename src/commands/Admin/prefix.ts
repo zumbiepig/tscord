@@ -36,7 +36,7 @@ export default class PrefixCommand {
 
 		if (guildData) {
 			guildData.prefix = prefix ?? null;
-			await this.db.orm.em.persistAndFlush(guildData);
+			await this.db.em.flush();
 
 			await simpleSuccessEmbed(
 				interaction,

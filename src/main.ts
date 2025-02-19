@@ -54,7 +54,7 @@ async function init() {
 
 	// init the database
 	const db = await resolveDependency(Database);
-	await db.initialize();
+	await db.init();
 
 	// init the client
 	DIService.engine = tsyringeDependencyRegistryEngine.setInjector(container);
@@ -118,7 +118,7 @@ async function init() {
 	await pluginsManager.importCommands();
 	await pluginsManager.importEvents();
 
-	await RequestContext.create(db.orm.em, async () => {
+	await RequestContext.create(db.em, async () => {
 		// init the data table if it doesn't exist
 		await initDataTable();
 
@@ -232,7 +232,7 @@ async function reload(client: Client, force = false) {
 	await pluginsManager.loadPlugins();
 
 	const db = await resolveDependency(Database);
-	await db.initialize();
+	await db.init();
 
 	await logger.log('info', 'Hot reloaded!', chalk.whiteBright('Hot reloaded!'));
 

@@ -14,7 +14,7 @@ import { dayjsTimezone } from '@/utils/functions';
 export class Guild extends BaseEntity {
 	[EntityRepositoryType]!: GuildRepository;
 
-	@PrimaryKey({ autoincrement: false })
+	@PrimaryKey()
 	id!: Snowflake;
 
 	@Property()
@@ -29,7 +29,7 @@ export class Guild extends BaseEntity {
 
 export class GuildRepository extends EntityRepository<Guild> {
 	async updateLastInteract(guildId: Snowflake): Promise<void> {
-		const guild = await this.findOne({ id: guildId });
+		const guild = await this.findOne(guildId);
 
 		if (guild) {
 			guild.lastInteract = dayjsTimezone().toDate();

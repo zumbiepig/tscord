@@ -13,5 +13,5 @@ export const RequestContextIsolator: GuardFunction = async (
 	next,
 ) => {
 	const db = await resolveDependency(Database);
-	await RequestContext.create(db.orm.em, next);
+	await RequestContext.create(db.em, next);
 };

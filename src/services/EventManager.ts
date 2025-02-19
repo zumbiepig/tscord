@@ -2,9 +2,9 @@ import { Service } from '@/utils/decorators';
 
 @Service()
 export class EventManager {
-	private _events = new Map<string, ((..._: unknown[]) => unknown)[]>();
+	private _events = new Map<string, ((...args: unknown[]) => unknown)[]>();
 
-	register(eventName: string, callback: (..._: unknown[]) => unknown): void {
+	register(eventName: string, callback: (...args: unknown[]) => unknown): void {
 		this._events.set(eventName, [
 			...(this._events.get(eventName) ?? []),
 			callback,
