@@ -8,8 +8,8 @@ import {
 import { dayjsTimezone } from '@/utils/functions';
 
 @Entity({ abstract: true })
-export abstract class BaseEntity extends MikroORMBaseEntity {
-	[OptionalProps]!: 'createdAt' | 'updatedAt';
+export abstract class BaseEntity<Optional = never> extends MikroORMBaseEntity {
+	[OptionalProps]!: 'createdAt' | 'updatedAt' | Optional;
 
 	@Property()
 	createdAt: Date = dayjsTimezone().toDate();
