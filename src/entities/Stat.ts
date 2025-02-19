@@ -11,7 +11,7 @@ import type { StatType } from '@/utils/types';
 
 @Entity({ repository: () => StatRepository })
 export class Stat extends BaseEntity {
-	[EntityRepositoryType]!: StatRepository;
+	[EntityRepositoryType]?: StatRepository;
 
 	@PrimaryKey()
 	id!: number;
@@ -22,8 +22,8 @@ export class Stat extends BaseEntity {
 	@Property()
 	value!: string;
 
-	@Property({ type: 'json', nullable: true })
-	additionalData?: unknown;
+	@Property()
+	additionalData?: object;
 }
 
 export class StatRepository extends EntityRepository<Stat> {}

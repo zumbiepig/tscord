@@ -18,8 +18,8 @@ export class Image extends BaseEntity {
 	@Property()
 	fileName!: string;
 
-	@Property({ default: '' })
-	basePath?: string;
+	@Property()
+	basePath!: string;
 
 	@Property()
 	url!: string;
@@ -31,7 +31,20 @@ export class Image extends BaseEntity {
 	hash!: string;
 
 	@Property()
-	deleteHash!: string;
+	deleteHash!: string | null;
+
+	@Property()
+	tags!: string[];
 }
 
-export class ImageRepository extends EntityRepository<Image> {}
+export class ImageRepository extends EntityRepository<Image> {
+	async findByTags(tags: string[], explicit = true): Promise<Image[]> {
+		const rows = await this.find({
+			$and: tags.map((tag) => ({ tags: new RegExp(tag) })),
+		});
+
+		return explicit
+			? rows.filter((row) => row.tags.length === tags.length)
+			: rows;
+	}
+}

@@ -46,15 +46,11 @@ export class Stats {
 	 * Add an entry to the stats table.
 	 * @param type
 	 * @param value
-	 * @param additionalData in JSON format
+	 * @param additionalData
 	 */
-	async register(type: StatType, value: string, additionalData?: unknown) {
-		const stat = new Stat();
-		stat.type = type;
-		stat.value = value;
-		if (additionalData) stat.additionalData = additionalData;
-
-		await this.db.em.persistAndFlush(stat);
+	async register(type: StatType, value: string, additionalData?: object) {
+		this.db.em.create(Stat, { type, value, additionalData });
+		await this.db.em.flush();
 	}
 
 	/**

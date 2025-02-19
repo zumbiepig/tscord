@@ -11,20 +11,20 @@ import { BaseEntity } from '@/utils/classes';
 import { dayjsTimezone } from '@/utils/functions';
 
 @Entity({ repository: () => GuildRepository })
-export class Guild extends BaseEntity {
+export class Guild extends BaseEntity<Guild> {
 	[EntityRepositoryType]!: GuildRepository;
 
 	@PrimaryKey()
 	id!: Snowflake;
 
 	@Property()
-	lastInteract: Date = dayjsTimezone().toDate();
+	lastInteract = dayjsTimezone().toDate();
 
 	@Property()
 	deleted = false;
 
-	@Property({ nullable: true, type: 'string' })
-	prefix!: string | null;
+	@Property()
+	prefix?: string;
 }
 
 export class GuildRepository extends EntityRepository<Guild> {

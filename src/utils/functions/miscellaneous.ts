@@ -1,12 +1,11 @@
 import type { PackageJson } from 'type-fest';
 
-import packageJson from '../../../package.json' assert { type: 'json' };
+import packageJson from '../../../package.json';
 
-export function getPackageJson() {
+export function getPackageJson(): PackageJson {
 	return packageJson as PackageJson;
 }
 
 export function getTscordVersion(): string {
-	return (packageJson as PackageJson & { tscord: { version: string } }).tscord
-		.version;
+	return packageJson.tscord.version;
 }

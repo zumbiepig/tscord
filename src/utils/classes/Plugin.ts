@@ -34,16 +34,16 @@ export class Plugin {
 		this.logger = await resolveDependency(Logger);
 
 		// read plugin.json
-		const pluginDotJson = await readFile(
+		const pluginJson = await readFile(
 			join(this._path, 'plugin.json'),
 			'utf8',
 		).catch(() => null);
-		if (pluginDotJson === null) {
+		if (!pluginJson) {
 			await this.stopLoad('plugin.json not found');
 			return false;
 		}
 
-		const pluginConfig = JSON.parse(pluginDotJson) as {
+		const pluginConfig = JSON.parse(pluginJson) as {
 			name: string;
 			version: string;
 			tscordVersion: string;

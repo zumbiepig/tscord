@@ -14,7 +14,7 @@ const envConfig: MikroORMConfigType = {
 		 * SQLite
 		 */
 		driver: (await import('@mikro-orm/better-sqlite')).BetterSqliteDriver,
-		dbName: join(databaseConfig.path, 'tscord.db'),
+		dbName: join(databaseConfig.path, 'sqlite.db'),
 
 		/**
 		 * MongoDB

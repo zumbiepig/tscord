@@ -1,6 +1,6 @@
 import { createReadStream } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
-import { basename, dirname, join } from 'node:path';
+import { basename, dirname, join, sep } from 'node:path';
 import { Readable } from 'node:stream';
 
 import chalk from 'chalk';
@@ -51,6 +51,7 @@ export class ImagesUpload {
 			windowsPathsNoEscape: true,
 			cwd: this.imageFolderPath,
 		});
+
 		const images = [];
 		for (const file of files) {
 			if (this.isValidImageFormat(file)) {
@@ -67,7 +68,7 @@ export class ImagesUpload {
 		// purge deleted images from the database, reupload expired images to imgur
 		const imagesInDb = await this.imageRepo.findAll();
 		for (const image of imagesInDb) {
-			const imagePath = join(image.basePath ?? '', image.fileName);
+			const imagePath = join(image.basePath, image.fileName);
 
 			if (!images.includes(imagePath)) {
 				// delete the image if it is not in the filesystem anymore
@@ -102,25 +103,17 @@ export class ImagesUpload {
 			)
 				await this.logger.log(
 					'warn',
-					`Image ${imagePath} has the same hash as ${join(imageInDb.basePath ?? '', imageInDb.fileName)} so it will be skipped`,
-					`Image ${chalk.bold.green(imagePath)} has the same hash as ${chalk.bold.green(join(imageInDb.basePath ?? '', imageInDb.fileName))} so it will be skipped`,
+					`Image ${imagePath} has the same hash as ${join(imageInDb.basePath, imageInDb.fileName)} so it will be skipped`,
+					`Image ${chalk.bold.green(imagePath)} has the same hash as ${chalk.bold.green(join(imageInDb.basePath, imageInDb.fileName))} so it will be skipped`,
 				);
 		}
 	}
 
-	async deleteImageFromImgur(image: Image) {
-		if (!this.imgurClient) return;
-
-		await this.imgurClient.deleteImage(image.deleteHash);
-
-		await this.logger.log(
-			'warn',
-			`Image ${image.fileName} deleted from database because it is not in the filesystem anymore`,
-		);
-	}
-
 	async addNewImageToImgur(imagePath: string, imageHash: string) {
 		if (!this.imgurClient) return;
+
+		const basePath = dirname(imagePath);
+		const fileName = basename(imagePath);
 
 		// upload the image to imgur
 		const uploadResponse = await this.imgurClient.upload({
@@ -133,19 +126,20 @@ export class ImagesUpload {
 		if (!uploadResponse.success) {
 			await this.logger.log(
 				'error',
-				`Error uploading image ${basename(imagePath)} to Imgur: ${uploadResponse.status.toString()} ${JSON.stringify(uploadResponse.data)}`,
+				`Error uploading image ${imagePath} to imgur: ${uploadResponse.status.toString()} ${JSON.stringify(uploadResponse.data)}`,
 			);
 			return;
 		}
 
 		// add the image to the database
 		const image = new Image();
-		image.basePath = dirname(imagePath);
-		image.fileName = basename(imagePath);
+		image.basePath = basePath;
+		image.fileName = fileName;
 		image.url = uploadResponse.data.link;
 		image.size = uploadResponse.data.size;
 		image.hash = imageHash;
-		image.deleteHash = uploadResponse.data.deletehash ?? '';
+		image.deleteHash = uploadResponse.data.deletehash ?? null;
+		image.tags = basePath.split(sep);
 		await this.db.em.persistAndFlush(image);
 
 		// log the success
@@ -153,6 +147,17 @@ export class ImagesUpload {
 			'info',
 			`Image ${imagePath} uploaded to imgur`,
 			`Image ${chalk.bold.green(imagePath)} uploaded to imgur`,
+		);
+	}
+
+	async deleteImageFromImgur(image: Image) {
+		if (!this.imgurClient || !image.deleteHash) return;
+
+		await this.imgurClient.deleteImage(image.deleteHash);
+
+		await this.logger.log(
+			'warn',
+			`Image ${image.fileName} deleted from database because it is not in the filesystem anymore`,
 		);
 	}
 

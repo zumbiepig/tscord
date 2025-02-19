@@ -7,58 +7,51 @@ import {
 } from '@mikro-orm/core';
 
 import { BaseEntity } from '@/utils/classes';
-import type { DataRepositoryType } from '@/utils/types';
+import type { ValueOf } from 'type-fest';
+
+const defaultData = {
+	maintenance: false,
+	lastMaintenance: Date.now(),
+	lastStartup: Date.now(),
+} as const;
 
 @Entity({ repository: () => DataRepository })
 export class Data extends BaseEntity {
-	[EntityRepositoryType]!: DataRepository;
+	[EntityRepositoryType]?: DataRepository;
 
 	@PrimaryKey()
-	key!: string;
+	key!: keyof typeof defaultData;
 
 	@Property()
-	value!: string;
+	value!: (typeof defaultData)[keyof typeof defaultData];
 }
 
 export class DataRepository extends EntityRepository<Data> {
-	async get<T extends keyof DataRepositoryType>(
+	async get<T extends keyof typeof defaultData>(
 		key: T,
-	): Promise<DataRepositoryType[T]> {
-		return JSON.parse(
-			(await this.findOne({ key }))?.value ?? '',
-		) as DataRepositoryType[T];
+	): Promise<(typeof defaultData)[T]> {
+		const data = await this.findOne({ key });
+
+		if (data) return data.value as (typeof defaultData)[T];
+		else return defaultData[key];
 	}
 
-	async set<T extends keyof DataRepositoryType>(
+	async set<T extends keyof typeof defaultData>(
 		key: T,
-		value: DataRepositoryType[T],
+		value: (typeof defaultData)[T],
 	): Promise<void> {
 		const data = await this.findOne({ key });
 
-		if (!data) {
-			const newData = new Data();
-			newData.key = key;
-			newData.value = JSON.stringify(value);
+		if (data) data.value = value;
+		else this.create({ key, value });
 
-			await this.em.persistAndFlush(newData);
-		} else {
-			data.value = JSON.stringify(value);
-			await this.em.flush();
-		}
+		await this.em.flush();
 	}
 
-	async add<T extends keyof DataRepositoryType>(
+	async add<T extends keyof typeof defaultData>(
 		key: T,
-		value: DataRepositoryType[T],
+		value: (typeof defaultData)[T],
 	): Promise<void> {
-		const data = await this.findOne({ key });
-
-		if (!data) {
-			const newData = new Data();
-			newData.key = key;
-			newData.value = JSON.stringify(value);
-
-			await this.em.persistAndFlush(newData);
-		}
+		if (!(await this.findOne({ key }))) await this.set(key, value);
 	}
 }

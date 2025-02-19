@@ -3,8 +3,13 @@ import { join } from 'node:path';
 
 import type { BetterSqliteDriver } from '@mikro-orm/better-sqlite';
 import {
+	DefaultLogger,
 	defineConfig,
 	type EntityName,
+	type LogContext,
+	type Logger as MikroORMLogger,
+	type LoggerNamespace,
+	type LoggerOptions,
 	MikroORM,
 	type Options,
 } from '@mikro-orm/core';
@@ -13,10 +18,12 @@ import type { MariaDbDriver } from '@mikro-orm/mariadb';
 import { Migrator } from '@mikro-orm/migrations';
 import type { MongoDriver } from '@mikro-orm/mongodb';
 import type { PostgreSqlDriver } from '@mikro-orm/postgresql';
+import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
+import chalk from 'chalk';
 import { delay, inject } from 'tsyringe';
 
-import { databaseConfig, mikroORMConfig } from '@/configs';
+import { databaseConfig, logsConfig, mikroORMConfig } from '@/configs';
 import * as entities from '@/entities';
 import { env } from '@/env';
 import { Logger, PluginsManager, Store } from '@/services';
@@ -29,6 +36,39 @@ import {
 	isSQLiteDatabase,
 	restoreDatabase,
 } from '@/utils/functions';
+
+class CustomLogger extends DefaultLogger implements MikroORMLogger {
+	constructor(
+		private logger: Logger,
+		options: LoggerOptions,
+	) {
+		super(options);
+	}
+
+	override log(
+		namespace: LoggerNamespace,
+		message: string,
+		context?: LogContext,
+	): void {
+		if (!this.isEnabled(namespace, context)) return;
+
+		message = message.replace(/\n/g, '').replace(/ +/g, ' ').trim();
+
+		const logMessage = `[${namespace}] ${context?.label ? `(${context.label}) ` : ''}${message}`;
+		const chalkedLogMessage = `${chalk.grey(`[${namespace}] `)}${context?.label ? chalk.cyan(`(${context.label}) `) : ''}${message}`;
+
+		void this.logger.log(
+			context?.level === 'warning'
+				? 'warn'
+				: context?.level === 'error'
+					? 'error'
+					: 'debug',
+			logMessage,
+			chalkedLogMessage,
+			logsConfig.database,
+		);
+	}
+}
 
 @Service()
 export class Database {
@@ -48,9 +88,11 @@ export class Database {
 				...Object.values(entities),
 				...this.pluginsManager.getEntities(),
 			],
+			metadataProvider: TsMorphMetadataProvider,
 
 			debug: env.isDev,
 			highlighter: new SqlHighlighter(),
+			loggerFactory: (options) => new CustomLogger(this.logger, options),
 
 			extensions: [EntityGenerator, Migrator],
 			migrations: {
@@ -64,26 +106,29 @@ export class Database {
 		this._orm = await MikroORM.init(this.mikroORMConfig);
 
 		if (!this.store.get('botHasBeenReloaded')) {
-			const migrator = this._orm.getMigrator();
-
 			// create initial migration if none are present in the migrations folder
-			const pendingMigrations = await migrator.getPendingMigrations();
-			const executedMigrations = await migrator.getExecutedMigrations();
+			const pendingMigrations = await this._orm.migrator.getPendingMigrations();
+			const executedMigrations =
+				await this._orm.migrator.getExecutedMigrations();
 			if (pendingMigrations.length === 0 && executedMigrations.length === 0)
-				await migrator.createInitialMigration();
+				await this._orm.migrator.createInitialMigration();
 
 			// migrate to the latest migration
-			if (await migrator.checkMigrationNeeded())
-				await this._orm.getMigrator().up();
+			if (await this._orm.migrator.checkMigrationNeeded()) {
+				await this._orm.migrator.createMigration();
+				await this._orm.migrator.up();
+			}
 		}
 	}
 
+	get orm() {
+		return this._orm as MikroORM<
+			BetterSqliteDriver | MongoDriver | MariaDbDriver | PostgreSqlDriver
+		>;
+	}
+
 	get em() {
-		return (
-			this._orm as MikroORM<
-				BetterSqliteDriver | MongoDriver | MariaDbDriver | PostgreSqlDriver
-			>
-		).em;
+		return (this._orm as typeof this.orm).em;
 	}
 
 	/**
@@ -116,7 +161,7 @@ export class Database {
 		}
 
 		if (!snapshotFile)
-			snapshotFile = `snapshot_${formatDate(dayjsTimezone(), 'dbBackup')}_${mikroORMConfig.dbName ?? ''}.backup`;
+			snapshotFile = `snapshot_${formatDate(dayjsTimezone(), 'dateTimeFilename')}_${mikroORMConfig.dbName ?? ''}.backup`;
 
 		await this._orm.em.flush();
 		await backupDatabase(

@@ -8,12 +8,16 @@ import {
 import { dayjsTimezone } from '@/utils/functions';
 
 @Entity({ abstract: true })
-export abstract class BaseEntity<Optional = never> extends MikroORMBaseEntity {
-	[OptionalProps]!: 'createdAt' | 'updatedAt' | Optional;
+export abstract class BaseEntity<
+	Entity extends object = never,
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+	Optional extends keyof Entity = never,
+> extends MikroORMBaseEntity {
+	[OptionalProps]?: 'createdAt' | 'updatedAt' | Optional;
 
 	@Property()
-	createdAt: Date = dayjsTimezone().toDate();
+	createdAt = dayjsTimezone().toDate();
 
 	@Property({ onUpdate: () => dayjsTimezone().toDate() })
-	updatedAt: Date = dayjsTimezone().toDate();
+	updatedAt = dayjsTimezone().toDate();
 }

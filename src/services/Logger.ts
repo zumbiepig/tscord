@@ -1,6 +1,7 @@
 import { createReadStream, createWriteStream } from 'node:fs';
 import { appendFile, mkdir, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
+import { setTimeout } from 'node:timers/promises';
 
 import archiver from 'archiver';
 import boxen from 'boxen';
@@ -114,9 +115,9 @@ export class Logger {
 		} = {},
 	): Promise<void> {
 		const date = dayjsTimezone();
-		const formattedDate = formatDate(date, 'onlyDateFileName');
+		const formattedDate = formatDate(date, 'onlyDateFilename');
 		const formattedTime = formatDate(date, 'logs');
-		const formattedLevel = level.toUpperCase() as Uppercase<typeof level>;
+		const formattedLevel = level.toUpperCase();
 		const trimmedMessage = message.trim();
 		const logMessage = `[${formattedTime}] [${formattedLevel}] ${trimmedMessage}`;
 		const chalkedLogMessage = `[${chalk.dim(formattedTime)}] [${formattedLevel}] ${chalkedMessage?.trim() ?? trimmedMessage}`;
@@ -160,17 +161,13 @@ export class Logger {
 
 		// send to discord channel
 		if (logLocation.channelId) {
-			if (this.client.token) {
-				const channel = await this.client.channels
-					.fetch(logLocation.channelId)
-					.catch(() => null);
-				if (
-					channel &&
-					(channel instanceof TextChannel || channel instanceof ThreadChannel)
-				) {
-					await channel.send(logLocation.discordEmbed);
-				}
-			}
+			while (!this.client.token) await setTimeout(50);
+
+			const channel = await this.client.channels
+				.fetch(logLocation.channelId)
+				.catch(() => null);
+			if (channel && 'send' in channel)
+				await channel.send(logLocation.discordEmbed);
 		}
 
 		// save the last logs tail queue
@@ -192,26 +189,41 @@ export class Logger {
 		const message = `(ERROR) ${error.stack ?? error.message}`;
 		const chalkedMessage = `(${chalk.bold.white('ERROR')}) ${chalk.dim.italic(error.stack ?? error.message)}`;
 
+		const embedTitle = `**${
+			type === 'uncaughtException'
+				? 'Uncaught Exception: '
+				: 'Unhandled Rejection: '
+		}**${error.message}`;
+		let embedMessage = '```\n' + (error.stack ?? error.message) + '\n```';
+		const embedAttachments = [];
+
+		if (embedMessage.length > 4096) {
+			embedMessage =
+				'```\n' +
+				(error.message.length > 4091
+					? `${error.message.slice(0, 4088)}...`
+					: error.message) +
+				'\n```';
+			embedAttachments.push(
+				new AttachmentBuilder(Buffer.from(error.stack ?? error.message)),
+			);
+		}
+
 		await this.log('error', message, chalkedMessage, {
 			...logsConfig.error,
 			discordEmbed: {
 				embeds: [
 					{
 						title:
-							type === 'uncaughtException'
-								? 'Uncaught Exception'
-								: 'Unhandled Rejection',
-						description:
-							error.message.length > 4096
-								? `${error.message.slice(0, 4093)}...`
-								: error.message,
+							embedTitle.length > 256
+								? `${embedTitle.slice(0, 253)}...`
+								: embedTitle,
+						description: embedMessage,
 						color: colorsConfig.logError,
 						timestamp: dayjsTimezone().toISOString(),
 					},
 				],
-				files: [
-					new AttachmentBuilder(Buffer.from(error.stack ?? error.message)),
-				],
+				files: embedAttachments,
 			},
 		});
 	}
@@ -231,7 +243,7 @@ export class Logger {
 		const user = resolveUser(interaction);
 
 		const message = `(${type}) "${action}" ${channel instanceof TextChannel || channel instanceof ThreadChannel ? `in channel #${channel.name}` : ''} ${guild ? `in guild ${guild.name}` : ''} by ${user.username}#${user.discriminator}`;
-		const chalkedMessage = `(${chalk.bold.white(type)}) "${chalk.bold.green(action)}" ${channel instanceof TextChannel || channel instanceof ThreadChannel ? `${chalk.dim.italic.gray('in channel')} ${chalk.bold.blue(`#${channel.name}`)}` : ''} ${guild ? `${chalk.dim.italic.gray('in guild')} ${chalk.bold.blue(guild.name)}` : ''} ${chalk.dim.italic.gray('by')} ${chalk.bold.blue(`${user.username}#${user.discriminator}`)}`;
+		const chalkedMessage = `(${chalk.bold.white(type)}) "${chalk.bold.green(action)}" ${channel instanceof TextChannel || channel instanceof ThreadChannel ? `${chalk.dim.italic.grey('in channel')} ${chalk.bold.blue(`#${channel.name}`)}` : ''} ${guild ? `${chalk.dim.italic.grey('in guild')} ${chalk.bold.blue(guild.name)}` : ''} ${chalk.dim.italic.grey('by')} ${chalk.bold.blue(`${user.username}#${user.discriminator}`)}`;
 
 		await this.log('info', message, chalkedMessage, {
 			...logsConfig.interaction,
@@ -276,7 +288,7 @@ export class Logger {
 	 */
 	async logNewUser(user: User): Promise<void> {
 		const message = `(NEW_USER) ${user.tag} (${user.id}) has been added to the db`;
-		const chalkedMessage = `(${chalk.bold.white('NEW_USER')}) ${chalk.bold.green(user.tag)} (${chalk.bold.blue(user.id)}) ${chalk.dim.italic.gray('has been added to the db')}`;
+		const chalkedMessage = `(${chalk.bold.white('NEW_USER')}) ${chalk.bold.green(user.tag)} (${chalk.bold.blue(user.id)}) ${chalk.dim.italic.grey('has been added to the db')}`;
 
 		await this.log('info', message, chalkedMessage, {
 			...logsConfig.newUser,
@@ -312,7 +324,7 @@ export class Logger {
 					? 'has been deleted'
 					: 'has been recovered';
 		const message = `(${type}) Guild ${guild ? `${guild.name} (${guildId})` : guildId} ${additionalMessage}`;
-		const chalkedMessage = `(${chalk.bold.white(type)}) ${chalk.dim.italic.gray('Guild')} ${guild ? `${chalk.bold.green(guild.name)} (${chalk.bold.blue(guildId)})` : guildId} ${chalk.dim.italic.gray(additionalMessage)}`;
+		const chalkedMessage = `(${chalk.bold.white(type)}) ${chalk.dim.italic.grey('Guild')} ${guild ? `${chalk.bold.green(guild.name)} (${chalk.bold.blue(guildId)})` : guildId} ${chalk.dim.italic.grey(additionalMessage)}`;
 
 		await this.log('info', message, chalkedMessage, {
 			...logsConfig.guild,
@@ -350,12 +362,6 @@ export class Logger {
 		return this._lastLogsTail;
 	}
 
-	async startSpinner(text: string): Promise<void> {
-		console.log('\n');
-		this.spinner.start(text);
-		await this.log('info', text, null, { console: false });
-	}
-
 	/**
 	 * Archive the logs in a tar.gz file each day, and delete log archives older than the retention period.
 	 */
@@ -374,7 +380,7 @@ export class Logger {
 			createWriteStream(
 				join(
 					this.logArchivePath,
-					`logs-${formatDate(dayjsTimezone().subtract(1, 'day'), 'onlyDateFileName')}.tar.gz`,
+					`logs-${formatDate(dayjsTimezone().subtract(1, 'day'), 'onlyDateFilename')}.tar.gz`,
 				),
 			),
 		);
@@ -411,6 +417,12 @@ export class Logger {
 		}
 	}
 
+	async startSpinner(text: string): Promise<void> {
+		console.log('\n');
+		this.spinner.start(text);
+		await this.log('info', text, null, { console: false });
+	}
+
 	async logStartingConsole(): Promise<void> {
 		this.spinner.stop();
 
@@ -439,7 +451,7 @@ export class Logger {
 		await this.log(
 			'info',
 			`\u200B  \u200B┝──╾ ${numberAlign(slashCommands.length)} slash commands\n\u200B  \u200B┝──╾ ${numberAlign(simpleCommands.length)} simple commands\n\u200B  \u200B╰──╾ ${numberAlign(contextMenus.length)} context menus`,
-			chalk.dim.gray(
+			chalk.dim.grey(
 				`\u200B  \u200B┝──╾ ${numberAlign(slashCommands.length)} slash commands\n\u200B  \u200B┝──╾ ${numberAlign(simpleCommands.length)} simple commands\n\u200B  \u200B╰──╾ ${numberAlign(contextMenus.length)} context menus`,
 			),
 		);
@@ -542,7 +554,7 @@ export class Logger {
 			await this.log(
 				'info',
 				`API Server listening on port ${apiConfig.port.toString()}`,
-				chalk.gray(
+				chalk.grey(
 					boxen(`API Server listening on port ${chalk.bold(apiConfig.port)}`, {
 						padding: { top: 0, bottom: 0, left: 1, right: 1 },
 						margin: { top: 1, bottom: 0, left: 1, right: 1 },

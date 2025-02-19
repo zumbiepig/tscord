@@ -67,6 +67,8 @@ export interface LogsConfigType {
 
 	error: LogsConfigCategoryType;
 
+	database: LogsConfigCategoryType;
+
 	interaction: LogsConfigCategoryType;
 
 	newUser: LogsConfigCategoryType;

@@ -25,6 +25,12 @@ export const logsConfig: LogsConfigType = {
 		channelId: null,
 	},
 
+	database: {
+		console: true,
+		file: true,
+		channelId: null,
+	},
+
 	interaction: {
 		console: true,
 		file: true,
