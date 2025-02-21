@@ -10,10 +10,10 @@ import { resolveDependency } from '@/utils/functions';
  * @param message
  */
 export async function getPrefixFromMessage(message: Message) {
+	if (!message.guild) return generalConfig.simpleCommandsPrefix;
+
 	const db = await resolveDependency(Database);
-	const guildRepo = db.get(Guild);
+	const guildData = await db.get(Guild).findOneOrFail(message.guild.id);
 
-	const guildData = await guildRepo.findOne({ id: message.guild?.id ?? '' });
-
-	return guildData?.prefix ?? generalConfig.simpleCommandsPrefix;
+	return guildData.prefix ?? generalConfig.simpleCommandsPrefix;
 }

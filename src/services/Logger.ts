@@ -316,7 +316,9 @@ export class Logger {
 		type: 'NEW_GUILD' | 'DELETE_GUILD' | 'RECOVER_GUILD',
 		guildId: Snowflake,
 	): Promise<void> {
-		const guild = await this.client.guilds.fetch(guildId).catch(() => null);
+		const guild = await this.client.guilds
+			.fetch(guildId)
+			.catch(() => this.client.guilds.cache.get(guildId) ?? null);
 		const additionalMessage =
 			type === 'NEW_GUILD'
 				? 'has been added to the db'
@@ -343,7 +345,7 @@ export class Logger {
 								value: `${guild?.memberCount.toString() ?? 'N/A'} members`,
 							},
 						],
-						footer: { text: guild?.id ?? 'Unknown' },
+						footer: { text: guildId },
 						thumbnail: { url: guild?.iconURL() ?? '' },
 						color:
 							type === 'NEW_GUILD'

@@ -32,7 +32,7 @@ export default class ReadyEvent {
 		this.changeActivity();
 
 		// update last startup time in the database
-		await this.db.get(Data).set('lastStartup', Date.now());
+		await this.db.get(Data).set('lastStartup', new Date());
 
 		// start scheduled jobs
 		this.scheduler.startAllJobs();

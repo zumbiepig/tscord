@@ -9,7 +9,7 @@ import {
 import { BaseEntity } from '@/utils/classes';
 
 @Entity({ repository: () => ImageRepository })
-export class Image extends BaseEntity {
+export class Image extends BaseEntity<Image, 'deleteHash'> {
 	[EntityRepositoryType]!: ImageRepository;
 
 	@PrimaryKey()
@@ -31,7 +31,7 @@ export class Image extends BaseEntity {
 	hash!: string;
 
 	@Property()
-	deleteHash!: string | null;
+	deleteHash?: string | undefined;
 
 	@Property()
 	tags!: string[];

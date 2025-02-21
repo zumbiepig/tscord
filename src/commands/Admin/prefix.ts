@@ -32,18 +32,17 @@ export default class PrefixCommand {
 		{ localize }: InteractionData,
 	) {
 		const guild = resolveGuild(interaction);
-		const guildData = await this.db.get(Guild).findOne({ id: guild?.id ?? '' });
+		if (!guild) throw new ReplyUnknownErrorError(interaction);
 
-		if (guildData) {
-			guildData.prefix = prefix;
-			await this.db.em.flush();
+		const guildData = await this.db.get(Guild).findOneOrFail(guild.id);
+		guildData.prefix = prefix;
+		await this.db.em.flush();
 
-			await simpleSuccessEmbed(
-				interaction,
-				localize.COMMANDS.PREFIX.EMBED.DESCRIPTION({
-					prefix: prefix ?? generalConfig.simpleCommandsPrefix ?? '',
-				}),
-			);
-		} else throw new ReplyUnknownErrorError(interaction);
+		await simpleSuccessEmbed(
+			interaction,
+			localize.COMMANDS.PREFIX.EMBED.DESCRIPTION({
+				prefix: prefix ?? generalConfig.simpleCommandsPrefix ?? '',
+			}),
+		);
 	}
 }

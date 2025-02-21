@@ -1,6 +1,6 @@
 import {
-	BaseEntity as MikroORMBaseEntity,
 	Entity,
+	OptionalProps,
 	PrimaryKey,
 	PrimaryKeyProp,
 	Property,
@@ -9,11 +9,17 @@ import type { Snowflake } from 'discord.js';
 
 import { BaseEntity } from '@/utils/classes';
 import { dayjsTimezone } from '@/utils/functions';
+import type { Except } from 'type-fest';
 
 @Entity({ abstract: true })
 export abstract class DiscordBaseEntity<
-	Entity = never,
-	Optional = never,
+	Entity extends (
+		Entity extends Except<DiscordBaseEntity, typeof OptionalProps> ? true : false
+	) extends true
+		? object
+		: DiscordBaseEntity = never,
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+	Optional extends Exclude<keyof Entity, keyof DiscordBaseEntity> = never,
 > extends BaseEntity<Entity, 'active' | 'lasInteract' | Optional> {
 	[PrimaryKeyProp]?: 'snowflake';
 

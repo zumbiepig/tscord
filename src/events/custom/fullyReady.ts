@@ -1,11 +1,11 @@
 import { Discord } from 'discordx';
+import { injectable } from 'tsyringe';
 
 import { Logger } from '@/services';
 import { OnCustom } from '@/utils/decorators';
-import { injectable } from 'tsyringe';
 
 @Discord()
-@injectable
+@injectable()
 export default class FullyReadyEvent {
 	constructor(private logger: Logger) {}
 

@@ -33,7 +33,8 @@ export default class InteractionCreateEvent {
 
 		// update last interaction time of both user and guild
 		await this.db.get(User).updateLastInteract(interaction.user.id);
-		await this.db.get(Guild).updateLastInteract(interaction.guild?.id ?? '');
+		if (interaction.guild)
+			await this.db.get(Guild).updateLastInteract(interaction.guild.id);
 
 		// register logs and stats
 		await this.stats.registerInteraction(interaction);

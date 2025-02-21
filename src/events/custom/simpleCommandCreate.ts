@@ -7,7 +7,6 @@ import {
 } from 'discordx';
 import { injectable } from 'tsyringe';
 
-import { generalConfig } from '@/configs';
 import { Guild, User } from '@/entities';
 import { Database, EventManager, Logger, Stats } from '@/services';
 import { OnCustom } from '@/utils/decorators';
@@ -30,9 +29,8 @@ export default class SimpleCommandCreateEvent {
 
 		// update last interaction time of both user and guild
 		await this.db.get(User).updateLastInteract(command.message.author.id);
-		await this.db
-			.get(Guild)
-			.updateLastInteract(command.message.guild?.id ?? '');
+		if (command.message.guild)
+			await this.db.get(Guild).updateLastInteract(command.message.guild.id);
 
 		await this.stats.registerInteraction(command);
 		await this.logger.logInteraction(command);
@@ -43,13 +41,11 @@ export default class SimpleCommandCreateEvent {
 		[message]: ArgsOf<'messageCreate'>,
 		client: Client,
 	) {
-		if (generalConfig.simpleCommandsPrefix) {
-			const prefix = await getPrefixFromMessage(message);
-			const command = await client.parseCommand(prefix ?? '', message, false);
-
-			if (command && command instanceof SimpleCommandMessage) {
+		const prefix = await getPrefixFromMessage(message);
+		if (prefix) {
+			const command = await client.parseCommand(prefix, message, false);
+			if (command instanceof SimpleCommandMessage)
 				await this.eventManager.emit('simpleCommandCreate', command);
-			}
 		}
 	}
 }
