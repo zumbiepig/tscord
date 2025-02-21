@@ -2,29 +2,19 @@ import {
 	Entity,
 	EntityRepository,
 	EntityRepositoryType,
-	PrimaryKey,
 	Property,
 } from '@mikro-orm/core';
 import type { Snowflake } from 'discord.js';
 
-import { BaseEntity } from '@/utils/classes';
+import { DiscordBaseEntity } from '@/utils/classes';
 import { dayjsTimezone } from '@/utils/functions';
 
 @Entity({ repository: () => GuildRepository })
-export class Guild extends BaseEntity<Guild> {
-	[EntityRepositoryType]!: GuildRepository;
-
-	@PrimaryKey()
-	id!: Snowflake;
+export class Guild extends DiscordBaseEntity<Guild, ''> {
+	[EntityRepositoryType]?: GuildRepository;
 
 	@Property()
-	lastInteract = dayjsTimezone().toDate();
-
-	@Property()
-	deleted = false;
-
-	@Property()
-	prefix?: string;
+	prefix?: string | undefined;
 }
 
 export class GuildRepository extends EntityRepository<Guild> {
@@ -38,6 +28,6 @@ export class GuildRepository extends EntityRepository<Guild> {
 	}
 
 	async getActiveGuilds() {
-		return this.find({ deleted: false });
+		return this.find({ active: true });
 	}
 }

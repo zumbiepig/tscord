@@ -30,7 +30,7 @@ export class Plugin {
 
 	constructor(private _path: string) {}
 
-	public async load(): Promise<boolean> {
+	async load(): Promise<boolean> {
 		this.logger = await resolveDependency(Logger);
 
 		// read plugin.json
@@ -166,11 +166,11 @@ export class Plugin {
 		return translations;
 	}
 
-	public async execMain() {
+	async execMain() {
 		await import(join(this._path, 'main.ts'));
 	}
 
-	public async importCommands() {
+	async importCommands() {
 		return Promise.all(
 			(
 				await glob(join(this._path, 'commands', '**', '*.ts'), {
@@ -180,7 +180,7 @@ export class Plugin {
 		);
 	}
 
-	public async importEvents() {
+	async importEvents() {
 		return Promise.all(
 			(
 				await glob(join(this._path, 'events', '**', '*.ts'), {

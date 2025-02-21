@@ -53,22 +53,23 @@ export async function syncGuild(guildId: Snowflake, client: Client) {
 	// check if this guild exists in the database, if not it creates it (or recovers it from the deleted ones)
 	if (!guildData) {
 		// create new guild
+		db.em.create(Guild, {snowflake: guildId})
 		const newGuild = new Guild();
-		newGuild.id = guildId;
+		newGuild.snowflake = guildId;
 		await db.em.persistAndFlush(newGuild);
 
 		await stats.register('NEW_GUILD', guildId);
 		await logger.logGuild('NEW_GUILD', guildId);
 	} else if (guildData.deleted && fetchedGuild) {
 		// recover deleted guild
-		guildData.deleted = false;
+		guildData.active = true;
 		await db.em.flush();
 
 		await stats.register('RECOVER_GUILD', guildId);
 		await logger.logGuild('RECOVER_GUILD', guildId);
 	} else if (!fetchedGuild) {
 		// guild is deleted but still exists in the database
-		guildData.deleted = true;
+		guildData.active = false;
 		await db.em.flush();
 
 		await stats.register('DELETE_GUILD', guildId);
@@ -90,7 +91,7 @@ export async function syncAllGuilds(client: Client) {
 	// remove deleted guilds
 	const db = await resolveDependency(Database);
 	const guildsData = await db.get(Guild).getActiveGuilds();
-	guildsData.forEach((guildData) => guildIds.push(guildData.id));
+	guildsData.forEach((guildData) => guildIds.push(guildData.snowflake));
 
 	// sync guilds
 	for (const guildId of guildIds) await syncGuild(guildId, client);

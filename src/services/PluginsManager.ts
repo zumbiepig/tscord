@@ -16,7 +16,7 @@ import { Service } from '@/utils/decorators';
 export class PluginsManager {
 	private _plugins: Plugin[] = [];
 
-	public async loadPlugins(): Promise<void> {
+	async loadPlugins(): Promise<void> {
 		const pluginPaths = await glob(join('src', 'plugins', '*'), {
 			windowsPathsNoEscape: true,
 		});
@@ -27,25 +27,25 @@ export class PluginsManager {
 		}
 	}
 
-	public getEntities(): EntityClass<AnyEntity>[] {
+	getEntities(): EntityClass<AnyEntity>[] {
 		return this._plugins.map((plugin) => Object.values(plugin.entities)).flat();
 	}
 
-	public getControllers(): (typeof BaseController)[] {
+	getControllers(): (typeof BaseController)[] {
 		return this._plugins
 			.map((plugin) => Object.values(plugin.controllers))
 			.flat();
 	}
 
-	public async importCommands(): Promise<void> {
+	async importCommands(): Promise<void> {
 		for (const plugin of this._plugins) await plugin.importCommands();
 	}
 
-	public async importEvents(): Promise<void> {
+	async importEvents(): Promise<void> {
 		for (const plugin of this._plugins) await plugin.importEvents();
 	}
 
-	public initServices(): Record<string, unknown> {
+	initServices(): Record<string, unknown> {
 		const services: Record<string, unknown> = {};
 
 		for (const plugin of this._plugins) {
@@ -58,11 +58,11 @@ export class PluginsManager {
 		return services;
 	}
 
-	public async execMains(): Promise<void> {
+	async execMains(): Promise<void> {
 		for (const plugin of this._plugins) await plugin.execMain();
 	}
 
-	public async syncTranslations(): Promise<void> {
+	async syncTranslations(): Promise<void> {
 		const localeMapping: ImportLocaleMapping[] = [];
 		const namespaces: Record<string, string[]> = {};
 		const translations: Record<string, Translation> = {};
@@ -106,7 +106,7 @@ export class PluginsManager {
 		await storeTranslationsToDisk(localeMapping, true);
 	}
 
-	public isPluginLoad(pluginName: string): boolean {
+	isPluginLoad(pluginName: string): boolean {
 		return (
 			this._plugins.findIndex((plugin) => plugin.name === pluginName) !== -1
 		);

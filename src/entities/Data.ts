@@ -3,55 +3,56 @@ import {
 	EntityRepository,
 	EntityRepositoryType,
 	PrimaryKey,
+	PrimaryKeyProp,
 	Property,
 } from '@mikro-orm/core';
 
 import { BaseEntity } from '@/utils/classes';
-import type { ValueOf } from 'type-fest';
+import { dayjsTimezone } from '@/utils/functions';
 
-const defaultData = {
+interface DataRepositoryType {
+	maintenance: boolean;
+	lastMaintenance: Date;
+	lastStartup: Date;
+}
+
+const defaultData: DataRepositoryType = {
 	maintenance: false,
-	lastMaintenance: Date.now(),
-	lastStartup: Date.now(),
-} as const;
+	lastMaintenance: dayjsTimezone().toDate(),
+	lastStartup: dayjsTimezone().toDate(),
+};
 
 @Entity({ repository: () => DataRepository })
 export class Data extends BaseEntity {
 	[EntityRepositoryType]?: DataRepository;
+	[PrimaryKeyProp]?: 'key';
 
 	@PrimaryKey()
-	key!: keyof typeof defaultData;
+	key!: keyof DataRepositoryType;
 
 	@Property()
-	value!: (typeof defaultData)[keyof typeof defaultData];
+	value!: DataRepositoryType[typeof this.key];
 }
 
 export class DataRepository extends EntityRepository<Data> {
-	async get<T extends keyof typeof defaultData>(
+	async get<T extends keyof DataRepositoryType>(
 		key: T,
-	): Promise<(typeof defaultData)[T]> {
-		const data = await this.findOne({ key });
+	): Promise<DataRepositoryType[T]> {
+		const data = await this.findOne(key);
 
-		if (data) return data.value as (typeof defaultData)[T];
+		if (data) return data.value as DataRepositoryType[T];
 		else return defaultData[key];
 	}
 
-	async set<T extends keyof typeof defaultData>(
+	async set<T extends keyof DataRepositoryType>(
 		key: T,
-		value: (typeof defaultData)[T],
+		value: DataRepositoryType[T],
 	): Promise<void> {
-		const data = await this.findOne({ key });
+		const data = await this.findOne(key);
 
 		if (data) data.value = value;
 		else this.create({ key, value });
 
 		await this.em.flush();
-	}
-
-	async add<T extends keyof typeof defaultData>(
-		key: T,
-		value: (typeof defaultData)[T],
-	): Promise<void> {
-		if (!(await this.findOne({ key }))) await this.set(key, value);
 	}
 }

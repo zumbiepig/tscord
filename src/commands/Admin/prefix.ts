@@ -35,7 +35,7 @@ export default class PrefixCommand {
 		const guildData = await this.db.get(Guild).findOne({ id: guild?.id ?? '' });
 
 		if (guildData) {
-			guildData.prefix = prefix ?? null;
+			guildData.prefix = prefix;
 			await this.db.em.flush();
 
 			await simpleSuccessEmbed(
