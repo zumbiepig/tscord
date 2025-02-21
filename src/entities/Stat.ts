@@ -1,12 +1,11 @@
 import {
 	Entity,
-	EntityRepository,
 	EntityRepositoryType,
 	PrimaryKey,
 	Property,
 } from '@mikro-orm/core';
 
-import { BaseEntity } from '@/utils/classes';
+import { BaseEntity, BaseRepository } from '@/utils/classes';
 import type { StatType } from '@/utils/types';
 
 @Entity({ repository: () => StatRepository })
@@ -26,4 +25,4 @@ export class Stat extends BaseEntity {
 	additionalData?: object;
 }
 
-export class StatRepository extends EntityRepository<Stat> {}
+export class StatRepository extends BaseRepository<Stat> {}

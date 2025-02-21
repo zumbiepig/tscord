@@ -1,15 +1,14 @@
 import {
 	Entity,
-	EntityRepository,
 	EntityRepositoryType,
 	PrimaryKey,
 	Property,
 } from '@mikro-orm/core';
 
-import { BaseEntity } from '@/utils/classes';
+import { BaseEntity, BaseRepository } from '@/utils/classes';
 
 @Entity({ repository: () => ImageRepository })
-export class Image extends BaseEntity<Image, 'deleteHash'> {
+export class Image extends BaseEntity {
 	[EntityRepositoryType]!: ImageRepository;
 
 	@PrimaryKey()
@@ -37,7 +36,7 @@ export class Image extends BaseEntity<Image, 'deleteHash'> {
 	tags!: string[];
 }
 
-export class ImageRepository extends EntityRepository<Image> {
+export class ImageRepository extends BaseRepository<Image> {
 	async findByTags(tags: string[], explicit = true): Promise<Image[]> {
 		const rows = await this.find({
 			$and: tags.map((tag) => ({ tags: new RegExp(tag) })),

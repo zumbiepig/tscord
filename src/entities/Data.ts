@@ -1,13 +1,12 @@
 import {
 	Entity,
-	EntityRepository,
 	EntityRepositoryType,
 	PrimaryKey,
 	PrimaryKeyProp,
 	Property,
 } from '@mikro-orm/core';
 
-import { BaseEntity } from '@/utils/classes';
+import { BaseEntity, BaseRepository } from '@/utils/classes';
 import { dayjsTimezone } from '@/utils/functions';
 
 interface DataRepositoryType {
@@ -34,7 +33,7 @@ export class Data extends BaseEntity {
 	value!: DataRepositoryType[typeof this.key];
 }
 
-export class DataRepository extends EntityRepository<Data> {
+export class DataRepository extends BaseRepository<Data> {
 	async get<T extends keyof DataRepositoryType>(
 		key: T,
 	): Promise<DataRepositoryType[T]> {

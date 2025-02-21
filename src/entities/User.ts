@@ -1,30 +1,26 @@
 import {
 	Entity,
-	EntityRepository,
 	EntityRepositoryType,
 	PrimaryKey,
 	Property,
 } from '@mikro-orm/core';
 import type { Locale, Snowflake } from 'discord.js';
 
-import { BaseEntity } from '@/utils/classes';
+import { BaseRepository, DiscordBaseEntity } from '@/utils/classes';
 import { dayjsTimezone } from '@/utils/functions';
 
 @Entity({ repository: () => UserRepository })
-export class User extends BaseEntity {
+export class User extends DiscordBaseEntity {
 	[EntityRepositoryType]!: UserRepository;
 
 	@PrimaryKey()
 	id!: Snowflake;
 
 	@Property()
-	lastInteract: Date = dayjsTimezone().toDate();
-
-	@Property()
-	locale!: Locale;
+	locale?: Locale;
 }
 
-export class UserRepository extends EntityRepository<User> {
+export class UserRepository extends BaseRepository<User> {
 	async updateLastInteract(userId: Snowflake): Promise<void> {
 		const user = await this.findOne(userId);
 
