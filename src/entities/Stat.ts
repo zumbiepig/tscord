@@ -9,7 +9,7 @@ import { BaseEntity, BaseRepository } from '@/utils/classes';
 import type { StatType } from '@/utils/types';
 
 @Entity({ repository: () => StatRepository })
-export class Stat extends BaseEntity {
+export class Stat extends BaseEntity<Stat> {
 	[EntityRepositoryType]?: StatRepository;
 
 	@PrimaryKey()

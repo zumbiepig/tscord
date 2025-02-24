@@ -36,12 +36,11 @@ export default class PrefixCommand {
 
 		const guildData = await this.db.get(Guild).findOneOrFail(guild.id);
 		guildData.prefix = prefix;
-		await this.db.em.flush();
 
 		await simpleSuccessEmbed(
 			interaction,
 			localize.COMMANDS.PREFIX.EMBED.DESCRIPTION({
-				prefix: prefix ?? generalConfig.simpleCommandsPrefix ?? '',
+				prefix: prefix ?? generalConfig.simpleCommandsPrefix ?? undefined,
 			}),
 		);
 	}

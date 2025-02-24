@@ -22,8 +22,9 @@ const defaultData: DataRepositoryType = {
 };
 
 @Entity({ repository: () => DataRepository })
-export class Data extends BaseEntity {
+export class Data extends BaseEntity<Data> {
 	[EntityRepositoryType]?: DataRepository;
+
 	[PrimaryKeyProp]?: 'key';
 
 	@PrimaryKey()
@@ -51,7 +52,5 @@ export class DataRepository extends BaseRepository<Data> {
 
 		if (data) data.value = value;
 		else this.create({ key, value });
-
-		await this.em.flush();
 	}
 }

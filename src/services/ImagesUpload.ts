@@ -73,7 +73,6 @@ export class ImagesUpload {
 			if (!images.includes(imagePath)) {
 				// delete the image if it is not in the filesystem anymore
 				await this.imageRepo.nativeDelete(image);
-				await this.db.em.flush();
 				await this.deleteImageFromImgur(image);
 			} else if (!(await this.isImgurImageValid(image.url))) {
 				// reupload if the image is not on imgur anymore
@@ -138,7 +137,7 @@ export class ImagesUpload {
 		image.url = uploadResponse.data.link;
 		image.size = uploadResponse.data.size;
 		image.hash = imageHash;
-		image.deleteHash = uploadResponse.data.deletehash ?? null;
+		image.deleteHash = uploadResponse.data.deletehash;
 		image.tags = basePath.split(sep);
 		await this.db.em.persistAndFlush(image);
 

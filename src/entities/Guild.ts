@@ -1,32 +1,19 @@
-import {
-	Entity,
-	EntityRepositoryType,
-	Property,
-} from '@mikro-orm/core';
-import type { Snowflake } from 'discord.js';
+import { Entity, EntityRepositoryType, Property } from '@mikro-orm/core';
 
-import { BaseRepository, DiscordBaseEntity } from '@/utils/classes';
-import { dayjsTimezone } from '@/utils/functions';
+import { BaseDiscordEntity, BaseDiscordRepository } from '@/utils/classes';
 
 @Entity({ repository: () => GuildRepository })
-export class Guild extends DiscordBaseEntity {
+export class Guild extends BaseDiscordEntity<Guild> {
 	[EntityRepositoryType]?: GuildRepository;
 
 	@Property()
 	prefix?: string | undefined;
 }
 
-export class GuildRepository extends BaseRepository<Guild> {
-	async updateLastInteract(guildId: Snowflake): Promise<void> {
-		const guild = await this.findOne(guildId);
-
-		if (guild) {
-			guild.lastInteract = dayjsTimezone().toDate();
-			await this.em.flush();
-		}
-	}
-
-	async getActiveGuilds() {
-		return this.find({ active: true });
+export class GuildRepository extends BaseDiscordRepository<Guild> {
+	async a() {
+		await this.findOne({ active: false });
+		await this.getAllActive();
+		return '1';
 	}
 }

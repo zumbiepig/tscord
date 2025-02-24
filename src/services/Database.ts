@@ -1,7 +1,6 @@
 import { readdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import type { BetterSqliteDriver } from '@mikro-orm/better-sqlite';
 import {
 	DefaultLogger,
 	defineConfig,
@@ -14,10 +13,7 @@ import {
 	type Options,
 } from '@mikro-orm/core';
 import { EntityGenerator } from '@mikro-orm/entity-generator';
-import type { MariaDbDriver } from '@mikro-orm/mariadb';
 import { Migrator } from '@mikro-orm/migrations';
-import type { MongoDriver } from '@mikro-orm/mongodb';
-import type { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import chalk from 'chalk';
@@ -121,14 +117,8 @@ export class Database {
 		}
 	}
 
-	get orm() {
-		return this._orm as MikroORM<
-			BetterSqliteDriver | MongoDriver | MariaDbDriver | PostgreSqlDriver
-		>;
-	}
-
 	get em() {
-		return (this._orm as typeof this.orm).em;
+		return this._orm.em;
 	}
 
 	/**
@@ -136,7 +126,7 @@ export class Database {
 	 * @param entity Entity of the custom repository to get
 	 */
 	get<T extends object>(entity: EntityName<T>) {
-		return this._orm.em.getRepository(entity);
+		return this.em.getRepository(entity);
 	}
 
 	/**
@@ -163,7 +153,7 @@ export class Database {
 		if (!snapshotFile)
 			snapshotFile = `snapshot_${formatDate(dayjsTimezone(), 'dateTimeFilename')}_${mikroORMConfig.dbName ?? ''}.backup`;
 
-		await this._orm.em.flush();
+		await this.em.flush();
 		await backupDatabase(
 			mikroORMConfig.dbName ?? '',
 			join(databaseConfig.path, 'backups', snapshotFile),

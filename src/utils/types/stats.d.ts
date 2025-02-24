@@ -1,7 +1,6 @@
 import type { Stats } from '@/services';
-import type { getTypeOfInteraction } from '@/utils/functions';
 
-export type StatType = ReturnType<typeof getTypeOfInteraction>;
+export type StatType = 'NEW_GUILD' | 'RECOVER_GUILD' | 'DELETE_GUILD';
 
 export type StatPerInterval = {
 	date: string;

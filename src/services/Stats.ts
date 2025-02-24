@@ -1,7 +1,9 @@
 import os from 'node:os';
 import process from 'node:process';
 
+import type { SqlEntityManager } from '@mikro-orm/better-sqlite';
 import { EntityRepository } from '@mikro-orm/core';
+import type { MongoEntityManager } from '@mikro-orm/mongodb';
 import type { Interaction, Snowflake } from 'discord.js';
 import { Client, SimpleCommandMessage } from 'discordx';
 import { delay, inject } from 'tsyringe';
@@ -48,16 +50,15 @@ export class Stats {
 	 * @param value
 	 * @param additionalData
 	 */
-	async register(type: StatType, value: string, additionalData?: object) {
+	register(type: StatType, value: string, additionalData?: object) {
 		this.db.em.create(Stat, { type, value, additionalData });
-		await this.db.em.flush();
 	}
 
 	/**
 	 * Record an interaction and add it to the database.
 	 * @param interaction
 	 */
-	async registerInteraction(interaction: Interaction | SimpleCommandMessage) {
+	registerInteraction(interaction: Interaction | SimpleCommandMessage) {
 		// we extract data from the interaction
 		const type = getTypeOfInteraction(interaction);
 
@@ -69,7 +70,7 @@ export class Stats {
 		};
 
 		// add it to the db
-		await this.register(type, value, additionalData);
+		this.register(type, value, additionalData);
 	}
 
 	/**
@@ -121,32 +122,44 @@ export class Stats {
 		let slashCommands: StatPerInterval;
 
 		if ('createQueryBuilder' in this.db.em) {
-			const qb = this.db.em.createQueryBuilder(Stat);
+			const qb = (this.db.em as SqlEntityManager).createQueryBuilder(Stat);
 			const query = qb
 				.select(['type', 'value as name', 'count(*) as count'])
 				.where(allInteractions)
 				.groupBy(['type', 'value']);
 
 			slashCommands = await query.execute();
+
+			slashCommands = this.db.em.find(Stat, allInteractions, {
+				fields: ['type', 'value'],
+				groupBy: ['type', 'value'],
+				orderBy: {
+					type: 'ASC',
+					value: 'ASC',
+				},
+			});
 		} else if ('aggregate' in this.db.em) {
-			slashCommands = (await this.db.em.aggregate(Stat, [
-				{
-					$match: allInteractions,
-				},
-				{
-					$group: {
-						id: { type: '$type', value: '$value' },
-						count: { $sum: 1 },
+			slashCommands = (await (this.db.em as MongoEntityManager).aggregate(
+				Stat,
+				[
+					{
+						$match: allInteractions,
 					},
-				},
-				{
-					$replaceRoot: {
-						newRoot: {
-							$mergeObjects: ['$id', { count: '$count' }],
+					{
+						$group: {
+							id: { type: '$type', value: '$value' },
+							count: { $sum: 1 },
 						},
 					},
-				},
-			])) as StatPerInterval;
+					{
+						$replaceRoot: {
+							newRoot: {
+								$mergeObjects: ['$id', { count: '$count' }],
+							},
+						},
+					},
+				],
+			)) as StatPerInterval;
 		} else {
 			throw new Error('Unsupported database driver');
 		}
