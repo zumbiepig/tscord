@@ -8,7 +8,6 @@ import {
 	type EmbedField,
 } from 'discord.js';
 import { Client, Discord } from 'discordx';
-import { Guard } from 'discordx';
 import { injectable } from 'tsyringe';
 
 import { colorsConfig, generalConfig } from '@/configs';

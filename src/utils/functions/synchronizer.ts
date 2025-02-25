@@ -85,7 +85,7 @@ export async function syncAllGuilds(client: Client) {
 
 	// remove deleted guilds
 	const db = await resolveDependency(Database);
-	const guildsData = await db.get(Guild).getAllActive();
+	const guildsData = await db.get(Guild).getActive();
 	guildsData.forEach((guildData) => guildIds.push(guildData.id));
 
 	// sync guilds

@@ -40,16 +40,16 @@ export default {
 			DESCRIPTION: 'Set the maintenance mode of the bot.',
 			EMBED: {
 				DESCRIPTION:
-					'Maintenance mode has been {status|{true:enabled,false:disabled}}.',
+					'Maintenance mode has been {status|{enabled:enabled,enabled:disabled}}.',
 			},
 		},
 		STATS: {
 			DESCRIPTION: 'Get some stats about the bot.',
 			HEADERS: {
-				COMMANDS: 'Commands',
+				USERS: 'Users',
 				GUILDS: 'Guild',
 				ACTIVE_USERS: 'Active Users',
-				USERS: 'Users',
+				COMMANDS: 'Commands',
 			},
 		},
 		HELP: {

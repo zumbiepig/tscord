@@ -1,71 +1,46 @@
-import { Pagination, PaginationType } from '@discordx/pagination';
+import { Pagination, type PaginationItem } from '@discordx/pagination';
 import { Category } from '@discordx/utilities';
+import ChartJsImage from 'chartjs-to-image';
 import {
 	ApplicationCommandOptionType,
 	CommandInteraction,
 	EmbedBuilder,
-	User,
 } from 'discord.js';
-import { Discord } from 'discordx';
+import { Discord, SimpleCommandMessage } from 'discordx';
 import { injectable } from 'tsyringe';
 
 import { colorsConfig } from '@/configs';
 import { Stats } from '@/services';
 import { Slash, SlashOption } from '@/utils/decorators';
-import type {
-	InteractionData,
-	StatPerInterval,
-	StatsResolverType,
-} from '@/utils/types';
-
-const statsResolver: StatsResolverType = [
-	{
-		name: 'COMMANDS',
-		data: async (stats: Stats, days: number) => {
-			const commandInteractions = await stats.countStatsPerDays(
-				'CHAT_INPUT_COMMAND_INTERACTION',
-				days,
-			);
-			const simpleCommandMessages = await stats.countStatsPerDays(
-				'SIMPLE_COMMAND_MESSAGE',
-				days,
-			);
-			const userContextMenus = await stats.countStatsPerDays(
-				'USER_CONTEXT_MENU_COMMAND_INTERACTION',
-				days,
-			);
-			const messageContextMenus = await stats.countStatsPerDays(
-				'MESSAGE_CONTEXT_MENU_COMMAND_INTERACTION',
-				days,
-			);
-
-			return stats.sumStats(
-				stats.sumStats(commandInteractions, simpleCommandMessages),
-				stats.sumStats(messageContextMenus, userContextMenus),
-			);
-		},
-	},
-	{
-		name: 'GUILDS',
-		data: async (stats, days) =>
-			await stats.countStatsPerDays('TOTAL_GUILDS', days),
-	},
-	{
-		name: 'ACTIVE_USERS',
-		data: async (stats, days) =>
-			await stats.countStatsPerDays('TOTAL_ACTIVE_USERS', days),
-	},
-	{
-		name: 'USERS',
-		data: async (stats, days) =>
-			await stats.countStatsPerDays('TOTAL_USERS', days),
-	},
-];
+import { formatDate, resolveUser } from '@/utils/functions';
+import type { InteractionData } from '@/utils/types';
 
 @Discord()
 @injectable()
 @Category('General')
 export default class StatsCommand {
+	private statsResolver = {
+		USERS: async (days: number) =>
+			await this.stats.countStatsPerDays('TOTAL_USERS', days),
+		GUILDS: async (days: number) =>
+			await this.stats.countStatsPerDays('TOTAL_GUILDS', days),
+		ACTIVE_USERS: async (days: number) =>
+			await this.stats.countStatsPerDays('TOTAL_ACTIVE_USERS', days),
+		COMMANDS: async (days: number) =>
+			this.stats.sumStats(
+				...(await Promise.all(
+					(
+						[
+							'CHAT_INPUT_COMMAND_INTERACTION',
+							'SIMPLE_COMMAND_MESSAGE',
+							'USER_CONTEXT_MENU_COMMAND_INTERACTION',
+							'MESSAGE_CONTEXT_MENU_COMMAND_INTERACTION',
+						] as const
+					).map((type) => this.stats.countStatsPerDays(type, days)),
+				)),
+			),
+	};
+
 	constructor(private stats: Stats) {}
 
 	@Slash({
@@ -75,89 +50,80 @@ export default class StatsCommand {
 		@SlashOption({
 			name: 'days',
 			type: ApplicationCommandOptionType.Number,
-			required: true,
+			minValue: 1,
 		})
-		days: number,
-		interaction: CommandInteraction,
+		days = 7,
+		interaction: CommandInteraction | SimpleCommandMessage,
 		{ localize }: InteractionData,
 	) {
-		const embeds: EmbedBuilder[] = [];
+		const pages: PaginationItem[] = [];
 
-		for (const stat of statsResolver) {
-			const stats = await stat.data(this.stats, days);
-			const link = this.generateLink(
-				stats,
-				localize.COMMANDS.STATS.HEADERS[
-					stat.name as keyof (typeof localize)['COMMANDS']['STATS']['HEADERS']
-				](),
-			);
-			const embed = this.getEmbed(interaction.user, link);
+		for (const resolver of Object.entries(this.statsResolver)) {
+			const stats = await resolver[1](days);
 
-			embeds.push(embed);
-		}
-
-		await new Pagination(
-			interaction,
-			embeds.map((embed) => ({
-				embeds: [embed],
-			})),
-			{
-				type: PaginationType.Button,
-			},
-		).send();
-	}
-
-	generateLink(stats: StatPerInterval, name: string): string {
-		const obj = {
-			type: 'line',
-			data: {
-				labels: stats.map((stat) => stat.date.split('/').slice(0, 2).join('/')), // we remove the year from the date
-				datasets: [
-					{
-						label: '',
-						data: stats.map((stat) => stat.count),
-						fill: true,
-						backgroundColor: 'rgba(252,231,3,0.1)',
-						borderColor: 'rgb(252,186,3)',
-						borderCapStyle: 'round',
-						lineTension: 0.3,
-					},
-				],
-			},
-			options: {
-				title: {
-					display: true,
-					text: name,
-					fontColor: 'rgba(255,255,254,0.6)',
-					fontSize: 20,
-					padding: 15,
-				},
-				legend: { display: false },
-				scales: {
-					xAxes: [{ ticks: { fontColor: 'rgba(255,255,254,0.6)' } }],
-					yAxes: [
+			const chart = new ChartJsImage().setConfig({
+				type: 'line',
+				data: {
+					labels: stats.map((stat) =>
+						formatDate(stat.date, 'onlyDayMonth'),
+					),
+					datasets: [
 						{
-							ticks: {
-								fontColor: 'rgba(255,255,254,0.6)',
-								beginAtZero: false,
-								stepSize: 1,
-							},
+							label: '',
+							data: stats.map((stat) => stat.count),
+							fill: true,
+							backgroundColor: 'rgba(252,231,3,0.1)',
+							borderColor: 'rgb(252,186,3)',
+							borderCapStyle: 'round',
+							lineTension: 0.3,
 						},
 					],
 				},
-			},
-		};
+				options: {
+					title: {
+						display: true,
+						text: localize.COMMANDS.STATS.HEADERS[
+							resolver[0] as keyof typeof this.statsResolver
+						](),
+						fontColor: 'rgba(255,255,254,0.6)',
+						fontSize: 20,
+						padding: 15,
+					},
+					legend: { display: false },
+					scales: {
+						xAxes: [{ ticks: { fontColor: 'rgba(255,255,254,0.6)' } }],
+						yAxes: [
+							{
+								ticks: {
+									fontColor: 'rgba(255,255,254,0.6)',
+									beginAtZero: false,
+									stepSize: 1,
+								},
+							},
+						],
+					},
+				},
+			});
 
-		return `https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(obj))}&format=png`;
-	}
+			const user = resolveUser(interaction);
+			pages.push({
+				embeds: [
+					new EmbedBuilder()
+						.setAuthor({
+							name: user.username,
+							iconURL: user.displayAvatarURL(),
+						})
+						.setColor(colorsConfig.primary)
+						.setImage(chart.getUrl()),
+				],
+			});
+		}
 
-	getEmbed(author: User, link: string): EmbedBuilder {
-		return new EmbedBuilder()
-			.setAuthor({
-				name: author.username,
-				iconURL: author.displayAvatarURL({ forceStatic: false }),
-			})
-			.setColor(colorsConfig.primary)
-			.setImage(link);
+		await new Pagination(
+			interaction instanceof SimpleCommandMessage
+				? interaction.message
+				: interaction,
+			pages,
+		).send();
 	}
 }

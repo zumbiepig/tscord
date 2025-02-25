@@ -2,13 +2,13 @@ import os from 'node:os';
 import process from 'node:process';
 
 import type { SqlEntityManager } from '@mikro-orm/better-sqlite';
-import { EntityRepository } from '@mikro-orm/core';
+import type { FilterQuery } from '@mikro-orm/core';
 import type { MongoEntityManager } from '@mikro-orm/mongodb';
 import type { Interaction, Snowflake } from 'discord.js';
 import { Client, SimpleCommandMessage } from 'discordx';
 import { delay, inject } from 'tsyringe';
 
-import { Guild, Stat, User } from '@/entities';
+import { Guild, Stat, StatRepository, User } from '@/entities';
 import { Database } from '@/services';
 import { Schedule, Service } from '@/utils/decorators';
 import {
@@ -25,17 +25,19 @@ import {
 import type { StatPerInterval, StatType } from '@/utils/types';
 
 const allInteractions = {
-	$or: [
-		{ type: 'CHAT_INPUT_COMMAND_INTERACTION' },
-		{ type: 'SIMPLE_COMMAND_MESSAGE' },
-		{ type: 'USER_CONTEXT_MENU_COMMAND_INTERACTION' },
-		{ type: 'MESSAGE_CONTEXT_MENU_COMMAND_INTERACTION' },
-	],
-};
+	type: {
+		$in: [
+			'CHAT_INPUT_COMMAND_INTERACTION',
+			'SIMPLE_COMMAND_MESSAGE',
+			'USER_CONTEXT_MENU_COMMAND_INTERACTION',
+			'MESSAGE_CONTEXT_MENU_COMMAND_INTERACTION',
+		],
+	},
+} satisfies FilterQuery<Stat>;
 
 @Service()
 export class Stats {
-	private statsRepo: EntityRepository<Stat>;
+	private statsRepo: StatRepository;
 
 	constructor(
 		private db: Database,
@@ -83,7 +85,7 @@ export class Stats {
 				0,
 			),
 			TOTAL_GUILDS: this.client.guilds.cache.size,
-			TOTAL_ACTIVE_USERS: await this.db.get(User).count(),
+			TOTAL_ACTIVE_USERS: await this.db.get(User).count({ active: true }),
 			TOTAL_COMMANDS: await this.statsRepo.count(allInteractions),
 		};
 
@@ -105,22 +107,21 @@ export class Stats {
 	 * Get the last guild added to the database.
 	 */
 	async getLastGuildAdded() {
-		const guilds = await this.db.get(Guild).find(
+		const guild = await this.db.em.findOne(
+			Guild,
 			{},
 			{
 				orderBy: { createdAt: 'DESC' },
 			},
 		);
 
-		return guilds[0];
+		return guild;
 	}
 
 	/**
 	 * Get commands sorted by total amount of uses in DESC order.
 	 */
 	async getTopCommands() {
-		let slashCommands: StatPerInterval;
-
 		if ('createQueryBuilder' in this.db.em) {
 			const qb = (this.db.em as SqlEntityManager).createQueryBuilder(Stat);
 			const query = qb
@@ -128,18 +129,11 @@ export class Stats {
 				.where(allInteractions)
 				.groupBy(['type', 'value']);
 
-			slashCommands = await query.execute();
+			const slashCommands = await query.execute();
 
-			slashCommands = this.db.em.find(Stat, allInteractions, {
-				fields: ['type', 'value'],
-				groupBy: ['type', 'value'],
-				orderBy: {
-					type: 'ASC',
-					value: 'ASC',
-				},
-			});
+			return slashCommands.sort((a, b) => b.count - a.count);
 		} else if ('aggregate' in this.db.em) {
-			slashCommands = (await (this.db.em as MongoEntityManager).aggregate(
+			const slashCommands = (await (this.db.em as MongoEntityManager).aggregate(
 				Stat,
 				[
 					{
@@ -160,11 +154,28 @@ export class Stats {
 					},
 				],
 			)) as StatPerInterval;
+			return slashCommands.sort((a, b) => b.count - a.count);
 		} else {
-			throw new Error('Unsupported database driver');
-		}
+			// Get distinct command types and values
+			const distinctCommands = await this.db.em.find(Stat, allInteractions);
 
-		return slashCommands.sort((a, b) => b.count - a.count);
+			// Count occurrences of each command
+			const commandCounts = await Promise.all(
+				distinctCommands.map(async (command) => {
+					const count = await this.db.em.count(Stat, {
+						type: command.type,
+						value: command.value,
+					});
+					return {
+						date: command.createdAt,
+						count,
+					};
+				}),
+			);
+
+			// Sort commands by count in descending order
+			return commandCounts.sort((a, b) => b.count - a.count);
+		}
 	}
 
 	/**
@@ -209,7 +220,7 @@ export class Stats {
 			totalCommands: number;
 		}[] = [];
 
-		const guilds = await this.db.get(Guild).getActiveGuilds();
+		const guilds = await this.db.get(Guild).getActive();
 
 		for (const guild of guilds) {
 			const discordGuild = await this.client.guilds
@@ -290,28 +301,29 @@ export class Stats {
 	}
 
 	/**
-	 * Sum two array of stats.
-	 * @param stats1
-	 * @param stats2
+	 * Sum an array of stats.
+	 * @param args An list of stats to sum
 	 */
-	sumStats(stats1: StatPerInterval, stats2: StatPerInterval): StatPerInterval {
-		const allDays = [
-			...new Set(stats1.concat(stats2).map((stat) => stat.date)),
-		].sort((a, b) => {
-			const aa = a.split('/').reverse().join();
-			const bb = b.split('/').reverse().join();
+	sumStats(...args: StatPerInterval[]): StatPerInterval {
+		return args.reduce((stats1, stats2) => {
+			const allDays = [
+				...new Set(stats1.concat(stats2).map((stat) => stat.date)),
+			].sort((a, b) => {
+				const aa = a.split('/').reverse().join();
+				const bb = b.split('/').reverse().join();
 
-			return aa < bb ? -1 : aa > bb ? 1 : 0;
+				return aa < bb ? -1 : aa > bb ? 1 : 0;
+			});
+
+			const sumStats = allDays.map((day) => ({
+				date: day,
+				count:
+					(stats1.find((stat) => stat.date === day)?.count ?? 0) +
+					(stats2.find((stat) => stat.date === day)?.count ?? 0),
+			}));
+
+			return sumStats;
 		});
-
-		const sumStats = allDays.map((day) => ({
-			date: day,
-			count:
-				(stats1.find((stat) => stat.date === day)?.count ?? 0) +
-				(stats2.find((stat) => stat.date === day)?.count ?? 0),
-		}));
-
-		return sumStats;
 	}
 
 	/**
@@ -363,7 +375,7 @@ export class Stats {
 
 		for (const type of Object.keys(totalStats)) {
 			const value = JSON.stringify(totalStats[type as keyof typeof totalStats]);
-			await this.register(type as keyof typeof totalStats, value);
+			this.register(type as keyof typeof totalStats, value);
 		}
 	}
 }

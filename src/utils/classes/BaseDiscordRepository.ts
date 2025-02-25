@@ -6,7 +6,7 @@ import { dayjsTimezone } from '@/utils/functions';
 export abstract class BaseDiscordRepository<
 	T extends BaseDiscordEntity<T>,
 > extends BaseRepository<BaseDiscordEntity<T>> {
-	async getAllActive() {
+	async getActive() {
 		return this.find({ active: true });
 	}
 

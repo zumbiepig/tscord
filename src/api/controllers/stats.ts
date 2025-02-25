@@ -91,12 +91,12 @@ export class StatsController extends BaseController {
 	@Get('/usersAndGuilds')
 	async usersAndGuilds(@QueryParams('numberOfDays') numberOfDays = 7) {
 		return {
+			users: await this.stats.countStatsPerDays('TOTAL_USERS', numberOfDays),
+			guilds: await this.stats.countStatsPerDays('TOTAL_GUILDS', numberOfDays),
 			activeUsers: await this.stats.countStatsPerDays(
 				'TOTAL_ACTIVE_USERS',
 				numberOfDays,
 			),
-			users: await this.stats.countStatsPerDays('TOTAL_USERS', numberOfDays),
-			guilds: await this.stats.countStatsPerDays('TOTAL_GUILDS', numberOfDays),
 		};
 	}
 }

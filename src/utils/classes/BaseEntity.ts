@@ -1,5 +1,4 @@
 import {
-	BaseEntity as MikroORMBaseEntity,
 	Entity,
 	EntityRepositoryType,
 	OptionalProps,
@@ -18,7 +17,7 @@ export abstract class BaseEntity<
 	K extends RequiredKeysOf<
 		RequiredEntityData<Omit<T, keyof BaseEntity<T>>>
 	> = never,
-> extends MikroORMBaseEntity {
+> {
 	abstract [EntityRepositoryType]?: BaseRepository<T>;
 
 	[OptionalProps]?: 'createdAt' | 'updatedAt' | K;

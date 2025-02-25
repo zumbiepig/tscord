@@ -13,7 +13,7 @@ export class Guild extends BaseDiscordEntity<Guild> {
 export class GuildRepository extends BaseDiscordRepository<Guild> {
 	async a() {
 		await this.findOne({ active: false });
-		await this.getAllActive();
+		await this.getActive();
 		return '1';
 	}
 }
