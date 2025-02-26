@@ -16,11 +16,7 @@ export async function syncUser(user: DUser) {
 		Logger,
 	]);
 
-	const userRepo = db.get(User);
-
-	const userData = await userRepo.findOne({
-		id: user.id,
-	});
+	const userData = await db.get(User).findOne(user.id);
 
 	if (!userData) {
 		// add user to the db
@@ -48,7 +44,9 @@ export async function syncGuild(guildId: Snowflake, client: Client) {
 
 	const guildData = await db.get(Guild).findOne(guildId);
 
-	const fetchedGuild = await client.guilds.fetch(guildId).catch(() => null);
+	const fetchedGuild = await client.guilds
+		.fetch(guildId)
+		.catch(() => undefined);
 
 	// check if this guild exists in the database, if not it creates it (or recovers it from the deleted ones)
 	if (!guildData) {

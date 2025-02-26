@@ -13,7 +13,7 @@ import {
 import type { SlashOptionOptions, TranslationPath } from '@/utils/types';
 
 export const SlashOption = (options: SlashOptionOptions) => {
-	let localizationSource: TranslationPath | null = null;
+	let localizationSource: TranslationPath | undefined;
 
 	if (options.localizationSource)
 		localizationSource = constantPreserveDots(

@@ -27,7 +27,7 @@ export function resolveUser(
 		| Message
 		| VoiceState
 		| MessageReaction,
-): User | null;
+): User | undefined;
 export function resolveUser(
 	interaction:
 		| BaseInteraction
@@ -35,17 +35,17 @@ export function resolveUser(
 		| Message
 		| VoiceState
 		| MessageReaction,
-): User | null {
+): User | undefined {
 	return interaction instanceof BaseInteraction
 		? interaction.user
 		: interaction instanceof SimpleCommandMessage ||
 			  interaction instanceof MessageReaction
-			? interaction.message.author
+			? (interaction.message.author ?? undefined)
 			: interaction instanceof Message
 				? interaction.author
 				: interaction instanceof VoiceState
-					? (interaction.member?.user ?? null)
-					: (null as never);
+					? interaction.member?.user
+					: (undefined as never);
 }
 
 export function resolveMember(
@@ -55,10 +55,10 @@ export function resolveMember(
 		| Message
 		| VoiceState
 		| MessageReaction,
-): GuildMember | APIInteractionGuildMember | null;
+): GuildMember | APIInteractionGuildMember | undefined;
 export function resolveMember(
 	interaction: SimpleCommandMessage | Message | VoiceState | MessageReaction,
-): GuildMember | null;
+): GuildMember | undefined;
 export function resolveMember(
 	interaction:
 		| BaseInteraction
@@ -66,15 +66,15 @@ export function resolveMember(
 		| Message
 		| VoiceState
 		| MessageReaction,
-): GuildMember | APIInteractionGuildMember | null {
+): GuildMember | APIInteractionGuildMember | undefined {
 	return interaction instanceof BaseInteraction ||
 		interaction instanceof Message ||
 		interaction instanceof VoiceState
-		? interaction.member
+		? (interaction.member ?? undefined)
 		: interaction instanceof SimpleCommandMessage ||
 			  interaction instanceof MessageReaction
-			? interaction.message.member
-			: (null as never);
+			? (interaction.message.member ?? undefined)
+			: (undefined as never);
 }
 
 export function resolveGuild(interaction: VoiceState): Guild;
@@ -85,7 +85,7 @@ export function resolveGuild(
 		| Message
 		| VoiceState
 		| MessageReaction,
-): Guild | null;
+): Guild | undefined;
 export function resolveGuild(
 	interaction:
 		| BaseInteraction
@@ -93,15 +93,15 @@ export function resolveGuild(
 		| Message
 		| VoiceState
 		| MessageReaction,
-): Guild | null {
+): Guild | undefined {
 	return interaction instanceof BaseInteraction
-		? interaction.guild
+		? (interaction.guild ?? undefined)
 		: interaction instanceof SimpleCommandMessage ||
 			  interaction instanceof MessageReaction
-			? interaction.message.guild
+			? (interaction.message.guild ?? undefined)
 			: interaction instanceof Message || interaction instanceof VoiceState
-				? interaction.guild
-				: (null as never);
+				? (interaction.guild ?? undefined)
+				: (undefined as never);
 }
 
 export function resolveChannel(
@@ -113,10 +113,10 @@ export function resolveChannel(
 		| SimpleCommandMessage
 		| Message
 		| MessageReaction,
-): TextBasedChannel | null;
+): TextBasedChannel | undefined;
 export function resolveChannel(
 	interaction: VoiceState,
-): VoiceBasedChannel | null;
+): VoiceBasedChannel | undefined;
 export function resolveChannel(
 	interaction:
 		| BaseInteraction
@@ -124,7 +124,7 @@ export function resolveChannel(
 		| Message
 		| VoiceState
 		| MessageReaction,
-): TextBasedChannel | VoiceBasedChannel | null;
+): TextBasedChannel | VoiceBasedChannel | undefined;
 export function resolveChannel(
 	interaction:
 		| BaseInteraction
@@ -132,15 +132,15 @@ export function resolveChannel(
 		| Message
 		| VoiceState
 		| MessageReaction,
-): TextBasedChannel | VoiceBasedChannel | null {
+): TextBasedChannel | VoiceBasedChannel | undefined {
 	return interaction instanceof BaseInteraction ||
 		interaction instanceof Message ||
 		interaction instanceof VoiceState
-		? interaction.channel
+		? (interaction.channel ?? undefined)
 		: interaction instanceof SimpleCommandMessage ||
 			  interaction instanceof MessageReaction
 			? interaction.message.channel
-			: (null as never);
+			: (undefined as never);
 }
 
 export function resolveAction(
@@ -154,19 +154,19 @@ export function resolveAction(
 			? interaction.customId
 			: interaction instanceof SimpleCommandMessage
 				? interaction.name
-				: (null as never);
+				: (undefined as never);
 }
 
 export function resolveLocale(interaction: BaseInteraction): Locale;
 export function resolveLocale(
 	interaction: BaseInteraction | SimpleCommandMessage,
-): Locale | null;
+): Locale | undefined;
 export function resolveLocale(
 	interaction: BaseInteraction | SimpleCommandMessage,
-): Locale | null {
+): Locale | undefined {
 	return interaction instanceof BaseInteraction
 		? interaction.locale
 		: interaction instanceof SimpleCommandMessage
-			? (interaction.message.guild?.preferredLocale ?? null)
-			: (null as never);
+			? interaction.message.guild?.preferredLocale
+			: (undefined as never);
 }

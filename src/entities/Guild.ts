@@ -10,10 +10,4 @@ export class Guild extends BaseDiscordEntity<Guild> {
 	prefix?: string | undefined;
 }
 
-export class GuildRepository extends BaseDiscordRepository<Guild> {
-	async a() {
-		await this.findOne({ active: false });
-		await this.getActive();
-		return '1';
-	}
-}
+export class GuildRepository extends BaseDiscordRepository<Guild> {}

@@ -16,36 +16,36 @@ export const logsConfig: LogsConfigType = {
 	system: {
 		console: true,
 		file: true,
-		channelId: null,
+		channelId: undefined,
 	},
 
 	error: {
 		console: true,
 		file: true,
-		channelId: null,
+		channelId: undefined,
 	},
 
 	database: {
 		console: true,
 		file: true,
-		channelId: null,
+		channelId: undefined,
 	},
 
 	interaction: {
 		console: true,
 		file: true,
-		channelId: null,
+		channelId: undefined,
 	},
 
 	newUser: {
 		console: true,
 		file: true,
-		channelId: null,
+		channelId: undefined,
 	},
 
 	guild: {
 		console: true,
 		file: true,
-		channelId: null,
+		channelId: undefined,
 	},
 };

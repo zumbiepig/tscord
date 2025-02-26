@@ -30,20 +30,38 @@ export class Image extends BaseEntity<Image> {
 	hash!: string;
 
 	@Property()
-	deleteHash?: string | undefined;
+	deleteHash!: string | undefined;
 
 	@Property()
 	tags!: string[];
 }
 
 export class ImageRepository extends BaseRepository<Image> {
-	async findByTags(tags: string[], explicit = true): Promise<Image[]> {
-		const rows = await this.find({
-			$and: tags.map((tag) => ({ tags: new RegExp(tag) })),
+	/**
+	 * Abstraction level for the image repository that will find an image by its name (with or without extension).
+	 * @param imageName
+	 * @returns image url
+	 */
+	async getImage(imageName: string) {
+		return await this.findOne({
+			fileName: {
+				$or: [
+					imageName,
+					`${imageName}.png`,
+					`${imageName}.jpeg`,
+					`${imageName}.jpg`,
+					`${imageName}.gif`,
+				],
+			},
 		});
+	}
 
-		return explicit
-			? rows.filter((row) => row.tags.length === tags.length)
-			: rows;
+	/**
+	 * Find images by their tags
+	 * @param tags tags to search for
+	 * @returns An array of images found
+	 */
+	async findByTags(tags: string[]) {
+		return await this.find({ tags: { $and: tags } });
 	}
 }

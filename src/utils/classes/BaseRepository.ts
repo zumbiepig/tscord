@@ -7,5 +7,8 @@ import {
 import type { BaseEntity } from '@/utils/classes';
 
 export abstract class BaseRepository<
-	T extends Omit<BaseEntity<T>, typeof OptionalProps>,
-> extends EntityRepository<Omit<T, typeof EntityRepositoryType>> {}
+	T extends Omit<
+		BaseEntity<T>,
+		typeof EntityRepositoryType | typeof OptionalProps
+	>,
+> extends EntityRepository<T> {}

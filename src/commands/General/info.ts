@@ -54,16 +54,15 @@ export default class InfoCommand {
 		 * Owner field
 		 */
 		if (generalConfig.ownerId) {
-			await client.users
+			const owner = await client.users
 				.fetch(generalConfig.ownerId)
-				.then((owner) => {
-					fields.push({
-						name: 'Owner',
-						value: `\`${owner.tag}\``,
-						inline: true,
-					});
-				})
-				.catch(() => null);
+				.catch(() => undefined);
+			if (owner)
+				fields.push({
+					name: 'Owner',
+					value: `\`${owner.tag}\``,
+					inline: true,
+				});
 		}
 
 		/**
@@ -114,14 +113,12 @@ export default class InfoCommand {
 		const buttons = links
 			.map((link) => {
 				const url = link.url.split('_').join('');
-				if (isValidUrl(url)) {
+				if (isValidUrl(url))
 					return new ButtonBuilder()
 						.setLabel(link.label)
 						.setURL(url)
 						.setStyle(ButtonStyle.Link);
-				} else {
-					return null;
-				}
+				else return undefined;
 			})
 			.filter((link) => link) as ButtonBuilder[];
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(...buttons);

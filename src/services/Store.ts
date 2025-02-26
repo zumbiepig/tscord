@@ -80,7 +80,7 @@ export class RxStore<T> {
 const initialState: State = {
 	ready: {
 		bot: false,
-		api: apiConfig.enabled ? false : null,
+		api: apiConfig.enabled ? false : undefined,
 	},
 	botHasBeenReloaded: false,
 	authorizedAPITokens: [],

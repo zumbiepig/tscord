@@ -4,16 +4,13 @@ import { Service } from '@/utils/decorators';
 
 @Service()
 export class Scheduler {
-	private _jobs = new Map<
-		string,
-		CronJob<CronOnCompleteCommand | null, unknown>
-	>();
+	private _jobs = new Map<string, CronJob<CronOnCompleteCommand, unknown>>();
 
 	get jobs() {
 		return this._jobs;
 	}
 
-	addJob(jobName: string, job: CronJob<CronOnCompleteCommand | null, unknown>) {
+	addJob(jobName: string, job: CronJob<CronOnCompleteCommand, unknown>) {
 		this._jobs.set(jobName, job);
 	}
 

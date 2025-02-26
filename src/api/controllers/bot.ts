@@ -55,7 +55,7 @@ export class BotController extends BaseController {
 			owner: (
 				await this.client.users
 					.fetch(generalConfig.ownerId ?? '')
-					.catch(() => null)
+					.catch(() => undefined)
 			)?.toJSON(),
 		};
 	}
@@ -78,7 +78,7 @@ export class BotController extends BaseController {
 
 			const databaseGuild = await this.db
 				.get(Guild)
-				.findOne({ id: discordGuild['id'] as string });
+				.findOne(discordRawGuild.id);
 
 			body.push({
 				discord: discordGuild,
@@ -94,7 +94,7 @@ export class BotController extends BaseController {
 		// get discord guild
 		const discordRawGuild = await this.client.guilds
 			.fetch(id)
-			.catch(() => null);
+			.catch(() => undefined);
 		if (!discordRawGuild) throw new NotFound('Guild not found');
 
 		const discordGuild = discordRawGuild.toJSON() as Record<string, unknown>;
@@ -102,7 +102,7 @@ export class BotController extends BaseController {
 		discordGuild['bannerURL'] = discordRawGuild.bannerURL();
 
 		// get database guild
-		const databaseGuild = await this.db.get(Guild).findOne({ id });
+		const databaseGuild = await this.db.get(Guild).findOne(id);
 
 		return {
 			discord: discordGuild,
@@ -112,7 +112,7 @@ export class BotController extends BaseController {
 
 	@Delete('/guilds/:id')
 	async deleteGuild(@PathParams('id') id: string) {
-		const guild = await this.client.guilds.fetch(id).catch(() => null);
+		const guild = await this.client.guilds.fetch(id).catch(() => undefined);
 		if (!guild) throw new NotFound('Guild not found');
 
 		await guild.leave();
@@ -125,7 +125,7 @@ export class BotController extends BaseController {
 
 	@Get('/guilds/:id/invite')
 	async invite(@PathParams('id') id: string) {
-		const guild = await this.client.guilds.fetch(id).catch(() => null);
+		const guild = await this.client.guilds.fetch(id).catch(() => undefined);
 		if (!guild) throw new NotFound('Guild not found');
 
 		const guildChannels = await guild.channels.fetch();
@@ -171,9 +171,7 @@ export class BotController extends BaseController {
 					discordUser['iconURL'] = member.user.displayAvatarURL();
 					discordUser['bannerURL'] = member.user.bannerURL();
 
-					const databaseUser = await this.db
-						.get(User)
-						.findOne({ id: discordUser['id'] as string });
+					const databaseUser = await this.db.get(User).findOne(member.user.id);
 
 					users.push({
 						discord: discordUser,
@@ -189,7 +187,9 @@ export class BotController extends BaseController {
 	@Get('/users/:id')
 	async user(@PathParams('id') id: string) {
 		// get discord user
-		const discordRawUser = await this.client.users.fetch(id).catch(() => null);
+		const discordRawUser = await this.client.users
+			.fetch(id)
+			.catch(() => undefined);
 		if (!discordRawUser) throw new NotFound('User not found');
 
 		const discordUser = discordRawUser.toJSON() as Record<string, unknown>;
@@ -197,7 +197,7 @@ export class BotController extends BaseController {
 		discordUser['bannerURL'] = discordRawUser.bannerURL();
 
 		// get database user
-		const databaseUser = await this.db.get(User).findOne({ id });
+		const databaseUser = await this.db.get(User).findOne(id);
 
 		return {
 			discord: discordUser,

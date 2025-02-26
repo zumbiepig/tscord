@@ -5,13 +5,17 @@ import { dayjsTimezone } from '@/utils/functions';
 
 export abstract class BaseDiscordRepository<
 	T extends BaseDiscordEntity<T>,
-> extends BaseRepository<BaseDiscordEntity<T>> {
+> extends BaseRepository<T> {
 	async getActive() {
-		return this.find({ active: true });
+		return (this as BaseRepository<BaseDiscordEntity<T>>).find({
+			active: true,
+		});
 	}
 
 	async updateLastInteract(id: Snowflake): Promise<void> {
-		const entity = await this.findOneOrFail(id);
+		const entity = await (
+			this as BaseRepository<BaseDiscordEntity<T>>
+		).findOneOrFail(id);
 		entity.lastInteract = dayjsTimezone().toDate();
 	}
 }

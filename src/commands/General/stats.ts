@@ -64,9 +64,7 @@ export default class StatsCommand {
 			const chart = new ChartJsImage().setConfig({
 				type: 'line',
 				data: {
-					labels: stats.map((stat) =>
-						formatDate(stat.date, 'onlyDayMonth'),
-					),
+					labels: stats.map((stat) => formatDate(stat.date, 'onlyDayMonth')),
 					datasets: [
 						{
 							label: '',

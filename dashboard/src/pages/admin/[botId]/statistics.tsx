@@ -1,30 +1,29 @@
-import type { GetServerSideProps, NextPage } from 'next';
-import { unstable_getServerSession } from 'next-auth/next';
-import { FaUserFriends, FaUserCheck } from 'react-icons/fa';
-import { BiTimeFive } from 'react-icons/bi';
-import { HiOutlineCode } from 'react-icons/hi';
-import { SiClubhouse } from 'react-icons/si';
-import { MdBarChart, MdMultilineChart } from 'react-icons/md';
 import { SimpleGrid, Text, useColorModeValue } from '@chakra-ui/react';
-import { type Cell } from 'react-table';
-import useSWR from 'swr';
-import TimeAgo from 'javascript-time-ago';
-import en from 'javascript-time-ago/locale/en';
-
-import { authOptions } from '../../api/auth/[...nextauth]';
-
 import { AdminDashboard } from '@components/layouts';
 import {
-  StatCard,
-  LineChart,
-  SimpleTable,
   BarChart,
   ChartCard,
-  SimpleSwitcher,
+  LineChart,
   PieChart,
+  SimpleSwitcher,
+  SimpleTable,
+  StatCard,
 } from '@components/shared';
 import { colors } from '@config/charts';
-import { fetcher, adminDashboardServerSideProps } from '@core/utils/functions';
+import { adminDashboardServerSideProps, fetcher } from '@core/utils/functions';
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
+import type { GetServerSideProps, NextPage } from 'next';
+import { unstable_getServerSession } from 'next-auth/next';
+import { BiTimeFive } from 'react-icons/bi';
+import { FaUserCheck, FaUserFriends } from 'react-icons/fa';
+import { HiOutlineCode } from 'react-icons/hi';
+import { MdBarChart, MdMultilineChart } from 'react-icons/md';
+import { SiClubhouse } from 'react-icons/si';
+import { type Cell } from 'react-table';
+import useSWR from 'swr';
+
+import { authOptions } from '../../api/auth/[...nextauth]';
 
 TimeAgo.addLocale(en);
 const timeAgo = new TimeAgo('en-US');

@@ -5,7 +5,6 @@ export * from './dependency.js';
 export * from './devs.js';
 export * from './embeds.js';
 export * from './files.js';
-export * from './image.js';
 export * from './interactions.js';
 export * from './localization.js';
 export * from './maintenance.js';

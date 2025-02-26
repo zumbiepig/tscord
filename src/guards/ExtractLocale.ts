@@ -16,8 +16,10 @@ export const ExtractLocale: GuardFunction<
 	ArgsOf<'interactionCreate' | 'messageCreate'>,
 	InteractionData
 > = async ([arg], _client, next, guardData) => {
-	if (arg instanceof BaseInteraction || arg instanceof SimpleCommandMessage)
-		guardData.localize = L[getLocaleFromInteraction(interaction)];
+	if (arg instanceof BaseInteraction || arg instanceof SimpleCommandMessage) {
+		const locale = await getLocaleFromInteraction(arg);
+		guardData.localize = L[locale];
+	}
 
 	await next();
 };

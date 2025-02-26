@@ -16,7 +16,7 @@ export const SlashGroup = <TRoot extends string>(
 	root?: VerifyName<TRoot>,
 ) => {
 	if (typeof options !== 'string') {
-		let localizationSource: TranslationPath | null = null;
+		let localizationSource: TranslationPath | undefined;
 		if (options.localizationSource)
 			localizationSource = constantPreserveDots(
 				options.localizationSource,

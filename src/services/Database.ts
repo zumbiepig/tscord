@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import {
 	DefaultLogger,
 	defineConfig,
-	type EntityName,
+	type EntityClass,
 	type LogContext,
 	type Logger as MikroORMLogger,
 	type LoggerNamespace,
@@ -125,7 +125,7 @@ export class Database {
 	 * Shorthand to get custom and natives repositories
 	 * @param entity Entity of the custom repository to get
 	 */
-	get<T extends object>(entity: EntityName<T>) {
+	get<T extends object>(entity: EntityClass<T>) {
 		return this.em.getRepository(entity);
 	}
 
@@ -204,13 +204,13 @@ export class Database {
 		return true;
 	}
 
-	async getBackupList(): Promise<string[] | null> {
+	async getBackupList() {
 		if (!databaseConfig.path) {
 			await this.logger.log(
 				'error',
 				"Database path not set, couldn't get list of backups",
 			);
-			return null;
+			return;
 		}
 
 		const files = await readdir(join(databaseConfig.path, 'backups'));
@@ -222,15 +222,16 @@ export class Database {
 	async getSize() {
 		const backupPath = join(databaseConfig.path, 'backups');
 		return {
-			db: isSQLiteDatabase()
-				? (await stat(mikroORMConfig.dbName ?? '')).size
-				: null,
+			db:
+				isSQLiteDatabase() && mikroORMConfig.dbName
+					? (await stat(mikroORMConfig.dbName)).size
+					: undefined,
 			backups: await getFolderSize(backupPath).catch((err: unknown) => {
 				if (
 					err instanceof Error &&
 					(err as NodeJS.ErrnoException).code === 'ENOENT'
 				)
-					return null;
+					return undefined;
 				else throw err;
 			}),
 		};

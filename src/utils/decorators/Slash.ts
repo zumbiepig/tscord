@@ -15,7 +15,7 @@ export const Slash = (options?: ApplicationCommandOptions) => {
 	if (!options) options = {};
 	else if (typeof options === 'string') options = { name: options };
 
-	let localizationSource: TranslationPath | null = null;
+	let localizationSource: TranslationPath | undefined;
 
 	if (options.localizationSource)
 		localizationSource = constantPreserveDots(

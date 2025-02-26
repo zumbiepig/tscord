@@ -2,7 +2,6 @@ import 'reflect-metadata';
 
 import { join } from 'node:path';
 
-import { NotBot } from '@discordx/utilities';
 import { RequestContext } from '@mikro-orm/core';
 import chalk from 'chalk';
 import chokidar from 'chokidar';
@@ -20,7 +19,12 @@ import type { constructor } from 'tsyringe/dist/typings/types';
 import { Server } from '@/api/server';
 import { apiConfig, generalConfig } from '@/configs';
 import { env, validateEnv } from '@/env';
-import { ExtractLocale, Maintenance, RequestContextIsolator } from '@/guards';
+import {
+	ExtractLocale,
+	Maintenance,
+	NotBot,
+	RequestContextIsolator,
+} from '@/guards';
 import {
 	Database,
 	ErrorHandler,
@@ -31,7 +35,7 @@ import {
 	Store,
 } from '@/services';
 import { keptInstances } from '@/utils/decorators';
-import { initDataTable, resolveDependency } from '@/utils/functions';
+import { resolveDependency } from '@/utils/functions';
 
 /** 0: Not reloading, 1: Reloading, 2: Reload requested */
 let reloadingState = 0;
@@ -95,7 +99,7 @@ async function init() {
 
 		guards: [RequestContextIsolator, NotBot, ExtractLocale, Maintenance],
 
-		...(generalConfig.simpleCommandsPrefix !== null && {
+		...(generalConfig.simpleCommandsPrefix && {
 			simpleCommand: {
 				prefix: generalConfig.simpleCommandsPrefix,
 			},
@@ -119,9 +123,6 @@ async function init() {
 	await pluginsManager.importEvents();
 
 	await RequestContext.create(db.em, async () => {
-		// init the data table if it doesn't exist
-		await initDataTable();
-
 		// init plugins services
 		pluginsManager.initServices();
 
@@ -160,7 +161,7 @@ async function init() {
 			// check that all properties that not disabled are ready
 			if (
 				Object.values(state)
-					.filter((value) => value !== null)
+					.filter((value) => value !== undefined)
 					.every((value) => value)
 			) {
 				void eventManager.emit('fullyReady'); // the template is fully ready!

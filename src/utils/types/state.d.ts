@@ -1,7 +1,7 @@
 export interface State {
 	ready: {
-		bot: boolean | null;
-		api: boolean | null;
+		bot: boolean;
+		api: boolean | undefined;
 	};
 	botHasBeenReloaded: boolean;
 	authorizedAPITokens: string[];

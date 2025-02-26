@@ -225,7 +225,7 @@ export class Stats {
 		for (const guild of guilds) {
 			const discordGuild = await this.client.guilds
 				.fetch(guild.id)
-				.catch(() => null);
+				.catch(() => undefined);
 			if (!discordGuild) continue;
 
 			const commandsCount = await this.db.get(Stat).count({

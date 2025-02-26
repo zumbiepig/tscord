@@ -1,9 +1,15 @@
-import type { Interaction } from 'discord.js';
-import type { SimpleCommandMessage } from 'discordx';
+import { BaseInteraction, type Interaction } from 'discord.js';
+import { SimpleCommandMessage } from 'discordx';
 
 import { generalConfig } from '@/configs';
+import { User } from '@/entities';
 import { L, loadedLocales, type Locales, locales } from '@/i18n';
-import { resolveLocale } from '@/utils/functions';
+import { Database } from '@/services';
+import {
+	resolveDependency,
+	resolveLocale,
+	resolveUser,
+} from '@/utils/functions';
 import type { SanitizedOptions, TranslationPath } from '@/utils/types';
 
 export function getLocalizedInfo(
@@ -80,8 +86,25 @@ export function setFallbackDescription<K extends SanitizedOptions>(
 	return options;
 }
 
-export function getLocaleFromInteraction(
+export async function getLocaleFromInteraction(
 	interaction: Interaction | SimpleCommandMessage,
 ) {
-	return resolveLocale(interaction) ?? generalConfig.defaultLocale;
+	const db = await resolveDependency(Database);
+	const user = await db.get(User).findOne(resolveUser(interaction).id);
+
+	if (interaction instanceof BaseInteraction) {
+		const interactionLocale = resolveLocale(interaction);
+		if (user) user.locale = interactionLocale;
+		return interactionLocale;
+	} else {
+		const guildLocale = resolveLocale(interaction);
+		return (
+			// return the user's cached locale if it was saved
+			user?.locale ??
+			// otherwise use the guild's preferred locale
+			guildLocale ??
+			// fallback to the bot's default locale
+			generalConfig.defaultLocale
+		);
+	}
 }

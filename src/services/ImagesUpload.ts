@@ -19,12 +19,12 @@ export class ImagesUpload {
 	private validImageExtensions = ['.png', '.jpeg', '.jpg', '.gif'];
 	private imageFolderPath = join('assets', 'images');
 
-	private imgurClient: ImgurClient | null =
+	private imgurClient: ImgurClient | undefined =
 		generalConfig.automaticUploadImagesToImgur
 			? new ImgurClient({
 					clientId: env.IMGUR_CLIENT_ID,
 				})
-			: null;
+			: undefined;
 
 	private imageRepo: ImageRepository;
 

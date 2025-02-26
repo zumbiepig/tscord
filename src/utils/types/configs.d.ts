@@ -18,21 +18,21 @@ export interface GeneralConfigType {
 	defaultLocale: Locales;
 	timezone: Timezone;
 
-	simpleCommandsPrefix: string | null;
+	simpleCommandsPrefix: string | undefined;
 	automaticDeferring: boolean;
 
-	ownerId: Snowflake | null;
+	ownerId: Snowflake | undefined;
 	devs: Snowflake[];
-	testGuildId: Snowflake | null;
+	testGuildId: Snowflake | undefined;
 
 	activities: ActivitiesOptions[] & { status: PresenceStatusData }[];
 
 	automaticUploadImagesToImgur: boolean;
 
 	links: {
-		botInvite: string | null;
-		supportServer: string | null;
-		gitRepo: string | null;
+		botInvite: string | undefined;
+		supportServer: string | undefined;
+		gitRepo: string | undefined;
 	};
 }
 
@@ -52,7 +52,7 @@ export type MikroORMConfigType = SetRequiredDeep<
 interface LogsConfigCategoryType {
 	console: boolean;
 	file: boolean;
-	channelId: Snowflake | null;
+	channelId: Snowflake | undefined;
 }
 
 export interface LogsConfigType {

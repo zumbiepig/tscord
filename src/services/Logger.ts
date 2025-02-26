@@ -106,11 +106,11 @@ export class Logger {
 	async log(
 		level: (typeof this.levels)[number],
 		message: string,
-		chalkedMessage: string | null = null,
+		chalkedMessage?: string,
 		logLocation: {
 			console?: boolean;
 			file?: boolean;
-			channelId?: Snowflake | null;
+			channelId?: Snowflake | undefined;
 			discordEmbed?: BaseMessageOptions;
 		} = {},
 	): Promise<void> {
@@ -123,14 +123,10 @@ export class Logger {
 		const chalkedLogMessage = `[${chalk.dim(formattedTime)}] [${formattedLevel}] ${chalkedMessage?.trim() ?? trimmedMessage}`;
 
 		// set default values
-		logLocation.console = logLocation.console ?? logsConfig.system.console;
-		logLocation.file = logLocation.file ?? logsConfig.system.file;
-		logLocation.channelId =
-			logLocation.channelId !== undefined
-				? logLocation.channelId
-				: logsConfig.system.channelId;
-		logLocation.discordEmbed =
-			logLocation.discordEmbed ?? this.embedLevelBuilder[level](logMessage);
+		logLocation.console ??= logsConfig.system.console;
+		logLocation.file ??= logsConfig.system.file;
+		logLocation.channelId ??= logsConfig.system.channelId;
+		logLocation.discordEmbed ??= this.embedLevelBuilder[level](logMessage);
 
 		// log to console
 		if (logLocation.console) {
@@ -165,7 +161,7 @@ export class Logger {
 
 			const channel = await this.client.channels
 				.fetch(logLocation.channelId)
-				.catch(() => null);
+				.catch(() => undefined);
 			if (channel && 'send' in channel)
 				await channel.send(logLocation.discordEmbed);
 		}
@@ -318,7 +314,7 @@ export class Logger {
 	): Promise<void> {
 		const guild = await this.client.guilds
 			.fetch(guildId)
-			.catch(() => this.client.guilds.cache.get(guildId) ?? null);
+			.catch(() => this.client.guilds.cache.get(guildId));
 		const additionalMessage =
 			type === 'NEW_GUILD'
 				? 'has been added to the db'
@@ -422,7 +418,7 @@ export class Logger {
 	async startSpinner(text: string): Promise<void> {
 		console.log('\n');
 		this.spinner.start(text);
-		await this.log('info', text, null, { console: false });
+		await this.log('info', text, undefined, { console: false });
 	}
 
 	async logStartingConsole(): Promise<void> {

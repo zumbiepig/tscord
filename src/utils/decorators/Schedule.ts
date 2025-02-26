@@ -29,7 +29,7 @@ export function Schedule(cronExpression: string) {
 		const job = new CronJob(
 			cronExpression,
 			descriptor.value as CronCommand<unknown>,
-			null,
+			undefined,
 			false,
 			generalConfig.timezone,
 			target,
