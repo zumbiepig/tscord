@@ -1,4 +1,5 @@
 {
+  // TODO [typescript@>=5.8.0]: Enable the node-ts preset
   //"extends": ["@tsconfig/node22", "@tsconfig/node-ts", "@tsconfig/strictest"],
   "extends": ["@tsconfig/node22", "@tsconfig/strictest"],
   //"include": ["src/**/*", "dashboard/**/*", "website/**/*"],

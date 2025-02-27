@@ -6,7 +6,6 @@ import {
 	ButtonInteraction,
 	ChannelSelectMenuInteraction,
 	ChatInputCommandInteraction,
-	ContextMenuCommandInteraction,
 	type Interaction,
 	type InteractionEditReplyOptions,
 	type InteractionReplyOptions,
