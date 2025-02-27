@@ -6,7 +6,6 @@ import { RequestContext } from '@mikro-orm/core';
 import chalk from 'chalk';
 import chokidar from 'chokidar';
 import { GatewayIntentBits, Partials } from 'discord.js';
-import discordLogs from 'discord-logs';
 import {
 	Client,
 	DIService,
@@ -36,9 +35,6 @@ import {
 } from '@/services';
 import { keptInstances } from '@/utils/decorators';
 import { resolveDependency } from '@/utils/functions';
-
-/** 0: Not reloading, 1: Reloading, 2: Reload requested */
-let reloadingState = 0;
 
 async function init() {
 	// validate env values
@@ -113,9 +109,7 @@ async function init() {
 			}),
 	});
 
-	// Load all new events
-	// @ts-expect-error: discord.js/discordx type overlap
-	await discordLogs(client, { debug: !env.isDev });
+	// register client
 	container.registerInstance(Client, client);
 
 	// import all the commands and events
@@ -169,6 +163,9 @@ async function init() {
 		});
 	});
 }
+
+/** 0: Not reloading, 1: Reloading, 2: Reload requested */
+let reloadingState = 0;
 
 /**
  * Hot reload

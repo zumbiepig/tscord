@@ -18,7 +18,7 @@ import {
 	NewsChannel,
 	PermissionsBitField,
 } from 'discord.js';
-import { Client, MetadataStorage } from 'discordx';
+import { Client } from 'discordx';
 import { injectable } from 'tsyringe';
 
 import { BotOnline, DevAuthenticated } from '@/api/middlewares';
@@ -30,6 +30,7 @@ import {
 	getDevs,
 	isDev,
 	isInMaintenance,
+	resolveDependency,
 	setMaintenance,
 } from '@/utils/functions';
 
@@ -61,8 +62,9 @@ export class BotController extends BaseController {
 	}
 
 	@Get('/commands')
-	commands() {
-		const commands = MetadataStorage.instance.applicationCommands;
+	async commands() {
+		const client = await resolveDependency(Client);
+		const commands = client.applicationCommands;
 
 		return commands.map((command) => command.toJSON());
 	}

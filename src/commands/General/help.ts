@@ -12,7 +12,6 @@ import {
 	Client,
 	DApplicationCommand,
 	Discord,
-	MetadataStorage,
 	SelectMenuComponent,
 } from 'discordx';
 
@@ -21,14 +20,28 @@ import { type TranslationFunctions } from '@/i18n';
 import { Slash } from '@/utils/decorators';
 import { chunkArray, resolveGuild, validString } from '@/utils/functions';
 import type { InteractionData } from '@/utils/types';
+import { injectable } from 'tsyringe';
 
 @Discord()
+@injectable()
 @Category('General')
 export default class HelpCommand {
 	private readonly _categories = new Map<string, DApplicationCommand[]>();
 
-	constructor() {
-		this.loadCategories();
+	constructor(private client: Client) {
+		// load categories
+		const commands = this.client.applicationCommandSlashesFlat
+
+		for (const command of commands) {
+			const { group } = command;
+			if (group && validString(group)) {
+				if (this._categories.has(group)) {
+					this._categories.get(group)?.push(command);
+				} else {
+					this._categories.set(group, [command]);
+				}
+			}
+		}
 	}
 
 	@Slash({
@@ -213,20 +226,5 @@ export default class HelpCommand {
 		return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
 			selectMenu,
 		);
-	}
-
-	loadCategories(): void {
-		const commands = MetadataStorage.instance.applicationCommandSlashesFlat;
-
-		for (const command of commands) {
-			const { group } = command;
-			if (group && validString(group)) {
-				if (this._categories.has(group)) {
-					this._categories.get(group)?.push(command);
-				} else {
-					this._categories.set(group, [command]);
-				}
-			}
-		}
 	}
 }

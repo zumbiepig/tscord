@@ -1,13 +1,14 @@
 {
-  "extends": ["@tsconfig/node-lts", "@tsconfig/node-ts", "@tsconfig/strictest"],
-  "include": ["src/**/*"],
+  //"extends": ["@tsconfig/node22", "@tsconfig/node-ts", "@tsconfig/strictest"],
+  "extends": ["@tsconfig/node22", "@tsconfig/strictest"],
   //"include": ["src/**/*", "dashboard/**/*", "website/**/*"],
+  "include": ["src/**/*"],
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
     "declaration": true,
 
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": true, // remove after TS v5.8.0 releases
 
     "resolveJsonModule": true,
     //"jsx": "preserve",
