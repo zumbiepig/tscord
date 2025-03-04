@@ -1,8 +1,8 @@
 import type { TranslationFunctions } from '@/i18n';
 import type { getTypeOfInteraction } from '@/utils/functions';
-
-export type InteractionsConstants = ReturnType<typeof getTypeOfInteraction>;
+import type { Locale } from 'discord.js';
 
 export interface InteractionData {
-	localize: TranslationFunctions;
+	interactionLocale: Locale;
+	translations: TranslationFunctions;
 }

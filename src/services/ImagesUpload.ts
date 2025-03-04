@@ -17,7 +17,7 @@ import { getFileHash } from '@/utils/functions';
 @Service()
 export class ImagesUpload {
 	private validImageExtensions = ['.png', '.jpeg', '.jpg', '.gif'];
-	private imageFolderPath = join('assets', 'images');
+	private imageFolderPath = join(process.cwd(), 'assets', 'images');
 
 	private imgurClient: ImgurClient | undefined =
 		generalConfig.automaticUploadImagesToImgur
@@ -36,11 +36,7 @@ export class ImagesUpload {
 	}
 
 	isValidImageFormat(file: string): boolean {
-		for (const extension of this.validImageExtensions) {
-			if (file.endsWith(extension)) return true;
-		}
-
-		return false;
+		return this.validImageExtensions.some(extension => file.endsWith(extension));
 	}
 
 	async syncWithDatabase() {
@@ -54,15 +50,8 @@ export class ImagesUpload {
 
 		const images = [];
 		for (const file of files) {
-			if (this.isValidImageFormat(file)) {
-				images.push(file);
-			} else {
-				await this.logger.log(
-					'error',
-					`Image ${file} has an invalid format. Valid formats: ${this.validImageExtensions.join(', ')}`,
-					`Image ${chalk.bold.green(file)} has an invalid format. Valid formats: ${chalk.bold(this.validImageExtensions.join(', '))}`,
-				);
-			}
+			if (this.isValidImageFormat(file)) images.push(file);
+			else await this.logger.log('error', `Image ${file} has an invalid format. Valid formats: ${this.validImageExtensions.join(', ')}`, `Image ${chalk.bold.green(file)} has an invalid format. Valid formats: ${chalk.bold(this.validImageExtensions.join(', '))}`);
 		}
 
 		// purge deleted images from the database, reupload expired images to imgur

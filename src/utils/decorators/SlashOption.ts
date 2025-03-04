@@ -12,7 +12,7 @@ import {
 } from '@/utils/functions';
 import type { SlashOptionOptions, TranslationPath } from '@/utils/types';
 
-export const SlashOption = (options: SlashOptionOptions) => {
+export function SlashOption (options: SlashOptionOptions)  {
 	let localizationSource: TranslationPath | undefined;
 
 	if (options.localizationSource)

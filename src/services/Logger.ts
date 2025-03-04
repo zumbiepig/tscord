@@ -21,12 +21,11 @@ import { delay, inject } from 'tsyringe';
 
 import * as controllers from '@/api/controllers';
 import { apiConfig, colorsConfig, logsConfig } from '@/configs';
-import { locales } from '@/i18n';
+import { locales as i18nLocales } from '@/i18n';
 import { PluginsManager, Scheduler } from '@/services';
 import { Schedule, Service } from '@/utils/decorators';
 import {
 	dayjsTimezone,
-	formatDate,
 	getTypeOfInteraction,
 	numberAlign,
 	resolveAction,
@@ -38,17 +37,16 @@ import {
 
 @Service()
 export class Logger {
-	private readonly logPath: string = join('logs');
+	private readonly logPath: string = join(process.cwd(), 'logs');
 	private readonly logArchivePath: string = join(this.logPath, 'archives');
 
-	private readonly levels = ['debug', 'info', 'warn', 'error'] as const;
 	private embedLevelBuilder = {
 		debug: (message: string): BaseMessageOptions => ({
 			embeds: [
 				{
 					title: 'DEBUG',
 					description: message,
-					color: colorsConfig.logDebug,
+					color: colorsConfig.logs.debug,
 					timestamp: dayjsTimezone().toISOString(),
 				},
 			],
@@ -58,7 +56,7 @@ export class Logger {
 				{
 					title: 'INFO',
 					description: message,
-					color: colorsConfig.logInfo,
+					color: colorsConfig.logs.info,
 					timestamp: dayjsTimezone().toISOString(),
 				},
 			],
@@ -68,7 +66,7 @@ export class Logger {
 				{
 					title: 'WARN',
 					description: message,
-					color: colorsConfig.logWarn,
+					color: colorsConfig.logs.warn,
 					timestamp: dayjsTimezone().toISOString(),
 				},
 			],
@@ -78,7 +76,7 @@ export class Logger {
 				{
 					title: 'ERROR',
 					description: message,
-					color: colorsConfig.logError,
+					color: colorsConfig.logs.error,
 					timestamp: dayjsTimezone().toISOString(),
 				},
 			],
@@ -104,7 +102,7 @@ export class Logger {
 	 * @param logLocation where to log the message
 	 */
 	async log(
-		level: (typeof this.levels)[number],
+		level: 'debug' | 'info' | 'warn' | 'error',
 		message: string,
 		chalkedMessage?: string,
 		logLocation: {
@@ -115,8 +113,8 @@ export class Logger {
 		} = {},
 	): Promise<void> {
 		const date = dayjsTimezone();
-		const formattedDate = formatDate(date, 'onlyDateFilename');
-		const formattedTime = formatDate(date, 'logs');
+		const formattedDate = date.format('YYYY-MM-DD');
+		const formattedTime = date.format('YYYY-MM-DD HH:mm:ss');
 		const formattedLevel = level.toUpperCase();
 		const trimmedMessage = message.trim();
 		const logMessage = `[${formattedTime}] [${formattedLevel}] ${trimmedMessage}`;
@@ -131,18 +129,22 @@ export class Logger {
 		// log to console
 		if (logLocation.console) {
 			switch (level) {
-				case 'debug':
+				case 'debug': {
 					console.debug(chalk.grey(chalkedLogMessage));
 					break;
-				case 'info':
+				}
+				case 'info': {
 					console.info(chalk.cyan(chalkedLogMessage));
 					break;
-				case 'warn':
+				}
+				case 'warn': {
 					console.warn(chalk.yellow(chalkedLogMessage));
 					break;
-				case 'error':
+				}
+				case 'error': {
 					console.error(chalk.red(chalkedLogMessage));
 					break;
+				}
 			}
 		}
 
@@ -161,7 +163,7 @@ export class Logger {
 
 			const channel = await this.client.channels
 				.fetch(logLocation.channelId)
-				.catch(() => undefined);
+				.catch(() => {});
 			if (channel && 'send' in channel)
 				await channel.send(logLocation.discordEmbed);
 		}
@@ -196,8 +198,8 @@ export class Logger {
 		if (embedMessage.length > 4096) {
 			embedMessage =
 				'```\n' +
-				(error.message.length > 4091
-					? `${error.message.slice(0, 4088)}...`
+				(error.message.length > 4088
+					? `${error.message.slice(0, 4087)}…`
 					: error.message) +
 				'\n```';
 			embedAttachments.push(
@@ -212,10 +214,10 @@ export class Logger {
 					{
 						title:
 							embedTitle.length > 256
-								? `${embedTitle.slice(0, 253)}...`
+								? `${embedTitle.slice(0, 255)}…`
 								: embedTitle,
 						description: embedMessage,
-						color: colorsConfig.logError,
+						color: colorsConfig.logs.error,
 						timestamp: dayjsTimezone().toISOString(),
 					},
 				],
@@ -263,14 +265,14 @@ export class Logger {
 							{
 								name: 'Channel',
 								value:
-									channel instanceof TextChannel ||
-									channel instanceof ThreadChannel
+									channel instanceof TextChannel
+									|| channel instanceof ThreadChannel
 										? `#${channel.name}`
 										: 'Unknown',
 								inline: true,
 							},
 						],
-						color: colorsConfig.logInteraction,
+						color: colorsConfig.discord.interaction,
 						timestamp: dayjsTimezone().toISOString(),
 					},
 				],
@@ -279,22 +281,35 @@ export class Logger {
 	}
 
 	/**
-	 * Logs all new users.
+	 * Logs all 'actions' (create, delete, etc) of a user.
+	 * @param type NEW_USER | DELETE_USER | RECOVER_USER
 	 * @param user
 	 */
-	async logNewUser(user: User): Promise<void> {
-		const message = `(NEW_USER) ${user.tag} (${user.id}) has been added to the db`;
-		const chalkedMessage = `(${chalk.bold.white('NEW_USER')}) ${chalk.bold.green(user.tag)} (${chalk.bold.blue(user.id)}) ${chalk.dim.italic.grey('has been added to the db')}`;
+	async logUser(type: 'NEW_USER' | 'DELETE_USER' | 'RECOVER_USER',
+		user: User): Promise<void> {
+		const additionalMessage
+			= type === 'NEW_USER'
+				? 'has been added to the db'
+				: (type === 'DELETE_USER'
+						? 'has been deleted'
+						: 'has been recovered');
+		const message = `(${type}) ${user.tag} (${user.id}) ${additionalMessage}`;
+		const chalkedMessage = `(${chalk.bold.white(type)}) ${chalk.bold.green(user.tag)} (${chalk.bold.blue(user.id)}) ${chalk.dim.italic.grey(additionalMessage)}`;
 
 		await this.log('info', message, chalkedMessage, {
-			...logsConfig.newUser,
+			...logsConfig.user,
 			discordEmbed: {
 				embeds: [
 					{
-						title: 'New user',
+						title: 
+						type === 'NEW_USER'
+							? 'New user'
+							: (type === 'DELETE_USER'
+									? 'Deleted user'
+									: 'Recovered user'),
 						description: `**${user.tag}**`,
 						thumbnail: { url: user.displayAvatarURL({ forceStatic: false }) },
-						color: colorsConfig.logNewUser,
+						color: type === 'NEW_USER' ? colorsConfig.discord.user.new : (type === 'DELETE_USER' ? colorsConfig.discord.user.delete : colorsConfig.discord.user.recover),
 						timestamp: dayjsTimezone().toISOString(),
 						footer: { text: user.id },
 					},
@@ -305,8 +320,8 @@ export class Logger {
 
 	/**
 	 * Logs all 'actions' (create, delete, etc) of a guild.
-	 * @param guildId
 	 * @param type NEW_GUILD | DELETE_GUILD | RECOVER_GUILD
+	 * @param guildId
 	 */
 	async logGuild(
 		type: 'NEW_GUILD' | 'DELETE_GUILD' | 'RECOVER_GUILD',
@@ -315,12 +330,12 @@ export class Logger {
 		const guild = await this.client.guilds
 			.fetch(guildId)
 			.catch(() => this.client.guilds.cache.get(guildId));
-		const additionalMessage =
-			type === 'NEW_GUILD'
+		const additionalMessage
+			= type === 'NEW_GUILD'
 				? 'has been added to the db'
-				: type === 'DELETE_GUILD'
-					? 'has been deleted'
-					: 'has been recovered';
+				: (type === 'DELETE_GUILD'
+						? 'has been deleted'
+						: 'has been recovered');
 		const message = `(${type}) Guild ${guild ? `${guild.name} (${guildId})` : guildId} ${additionalMessage}`;
 		const chalkedMessage = `(${chalk.bold.white(type)}) ${chalk.dim.italic.grey('Guild')} ${guild ? `${chalk.bold.green(guild.name)} (${chalk.bold.blue(guildId)})` : guildId} ${chalk.dim.italic.grey(additionalMessage)}`;
 
@@ -332,9 +347,9 @@ export class Logger {
 						title:
 							type === 'NEW_GUILD'
 								? 'New guild'
-								: type === 'DELETE_GUILD'
-									? 'Deleted guild'
-									: 'Recovered guild',
+								: (type === 'DELETE_GUILD'
+										? 'Deleted guild'
+										: 'Recovered guild'),
 						fields: [
 							{
 								name: guild?.name ?? 'Unknown',
@@ -345,10 +360,10 @@ export class Logger {
 						thumbnail: { url: guild?.iconURL() ?? '' },
 						color:
 							type === 'NEW_GUILD'
-								? colorsConfig.logGuildNew
-								: type === 'DELETE_GUILD'
-									? colorsConfig.logGuildDelete
-									: colorsConfig.logGuildRecover,
+								? colorsConfig.discord.guild.new
+								: (type === 'DELETE_GUILD'
+										? colorsConfig.discord.guild.delete
+										: colorsConfig.discord.guild.recover),
 						timestamp: dayjsTimezone().toISOString(),
 					},
 				],
@@ -378,14 +393,14 @@ export class Logger {
 			createWriteStream(
 				join(
 					this.logArchivePath,
-					`logs-${formatDate(dayjsTimezone().subtract(1, 'day'), 'onlyDateFilename')}.tar.gz`,
+					`logs-${dayjsTimezone().subtract(1, 'day').format('YYYY-MM-DD')}.tar.gz`,
 				),
 			),
 		);
 
 		// add files to the archive
 		const logPaths = [];
-		for (const currentLogPath of (await readdir(this.logPath)).filter((file) =>
+		for (const currentLogPath of (await readdir(this.logPath)).filter(file =>
 			file.endsWith('.log'),
 		)) {
 			const path = join(this.logPath, currentLogPath);
@@ -397,20 +412,18 @@ export class Logger {
 		await archive.finalize();
 
 		// delete archived logs
-		await Promise.all(logPaths.map((path) => rm(path)));
+		await Promise.all(logPaths.map(path => rm(path)));
 
 		// retention policy
 		for (const file of await readdir(this.logArchivePath)) {
 			const match = /^logs-(.+)\.tar\.gz$/.exec(file);
-			if (match?.[1]) {
-				if (timeAgo(match[1], 'day') > logsConfig.archive.retentionDays) {
-					await this.log(
-						'info',
-						`Deleting log archive ${file} older than ${logsConfig.archive.retentionDays.toString()} days`,
-						`Deleting log archive ${chalk.bold.red(file)} older than ${chalk.bold.red(logsConfig.archive.retentionDays.toString())} days`,
-					);
-					await rm(join(this.logArchivePath, file));
-				}
+			if (match?.[1] && timeAgo(match[1], 'day') > logsConfig.archive.retentionDays) {
+				await this.log(
+					'info',
+					`Deleting log archive ${file} older than ${logsConfig.archive.retentionDays.toString()} days`,
+					`Deleting log archive ${chalk.bold.red(file)} older than ${chalk.bold.red(logsConfig.archive.retentionDays.toString())} days`,
+				);
+				await rm(join(this.logArchivePath, file));
 			}
 		}
 	}
@@ -437,8 +450,8 @@ export class Logger {
 			...MetadataStorage.instance.applicationCommandMessages,
 			...MetadataStorage.instance.applicationCommandUsers,
 		];
-		const commandsSum =
-			slashCommands.length + simpleCommands.length + contextMenus.length;
+		const commandsSum
+			= slashCommands.length + simpleCommands.length + contextMenus.length;
 		await this.log(
 			'info',
 			`✓ ${numberAlign(commandsSum)} commands loaded`,
@@ -466,7 +479,7 @@ export class Logger {
 
 		// entities
 		const entities = (await readdir(join('src', 'entities'))).filter(
-			(entity) =>
+			entity =>
 				!entity.startsWith('index') && !entity.startsWith('BaseEntity'),
 		);
 		const pluginsEntitesCount = this.pluginsManager.plugins.reduce(
@@ -483,7 +496,7 @@ export class Logger {
 
 		// services
 		const services = (await readdir(join('src', 'services'))).filter(
-			(service) => !service.startsWith('index'),
+			service => !service.startsWith('index'),
 		);
 		const pluginsServicesCount = this.pluginsManager.plugins.reduce(
 			(acc, plugin) => acc + Object.values(plugin.services).length,
@@ -503,7 +516,7 @@ export class Logger {
 				(acc, controller) => {
 					const methodsName = Object.getOwnPropertyNames(
 						controller.prototype,
-					).filter((methodName) => methodName !== 'constructor');
+					).filter(methodName => methodName !== 'constructor');
 
 					return acc + methodsName.length;
 				},
@@ -531,9 +544,9 @@ export class Logger {
 		// translations
 		await this.log(
 			'info',
-			`✓ ${numberAlign(locales.length)} translations loaded`,
+			`✓ ${numberAlign(i18nLocales.length)} translations loaded`,
 			chalk.magenta(
-				`✓ ${numberAlign(locales.length)} ${chalk.bold('translations')} loaded`,
+				`✓ ${numberAlign(i18nLocales.length)} ${chalk.bold('translations')} loaded`,
 			),
 		);
 

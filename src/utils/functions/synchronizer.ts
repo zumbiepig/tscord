@@ -20,13 +20,11 @@ export async function syncUser(user: DUser) {
 
 	if (!userData) {
 		// add user to the db
-		const newUser = new User();
-		newUser.id = user.id;
-		await db.em.persistAndFlush(newUser);
+		db.em.create(User, { id: user.id });
 
 		// record new user both in logs and stats
 		stats.register('NEW_USER', user.id);
-		await logger.logNewUser(user);
+		await logger.logUser('NEW_USER', user);
 	}
 }
 
@@ -46,7 +44,7 @@ export async function syncGuild(guildId: Snowflake, client: Client) {
 
 	const fetchedGuild = await client.guilds
 		.fetch(guildId)
-		.catch(() => undefined);
+		.catch(() => void 0);
 
 	// check if this guild exists in the database, if not it creates it (or recovers it from the deleted ones)
 	if (!guildData) {
@@ -79,12 +77,12 @@ export async function syncAllGuilds(client: Client) {
 
 	// add missing guilds
 	const clientGuilds = client.guilds.cache;
-	clientGuilds.forEach((guild) => guildIds.push(guild.id));
+	for (const guild of clientGuilds.values()) guildIds.push(guild.id);
 
 	// remove deleted guilds
 	const db = await resolveDependency(Database);
 	const guildsData = await db.get(Guild).getActive();
-	guildsData.forEach((guildData) => guildIds.push(guildData.id));
+	for (const guildData of guildsData) guildIds.push(guildData.id);
 
 	// sync guilds
 	for (const guildId of guildIds) await syncGuild(guildId, client);

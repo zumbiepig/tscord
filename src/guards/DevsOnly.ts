@@ -9,7 +9,7 @@ import type { InteractionData } from '@/utils/types';
 export const DevsOnly: GuardFunction<
 	ArgsOf<'interactionCreate' | 'messageCreate'>,
 	InteractionData
-> = async ([interaction], _client, next, guardData) => {
-	if (isDev(resolveUser(interaction).id)) await next();
-	else await replyToInteraction(interaction, guardData.localize.GUARDS.DEVS_ONLY());
+> = async ([arg], _client, next, guardData) => {
+	if (isDev(resolveUser(arg).id)) await next();
+	else await replyToInteraction(arg, guardData.translations.GUARDS.DEVS_ONLY());
 };

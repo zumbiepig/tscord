@@ -1,4 +1,4 @@
-import type { ApplicationCommandType } from 'discord.js';
+import type { ApplicationCommandType,	LocalizationMap} from 'discord.js';
 import type {
 	ApplicationCommandOptions as ApplicationCommandOptionsX,
 	NotEmpty as NotEmptyX,
@@ -26,8 +26,6 @@ export type TranslationPath = Paths<
 export type TranslationType<K extends TranslationPath> = Simplify<
 	Get<Translations, K>
 >;
-
-type LocalizationMap = Partial<Record<Locales, string>>;
 
 export interface SanitizedOptions {
 	descriptionLocalizations?: LocalizationMap;

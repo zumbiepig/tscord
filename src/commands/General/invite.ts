@@ -15,16 +15,16 @@ export default class InviteCommand {
 	})
 	async invite(
 		interaction: RepliableInteraction,
-		{ localize }: InteractionData,
+		{ translations }: InteractionData,
 	) {
 		const embed = new EmbedBuilder()
-			.setTitle(localize.COMMANDS.INVITE.EMBED.TITLE())
+			.setTitle(translations.COMMANDS.INVITE.EMBED.TITLE())
 			.setDescription(
-				localize.COMMANDS.INVITE.EMBED.DESCRIPTION({
+				translations.COMMANDS.INVITE.EMBED.DESCRIPTION({
 					link: generalConfig.links.botInvite ?? '',
 				}),
 			)
-			.setColor(colorsConfig.primary);
+			.setColor(colorsConfig.basicEmbeds.primary);
 
 		await replyToInteraction(interaction, {
 			embeds: [embed],

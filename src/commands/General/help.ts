@@ -50,16 +50,16 @@ export default class HelpCommand {
 	async help(
 		interaction: CommandInteraction,
 		client: Client,
-		{ localize }: InteractionData,
+		{ translations }: InteractionData,
 	) {
 		const embed = await this.getEmbed({
 			client,
 			interaction,
-			localize: localize,
+			translations: translations,
 		});
 
 		const components: ActionRowBuilder<StringSelectMenuBuilder>[] = [];
-		components.push(this.getSelectDropdown('categories', localize));
+		components.push(this.getSelectDropdown('categories', translations));
 
 		await interaction.followUp({
 			embeds: [embed],
@@ -73,7 +73,7 @@ export default class HelpCommand {
 	async selectCategory(
 		interaction: StringSelectMenuInteraction,
 		client: Client,
-		{ localize }: InteractionData,
+		{ translations }: InteractionData,
 	) {
 		const category = interaction.values[0] ?? '';
 
@@ -81,10 +81,10 @@ export default class HelpCommand {
 			client,
 			interaction,
 			category,
-			localize: localize,
+			translations: translations,
 		});
 		const components: ActionRowBuilder<StringSelectMenuBuilder>[] = [];
-		components.push(this.getSelectDropdown(category, localize));
+		components.push(this.getSelectDropdown(category, translations));
 
 		await interaction.update({
 			embeds: [embed],
@@ -97,13 +97,13 @@ export default class HelpCommand {
 		interaction,
 		category = '',
 		pageNumber = 0,
-		localize,
+		translations,
 	}: {
 		client: Client;
 		interaction: CommandInteraction | StringSelectMenuInteraction;
 		category?: string;
 		pageNumber?: number;
-		localize: TranslationFunctions;
+		translations: TranslationFunctions;
 	}): Promise<EmbedBuilder> {
 		const commands = this._categories.get(category);
 
@@ -116,11 +116,11 @@ export default class HelpCommand {
 						forceStatic: false,
 					}),
 				})
-				.setTitle(localize.COMMANDS.HELP.EMBED.TITLE())
+				.setTitle(translations.COMMANDS.HELP.EMBED.TITLE())
 				.setThumbnail(
 					'https://upload.wikimedia.org/wikipedia/commons/a/a4/Cute-Ball-Help-icon.png',
 				)
-				.setColor(colorsConfig.primary);
+				.setColor(colorsConfig.basicEmbeds.primary);
 
 			const currentGuild = resolveGuild(interaction as Interaction);
 			const applicationCommands = [
@@ -158,7 +158,7 @@ export default class HelpCommand {
 					forceStatic: false,
 				}),
 			})
-			.setTitle(localize.COMMANDS.HELP.EMBED.CATEGORY_TITLE({ category }))
+			.setTitle(translations.COMMANDS.HELP.EMBED.CATEGORY_TITLE({ category }))
 			.setFooter({
 				text: `${client.user?.username ?? ''} • Page ${(pageNumber + 1).toString()} of ${maxPage.toString()}`,
 			});
@@ -195,12 +195,12 @@ export default class HelpCommand {
 
 	private getSelectDropdown(
 		defaultValue = 'categories',
-		localize: TranslationFunctions,
+		translations: TranslationFunctions,
 	): ActionRowBuilder<StringSelectMenuBuilder> {
 		const optionsForEmbed: APISelectMenuOption[] = [];
 
 		optionsForEmbed.push({
-			description: localize.COMMANDS.HELP.SELECT_MENU.TITLE(),
+			description: translations.COMMANDS.HELP.SELECT_MENU.TITLE(),
 			label: 'Categories',
 			value: 'categories',
 			default: defaultValue === 'categories',
@@ -208,7 +208,7 @@ export default class HelpCommand {
 
 		for (const [category] of this._categories) {
 			const description =
-				localize.COMMANDS.HELP.SELECT_MENU.CATEGORY_DESCRIPTION({
+				translations.COMMANDS.HELP.SELECT_MENU.CATEGORY_DESCRIPTION({
 					category,
 				});
 			optionsForEmbed.push({

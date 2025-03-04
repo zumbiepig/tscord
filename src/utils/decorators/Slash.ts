@@ -11,7 +11,7 @@ import {
 } from '@/utils/functions';
 import type { ApplicationCommandOptions, TranslationPath } from '@/utils/types';
 
-export const Slash = (options?: ApplicationCommandOptions) => {
+export function Slash (options?: ApplicationCommandOptions) {
 	if (!options) options = {};
 	else if (typeof options === 'string') options = { name: options };
 

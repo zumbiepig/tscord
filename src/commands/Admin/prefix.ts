@@ -29,7 +29,7 @@ export default class PrefixCommand {
 		})
 		prefix: string | undefined,
 		interaction: RepliableInteraction | SimpleCommandMessage,
-		{ localize }: InteractionData,
+		{ translations }: InteractionData,
 	) {
 		const guild = resolveGuild(interaction);
 		if (!guild) throw new ReplyUnknownErrorError(interaction);
@@ -39,7 +39,7 @@ export default class PrefixCommand {
 
 		await simpleSuccessEmbed(
 			interaction,
-			localize.COMMANDS.PREFIX.EMBED.DESCRIPTION({
+			translations.COMMANDS.PREFIX.EMBED.DESCRIPTION({
 				prefix: prefix ?? generalConfig.simpleCommandsPrefix ?? undefined,
 			}),
 		);

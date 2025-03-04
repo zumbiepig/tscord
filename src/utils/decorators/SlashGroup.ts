@@ -11,10 +11,10 @@ import {
 } from '@/utils/functions';
 import type { SlashGroupOptions, TranslationPath } from '@/utils/types';
 
-export const SlashGroup = <TRoot extends string>(
+export function SlashGroup <TRoot extends string>(
 	options: VerifyName<string> | SlashGroupOptions,
 	root?: VerifyName<TRoot>,
-) => {
+) {
 	if (typeof options !== 'string') {
 		let localizationSource: TranslationPath | undefined;
 		if (options.localizationSource)

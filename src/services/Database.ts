@@ -27,7 +27,6 @@ import { Schedule, Service } from '@/utils/decorators';
 import {
 	backupDatabase,
 	dayjsTimezone,
-	formatDate,
 	getFolderSize,
 	isSQLiteDatabase,
 	restoreDatabase,
@@ -134,7 +133,7 @@ export class Database {
 	 * @param snapshotFile name of the snapshot to create
 	 */
 	@Schedule('0 0 * * *')
-	async backup(snapshotFile?: string): Promise<boolean> {
+	async backupDb(snapshotFile?: string): Promise<boolean> {
 		if (!databaseConfig.enableBackups && !snapshotFile) return false;
 
 		if (!isSQLiteDatabase()) {
@@ -151,7 +150,7 @@ export class Database {
 		}
 
 		if (!snapshotFile)
-			snapshotFile = `snapshot_${formatDate(dayjsTimezone(), 'dateTimeFilename')}_${mikroORMConfig.dbName ?? ''}.backup`;
+			snapshotFile = `snapshot_${dayjsTimezone().format('YYYY-MM-DD_HH-mm-ss')}_${mikroORMConfig.dbName ?? ''}.backup`;
 
 		await this.em.flush();
 		await backupDatabase(
@@ -167,7 +166,7 @@ export class Database {
 	 * @param snapshotFile name of the snapshot to restore
 	 * @returns true if the snapshot has been restored, false otherwise
 	 */
-	async restore(snapshotFile: string): Promise<boolean> {
+	async restoreDb(snapshotFile: string): Promise<boolean> {
 		if (!isSQLiteDatabase()) {
 			await this.logger.log(
 				'error',

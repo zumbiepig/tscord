@@ -1,16 +1,16 @@
-import os from "node:os";
-import process from "node:process";
+import os from 'node:os';
+import process from 'node:process';
 
-import type { SqlEntityManager } from "@mikro-orm/better-sqlite";
-import type { FilterQuery } from "@mikro-orm/core";
-import type { MongoEntityManager } from "@mikro-orm/mongodb";
-import type { Interaction, Snowflake } from "discord.js";
-import { Client, SimpleCommandMessage } from "discordx";
-import { delay, inject } from "tsyringe";
+import type { SqlEntityManager } from '@mikro-orm/better-sqlite';
+import type { FilterQuery } from '@mikro-orm/core';
+import type { MongoEntityManager } from '@mikro-orm/mongodb';
+import type { Interaction, Snowflake } from 'discord.js';
+import { Client, SimpleCommandMessage } from 'discordx';
+import { delay, inject } from 'tsyringe';
 
-import { Guild, Stat, StatRepository, User } from "@/entities";
-import { Database } from "@/services";
-import { Schedule, Service } from "@/utils/decorators";
+import { Guild, Stat, StatRepository, User } from '@/entities';
+import { Database } from '@/services';
+import { Schedule, Service } from '@/utils/decorators';
 import {
 	dayjsTimezone,
 	getHostCPUUsage,
@@ -20,16 +20,16 @@ import {
 	resolveChannel,
 	resolveGuild,
 	resolveUser,
-} from "@/utils/functions";
-import type { StatPerInterval, StatType } from "@/utils/types";
+} from '@/utils/functions';
+import type { StatPerInterval, StatType } from '@/utils/types';
 
 const allInteractions = {
 	type: {
 		$in: [
-			"CHAT_INPUT_COMMAND_INTERACTION",
-			"SIMPLE_COMMAND_MESSAGE",
-			"USER_CONTEXT_MENU_COMMAND_INTERACTION",
-			"MESSAGE_CONTEXT_MENU_COMMAND_INTERACTION",
+			'CHAT_INPUT_COMMAND_INTERACTION',
+			'SIMPLE_COMMAND_MESSAGE',
+			'USER_CONTEXT_MENU_COMMAND_INTERACTION',
+			'MESSAGE_CONTEXT_MENU_COMMAND_INTERACTION',
 		],
 	},
 } satisfies FilterQuery<Stat>;
@@ -78,7 +78,7 @@ export class Stats {
 	 * Returns an object with the total stats for each type.
 	 */
 	async getTotalStats() {
-		const totalStatsObj = {
+		const totalStatsObject = {
 			TOTAL_USERS: this.client.guilds.cache.reduce(
 				(acc, guild) => acc + guild.memberCount,
 				0,
@@ -88,7 +88,7 @@ export class Stats {
 			TOTAL_COMMANDS: await this.statsRepo.count(allInteractions),
 		};
 
-		return totalStatsObj;
+		return totalStatsObject;
 	}
 
 	/**
@@ -96,7 +96,7 @@ export class Stats {
 	 */
 	async getLastInteraction() {
 		const lastInteraction = await this.statsRepo.findOne(allInteractions, {
-			orderBy: { createdAt: "DESC" },
+			orderBy: { createdAt: 'DESC' },
 		});
 
 		return lastInteraction;
@@ -110,7 +110,7 @@ export class Stats {
 			Guild,
 			{},
 			{
-				orderBy: { createdAt: "DESC" },
+				orderBy: { createdAt: 'DESC' },
 			},
 		);
 
@@ -120,18 +120,18 @@ export class Stats {
 	/**
 	 * Get commands sorted by total amount of uses in DESC order.
 	 */
-	async getTopCommands() {
-		if ("createQueryBuilder" in this.db.em) {
+	async getTopCommands(): Promise<StatPerInterval> {
+		if ('createQueryBuilder' in this.db.em) {
 			const qb = (this.db.em as SqlEntityManager).createQueryBuilder(Stat);
 			const query = qb
-				.select(["type", "value as name", "count(*) as count"])
+				.select(['type', 'value as name', 'count(*) as count'])
 				.where(allInteractions)
-				.groupBy(["type", "value"]);
+				.groupBy(['type', 'value']);
 
 			const slashCommands = await query.execute();
 
 			return slashCommands.sort((a, b) => b.count - a.count);
-		} else if ("aggregate" in this.db.em) {
+		} else if ('aggregate' in this.db.em) {
 			const slashCommands = (await (this.db.em as MongoEntityManager).aggregate(
 				Stat,
 				[
@@ -140,14 +140,14 @@ export class Stats {
 					},
 					{
 						$group: {
-							id: { type: "$type", value: "$value" },
+							id: { type: '$type', value: '$value' },
 							count: { $sum: 1 },
 						},
 					},
 					{
 						$replaceRoot: {
 							newRoot: {
-								$mergeObjects: ["$id", { count: "$count" }],
+								$mergeObjects: ['$id', { count: '$count' }],
 							},
 						},
 					},
@@ -155,25 +155,27 @@ export class Stats {
 			)) as StatPerInterval;
 			return slashCommands.sort((a, b) => b.count - a.count);
 		} else {
-			// Get distinct command types and values
-			const distinctCommands = await this.db.em.find(Stat, allInteractions);
-
-			// Count occurrences of each command
-			const commandCounts = await Promise.all(
-				distinctCommands.map(async (command) => {
-					const count = await this.db.em.count(Stat, {
-						type: command.type,
-						value: command.value,
-					});
-					return {
-						date: command.createdAt,
-						count,
-					};
-				}),
-			);
-
+			const stats = await this.db.em.find(Stat, allInteractions, {
+			});
+			
+			// Transform results to group by date, type, and value
+			const groupedResults = stats.reduce((acc, stat) => {
+				const date = dayjsTimezone(stat.createdAt).format('YYYY-MM-DD');
+				const key = `${date}_${stat.type}_${stat.value}`;
+			
+				if (!acc[key]) {
+					acc[key] = { date: date!, type: stat.type, name: stat.value, count: 0 };
+				}
+			
+				acc[key].count += 1;
+				return acc;
+			}, {} as Record<string, { date: string; type: string; name: string; count: number }>);
+			
+			// Convert object map to an array
+			const results = Object.values(groupedResults);
+			
 			// Sort commands by count in descending order
-			return commandCounts.sort((a, b) => b.count - a.count);
+			return results.sort((a, b) => b.count - a.count);
 		}
 	}
 
@@ -182,11 +184,11 @@ export class Stats {
 	 */
 	async getUsersActivity() {
 		const usersActivity = {
-			"1-10": 0,
-			"11-50": 0,
-			"51-100": 0,
-			"101-1000": 0,
-			">1000": 0,
+			'1-10': 0,
+			'11-50': 0,
+			'51-100': 0,
+			'101-1000': 0,
+			'>1000': 0,
 		};
 
 		const users = await this.db.get(User).findAll();
@@ -199,11 +201,11 @@ export class Stats {
 				},
 			});
 
-			if (commandsCount <= 10) usersActivity["1-10"]++;
-			else if (commandsCount <= 50) usersActivity["11-50"]++;
-			else if (commandsCount <= 100) usersActivity["51-100"]++;
-			else if (commandsCount <= 1000) usersActivity["101-1000"]++;
-			else usersActivity[">1000"]++;
+			if (commandsCount <= 10) usersActivity['1-10']++;
+			else if (commandsCount <= 50) usersActivity['11-50']++;
+			else if (commandsCount <= 100) usersActivity['51-100']++;
+			else if (commandsCount <= 1000) usersActivity['101-1000']++;
+			else usersActivity['>1000']++;
 		}
 
 		return usersActivity;
@@ -224,7 +226,7 @@ export class Stats {
 		for (const guild of guilds) {
 			const discordGuild = await this.client.guilds
 				.fetch(guild.id)
-				.catch(() => undefined);
+				.catch(() => void 0);
 			if (!discordGuild) continue;
 
 			const commandsCount = await this.db.get(Stat).count({
@@ -257,19 +259,13 @@ export class Stats {
 		const now = dayjsTimezone();
 
 		for (let i = 0; i < days; i++) {
-			const date = now.subtract(i, "day");
-			const statsFound = await this.statsRepo.find({
-				type,
-				createdAt: {
-					$gte: date.startOf("day").toDate(),
-					$lte: date.endOf("day").toDate(),
-				},
-			});
+			const date = now.subtract(i, 'day').toDate()
+			const statCount = await this.getCountForGivenDay(type, date)
 
 			stats.push({
-				date: date.toDate(),
-				count: statsFound.length,
-			});
+				date: date,
+				count: statCount,
+			})
 		}
 
 		return this.cumulateStatPerInterval(stats);
@@ -306,24 +302,44 @@ export class Stats {
 	sumStats(...args: StatPerInterval[]): StatPerInterval {
 		return args.reduce((stats1, stats2) => {
 			const allDays = [
-				...new Set(stats1.concat(stats2).map((stat) => stat.date)),
+				...new Set(stats1.concat(stats2).map(stat => stat.date)),
 			].sort((a, b) => {
 				const msInDay = 1000 * 60 * 60 * 24;
 				return (
-					Math.ceil(a.getTime() / msInDay) * msInDay -
-					Math.ceil(b.getTime() / msInDay) * msInDay
+					Math.ceil(a.getTime() / msInDay) * msInDay
+					- Math.ceil(b.getTime() / msInDay) * msInDay
 				);
 			});
 
-			const sumStats = allDays.map((day) => ({
+			const sumStats = allDays.map(day => ({
 				date: day,
 				count:
-					(stats1.find((stat) => stat.date === day)?.count ?? 0) +
-					(stats2.find((stat) => stat.date === day)?.count ?? 0),
+					(stats1.find(stat => stat.date === day)?.count ?? 0)
+					+ (stats2.find(stat => stat.date === day)?.count ?? 0),
 			}));
 
 			return sumStats;
 		});
+	}
+
+	/**
+	 * Returns the total count of row for a given type at a given day.
+	 * @param type
+	 * @param date - day to get the stats for (any time of the day will work as it extract the very beginning and the very ending of the day as the two limits)
+	 */
+	async getCountForGivenDay(type: StatType, date: Date): Promise<number> {
+		const start = dayjsTimezone(date).startOf('day').toDate()
+		const end = dayjsTimezone(date).endOf('day').toDate()
+
+		const stats = await this.statsRepo.find({
+			type,
+			createdAt: {
+				$gte: start,
+				$lte: end,
+			},
+		})
+
+		return stats.length
 	}
 
 	/**
@@ -369,7 +385,7 @@ export class Stats {
 	/**
 	 * Run each day at 00:00 to update daily stats.
 	 */
-	@Schedule("0 0 * * *")
+	@Schedule('0 0 * * *')
 	async registerDailyStats() {
 		const totalStats = await this.getTotalStats();
 

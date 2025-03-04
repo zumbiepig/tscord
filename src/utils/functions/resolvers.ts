@@ -38,8 +38,8 @@ export function resolveUser(
 ): User | undefined {
 	return interaction instanceof BaseInteraction
 		? interaction.user
-		: interaction instanceof SimpleCommandMessage ||
-			  interaction instanceof MessageReaction
+		: interaction instanceof SimpleCommandMessage
+			|| interaction instanceof MessageReaction
 			? (interaction.message.author ?? undefined)
 			: interaction instanceof Message
 				? interaction.author
@@ -67,14 +67,14 @@ export function resolveMember(
 		| VoiceState
 		| MessageReaction,
 ): GuildMember | APIInteractionGuildMember | undefined {
-	return interaction instanceof BaseInteraction ||
-		interaction instanceof Message ||
-		interaction instanceof VoiceState
+	return interaction instanceof BaseInteraction
+		|| interaction instanceof Message
+		|| interaction instanceof VoiceState
 		? (interaction.member ?? undefined)
-		: interaction instanceof SimpleCommandMessage ||
-			  interaction instanceof MessageReaction
-			? (interaction.message.member ?? undefined)
-			: (undefined as never);
+		: (interaction instanceof SimpleCommandMessage
+			|| interaction instanceof MessageReaction
+				? (interaction.message.member ?? undefined)
+				: (undefined as never));
 }
 
 export function resolveGuild(interaction: VoiceState): Guild;
@@ -96,8 +96,8 @@ export function resolveGuild(
 ): Guild | undefined {
 	return interaction instanceof BaseInteraction
 		? (interaction.guild ?? undefined)
-		: interaction instanceof SimpleCommandMessage ||
-			  interaction instanceof MessageReaction
+		: interaction instanceof SimpleCommandMessage
+			|| interaction instanceof MessageReaction
 			? (interaction.message.guild ?? undefined)
 			: interaction instanceof Message || interaction instanceof VoiceState
 				? (interaction.guild ?? undefined)
@@ -133,40 +133,44 @@ export function resolveChannel(
 		| VoiceState
 		| MessageReaction,
 ): TextBasedChannel | VoiceBasedChannel | undefined {
-	return interaction instanceof BaseInteraction ||
-		interaction instanceof Message ||
-		interaction instanceof VoiceState
+	return interaction instanceof BaseInteraction
+		|| interaction instanceof Message
+		|| interaction instanceof VoiceState
 		? (interaction.channel ?? undefined)
-		: interaction instanceof SimpleCommandMessage ||
-			  interaction instanceof MessageReaction
-			? interaction.message.channel
-			: (undefined as never);
+		: (interaction instanceof SimpleCommandMessage
+			|| interaction instanceof MessageReaction
+				? interaction.message.channel
+				: (undefined as never));
 }
 
 export function resolveAction(
 	interaction: BaseInteraction | SimpleCommandMessage,
 ): string {
-	return interaction instanceof CommandInteraction ||
-		interaction instanceof AutocompleteInteraction
+	return interaction instanceof CommandInteraction
+		|| interaction instanceof AutocompleteInteraction
 		? interaction.commandName
-		: interaction instanceof MessageComponentInteraction ||
-			  interaction instanceof ModalSubmitInteraction
+		: interaction instanceof MessageComponentInteraction
+			|| interaction instanceof ModalSubmitInteraction
 			? interaction.customId
 			: interaction instanceof SimpleCommandMessage
 				? interaction.name
 				: (undefined as never);
 }
 
-export function resolveLocale(interaction: BaseInteraction): Locale;
 export function resolveLocale(
-	interaction: BaseInteraction | SimpleCommandMessage,
-): Locale | undefined;
-export function resolveLocale(
+	interaction: BaseInteraction,
+): Locale {
+	return interaction instanceof BaseInteraction
+		? interaction.locale
+		: undefined as never;
+}
+
+export function resolveGuildLocale(
 	interaction: BaseInteraction | SimpleCommandMessage,
 ): Locale | undefined {
 	return interaction instanceof BaseInteraction
-		? interaction.locale
-		: interaction instanceof SimpleCommandMessage
-			? interaction.message.guild?.preferredLocale
-			: (undefined as never);
+		? (interaction.guildLocale ?? undefined)
+		: (interaction instanceof SimpleCommandMessage
+				? interaction.message.guild?.preferredLocale
+				: (undefined as never));
 }

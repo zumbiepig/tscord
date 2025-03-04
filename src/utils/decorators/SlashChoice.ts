@@ -10,7 +10,7 @@ import type {
 	TranslationPath,
 } from '@/utils/types';
 
-export const SlashChoice = (...options: SanitizedOptions[]) => {
+export function SlashChoice (...options: SanitizedOptions[]) {
 	for (let i = 0; i < options.length; i++) {
 		let option = options[i];
 

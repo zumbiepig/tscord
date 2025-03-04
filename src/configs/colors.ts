@@ -36,16 +36,28 @@ import type { ColorsConfigType } from '@/utils/types';
  * @property {number} Yellow 0xFEE75C | rgb(254,231,92)
  */
 export const colorsConfig = {
-	primary: Colors.DarkButNotBlack, // #2C2F33
-	success: Colors.Green, // #57F287
-	error: Colors.Red, // #ED4245
-	logDebug: Colors.DarkerGrey, // #7F8C8D
-	logInfo: Colors.Blue, // #3498DB
-	logWarn: Colors.Orange, // #E67E22
-	logError: Colors.DarkRed, // #992D22
-	logInteraction: Colors.DarkOrange, // #A84300
-	logNewUser: Colors.Aqua, // #1ABC9C
-	logGuildNew: Colors.Green, // #57F287
-	logGuildDelete: Colors.Red, // #ED4245
-	logGuildRecover: Colors.Yellow, // #FEE75C
+	basicEmbeds: {
+		primary: Colors.DarkButNotBlack, // #2c2f33
+		success: Colors.Green, // #57f287
+		error: Colors.Red, // #ed4245
+	},
+	logs: {
+		debug: Colors.DarkerGrey, // #7f8c8d
+		info: Colors.Blue, // #3498db
+		warn: Colors.Orange, // #e67e22
+		error: Colors.DarkRed, // #992d22
+	},
+	discord: {
+		interaction: Colors.DarkOrange, // #a84300
+		user: {
+			new: Colors.Aqua, // #1abc9c
+			delete: Colors.Fuchsia, // #eb459e
+			recover: Colors.DarkGold, // #c27c0e
+		},
+		guild: {
+			new: Colors.Green, // #57f287
+			delete: Colors.Red, // #ed4245
+			recover: Colors.Yellow, // #fee75c
+		},
+	},
 } satisfies ColorsConfigType;

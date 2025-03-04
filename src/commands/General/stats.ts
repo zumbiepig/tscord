@@ -12,7 +12,7 @@ import { injectable } from 'tsyringe';
 import { colorsConfig } from '@/configs';
 import { Stats } from '@/services';
 import { Slash, SlashOption } from '@/utils/decorators';
-import { formatDate, resolveUser } from '@/utils/functions';
+import { resolveUser } from '@/utils/functions';
 import type { InteractionData } from '@/utils/types';
 
 @Discord()
@@ -54,7 +54,7 @@ export default class StatsCommand {
 		})
 		days = 7,
 		interaction: CommandInteraction | SimpleCommandMessage,
-		{ localize }: InteractionData,
+		{ translations, interactionLocale }: InteractionData,
 	) {
 		const pages: PaginationItem[] = [];
 
@@ -64,7 +64,7 @@ export default class StatsCommand {
 			const chart = new ChartJsImage().setConfig({
 				type: 'line',
 				data: {
-					labels: stats.map((stat) => formatDate(stat.date, 'onlyDayMonth')),
+					labels: stats.map((stat) => stat.date.toLocaleDateString(interactionLocale)),
 					datasets: [
 						{
 							label: '',
@@ -80,7 +80,7 @@ export default class StatsCommand {
 				options: {
 					title: {
 						display: true,
-						text: localize.COMMANDS.STATS.HEADERS[
+						text: translations.COMMANDS.STATS.HEADERS[
 							resolver[0] as keyof typeof this.statsResolver
 						](),
 						fontColor: 'rgba(255,255,254,0.6)',
@@ -111,7 +111,7 @@ export default class StatsCommand {
 							name: user.username,
 							iconURL: user.displayAvatarURL(),
 						})
-						.setColor(colorsConfig.primary)
+						.setColor(colorsConfig.basicEmbeds.primary)
 						.setImage(chart.getUrl()),
 				],
 			});

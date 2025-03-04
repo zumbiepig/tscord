@@ -37,7 +37,7 @@ export const logsConfig: LogsConfigType = {
 		channelId: undefined,
 	},
 
-	newUser: {
+	user: {
 		console: true,
 		file: true,
 		channelId: undefined,

@@ -11,6 +11,7 @@ import { type Locales, locales as i18nLocales, type Translation } from '@/i18n';
 import { Logger } from '@/services';
 import { BaseController } from '@/utils/classes';
 import { getTscordVersion, resolveDependency } from '@/utils/functions';
+import { readFile } from 'node:fs/promises';
 
 @autoInjectable()
 export class Plugin {
@@ -33,15 +34,17 @@ export class Plugin {
 		this.logger = await resolveDependency(Logger);
 
 		// read plugin.json
-		const pluginJson = await (import(path.join(this._path, 'plugin.json')) as Promise<{
-			name: string;
-			version: string;
-			tscordVersion: string;
-		}>).catch(() => void 0);
-		if (!pluginJson) {
+		const pluginJsonFile = await readFile(path.join(this._path, 'plugin.json'), 'utf8').catch(() => void 0)
+		if (!pluginJsonFile) {
 			await this.stopLoad('plugin.json not found');
 			return false;
 		}
+
+		const pluginJson = JSON.parse(pluginJsonFile) as {
+			name: string;
+			version: string;
+			tscordVersion: string;
+		};
 
 		// plugin name
 		if (!pluginJson.name) {

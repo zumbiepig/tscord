@@ -8,13 +8,34 @@ import type {
 import type { SetRequiredDeep, ValueOf } from 'type-fest';
 
 import type { env } from '@/env';
+import type { Locales } from '@/i18n';
 import type { Timezone } from '@/utils/types';
+
+export interface APIConfigType {
+	enabled: boolean;
+	port: number;
+}
+
+export type ColorsConfigType = { [x in PropertyKey]: ValueOf<typeof Colors> | ColorsConfigType };
+
+export interface DatabaseConfigType {
+	path: string;
+	enableBackups: boolean;
+}
+
+export type MikroORMConfigType = SetRequiredDeep<
+	Record<
+		typeof env.NODE_ENV,
+		Pick<MikroORMOptions, 'driver'> & ConnectionOptions
+	>,
+	'production.driver'
+>;
 
 export interface GeneralConfigType {
 	name: string;
 	description: string;
 
-	defaultLocale: `${Locale}`;
+	defaultLocale: Extract<`${Locale}`, Locales>;
 	timezone: Timezone;
 
 	simpleCommandsPrefix: string | undefined;
@@ -34,19 +55,6 @@ export interface GeneralConfigType {
 		gitRepo: string | undefined;
 	};
 }
-
-export interface DatabaseConfigType {
-	path: string;
-	enableBackups: boolean;
-}
-
-export type MikroORMConfigType = SetRequiredDeep<
-	Record<
-		typeof env.NODE_ENV,
-		Pick<MikroORMOptions, 'driver'> & ConnectionOptions
-	>,
-	'production.driver'
->;
 
 interface LogsConfigCategoryType {
 	console: boolean;
@@ -70,14 +78,7 @@ export interface LogsConfigType {
 
 	interaction: LogsConfigCategoryType;
 
-	newUser: LogsConfigCategoryType;
+	user: LogsConfigCategoryType;
 
 	guild: LogsConfigCategoryType;
 }
-
-export interface APIConfigType {
-	enabled: boolean;
-	port: number;
-}
-
-export type ColorsConfigType = Record<string, ValueOf<typeof Colors>>;

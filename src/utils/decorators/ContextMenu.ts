@@ -6,7 +6,7 @@ import {
 } from '@/utils/functions';
 import type { ContextMenuOptions, TranslationPath } from '@/utils/types';
 
-export const ContextMenu = (options: ContextMenuOptions) => {
+export function ContextMenu  (options: ContextMenuOptions) {
 	let localizationSource: TranslationPath | undefined;
 
 	if (options.localizationSource)

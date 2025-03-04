@@ -23,13 +23,13 @@ export default class MaintenanceCommand {
 		})
 		state: boolean,
 		interaction: RepliableInteraction,
-		{ localize }: InteractionData,
+		{ translations }: InteractionData,
 	) {
 		await setMaintenance(state);
 
 		await simpleSuccessEmbed(
 			interaction,
-			localize.COMMANDS.MAINTENANCE.EMBED.DESCRIPTION({
+			translations.COMMANDS.MAINTENANCE.EMBED.DESCRIPTION({
 				status: state ? 'enabled' : 'disabled',
 			}),
 		);

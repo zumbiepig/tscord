@@ -13,9 +13,9 @@ export function NSFW(
 	ArgsOf<'interactionCreate' | 'messageCreate'>,
 	InteractionData
 > {
-	return async ([interaction], _client, next, guardData) => {
-		const channel = resolveChannel(interaction);
+	return async ([arg], _client, next, guardData) => {
+		const channel = resolveChannel(arg);
 		if (channel && 'nsfw' in channel && channel.nsfw === !invert) await next();
-		else await replyToInteraction(interaction, guardData.localize.GUARDS.NSFW());
+		else await replyToInteraction(arg, guardData.translations.GUARDS.NSFW());
 	};
 }

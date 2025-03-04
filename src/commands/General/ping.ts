@@ -15,12 +15,12 @@ export default class PingCommand {
 	async ping(
 		interaction: RepliableInteraction,
 		client: Client,
-		{ localize }: InteractionData,
+		{ translations }: InteractionData,
 	) {
-		const reply = await replyToInteraction(interaction, 'Pinging...');
+		const reply = await replyToInteraction(interaction, 'Pinging…');
 
 		await reply.edit(
-			localize.COMMANDS.PING.MESSAGE({
+			translations.COMMANDS.PING.MESSAGE({
 				time: reply.createdTimestamp - interaction.createdTimestamp,
 				heartbeat: Math.floor(client.ws.ping).toString(),
 			}),

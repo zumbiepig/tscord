@@ -45,7 +45,7 @@ export default class InfoCommand {
 			})
 			.setTitle(client.user?.tag ?? '')
 			.setThumbnail(client.user?.displayAvatarURL() ?? '')
-			.setColor(colorsConfig.primary)
+			.setColor(colorsConfig.basicEmbeds.primary)
 			.setDescription(generalConfig.description);
 
 		const fields: EmbedField[] = [];
@@ -56,7 +56,7 @@ export default class InfoCommand {
 		if (generalConfig.ownerId) {
 			const owner = await client.users
 				.fetch(generalConfig.ownerId)
-				.catch(() => undefined);
+				.catch(() => void 0);
 			if (owner)
 				fields.push({
 					name: 'Owner',
@@ -100,7 +100,7 @@ export default class InfoCommand {
 		 */
 		fields.push({
 			name: 'Libraries',
-			value: `[discord.js](https://discord.js.org/) (v${getPackageJson().dependencies?.['discord.js']?.replace(/[><=~^]/g, '') ?? ''})\n[discordx](https://discordx.js.org/) (v${getPackageJson().dependencies?.['discordx']?.replace(/[><=~^]/g, '') ?? ''})`,
+			value: `[discord.js](https://discord.js.org/) (v${getPackageJson().dependencies?.['discord.js']?.replace(/[<=>^~]/g, '') ?? ''})\n[discordx](https://discordx.js.org/) (v${getPackageJson().dependencies?.['discordx']?.replace(/[<=>^~]/g, '') ?? ''})`,
 			inline: true,
 		});
 
@@ -113,14 +113,14 @@ export default class InfoCommand {
 		const buttons = links
 			.map((link) => {
 				const url = link.url.split('_').join('');
-				if (isValidUrl(url))
-					return new ButtonBuilder()
-						.setLabel(link.label)
-						.setURL(url)
-						.setStyle(ButtonStyle.Link);
-				else return undefined;
+				return isValidUrl(url)
+					? new ButtonBuilder()
+							.setLabel(link.label)
+							.setURL(url)
+							.setStyle(ButtonStyle.Link)
+					: undefined;
 			})
-			.filter((link) => link) as ButtonBuilder[];
+			.filter(Boolean) as ButtonBuilder[];
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(...buttons);
 
 		// finally send the embed

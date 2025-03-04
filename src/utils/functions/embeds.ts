@@ -14,7 +14,7 @@ export async function simpleSuccessEmbed(
 	message: string,
 ) {
 	const embed = new EmbedBuilder()
-		.setColor(colorsConfig.success)
+		.setColor(colorsConfig.basicEmbeds.success)
 		.setTitle(`✅ ${message}`);
 
 	await replyToInteraction(interaction, { embeds: [embed] });
@@ -30,7 +30,7 @@ export async function simpleErrorEmbed(
 	message: string,
 ) {
 	const embed = new EmbedBuilder()
-		.setColor(colorsConfig.error)
+		.setColor(colorsConfig.basicEmbeds.error)
 		.setTitle(`❌ ${message}`);
 
 	await replyToInteraction(interaction, { embeds: [embed] });

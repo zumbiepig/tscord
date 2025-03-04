@@ -33,7 +33,7 @@ import {
 	PluginsManager,
 	Store,
 } from '@/services';
-import { keptInstances } from '@/utils/decorators';
+import { persistedServices } from '@/utils/decorators';
 import { resolveDependency } from '@/utils/functions';
 
 async function init() {
@@ -50,7 +50,7 @@ async function init() {
 
 	// start spinner
 	const logger = await resolveDependency(Logger);
-	await logger.startSpinner('Starting...');
+	await logger.startSpinner('Starting…');
 
 	// init the database
 	const db = await resolveDependency(Database);
@@ -182,16 +182,17 @@ async function reload(client: Client, force = false) {
 	store.set('botHasBeenReloaded', true);
 
 	const logger = await resolveDependency(Logger);
-	await logger.startSpinner('Hot reloading...');
+	await logger.startSpinner('Hot reloading…');
 
 	// remove events
 	client.removeEvents();
 
 	// get all instances to keep
 	const instancesToKeep = new Map<constructor<unknown>, unknown>();
-	for (const target of keptInstances) {
-		const instance = await resolveDependency(target);
-		instancesToKeep.set(target, instance);
+	instancesToKeep.set(Client, client);
+	for (const service of persistedServices) {
+		const instance = await resolveDependency(service);
+		instancesToKeep.set(service, instance);
 	}
 
 	// cleanup
@@ -199,12 +200,7 @@ async function reload(client: Client, force = false) {
 	DIService.engine.clearAllServices();
 
 	// transfer store instance to the new container in order to keep the same states
-	for (const [target, instance] of instancesToKeep) {
-		container.registerInstance(target, instance);
-	}
-
-	// re-register the client instance
-	container.registerInstance(Client, client);
+	instancesToKeep.forEach((instance, target) => container.registerInstance(target, instance));
 
 	// reload files (this does not work in esm)
 	/* await Promise.all(

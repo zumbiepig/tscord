@@ -7,7 +7,7 @@ import { DevAuthenticated } from '@/api/middlewares';
 import { databaseConfig, mikroORMConfig } from '@/configs';
 import { Database } from '@/services';
 import { BaseController } from '@/utils/classes';
-import { dayjsTimezone, formatDate } from '@/utils/functions';
+import { dayjsTimezone } from '@/utils/functions';
 
 @Controller('/database')
 @UseBefore(DevAuthenticated)
@@ -19,8 +19,8 @@ export class DatabaseController extends BaseController {
 
 	@Post('/backup')
 	async generateBackup() {
-		const snapshotName = `snapshot_${formatDate(dayjsTimezone(), 'dateTimeFilename')}_manual_${mikroORMConfig.dbName ?? ''}.backup`;
-		const success = await this.db.backup(snapshotName);
+		const snapshotName = `snapshot_${dayjsTimezone().format('YYYY-MM-DD_HH-mm-ss')}_manual_${mikroORMConfig.dbName ?? ''}.backup`;
+		const success = await this.db.backupDb(snapshotName);
 
 		if (success) {
 			return {
@@ -40,7 +40,7 @@ export class DatabaseController extends BaseController {
 	async restoreBackup(
 		@Required() @BodyParams('snapshotName') snapshotName: string,
 	) {
-		const success = await this.db.restore(snapshotName);
+		const success = await this.db.restoreDb(snapshotName);
 
 		if (success) return { message: 'Backup restored' };
 		else

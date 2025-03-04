@@ -56,7 +56,7 @@ export class BotController extends BaseController {
 			owner: (
 				await this.client.users
 					.fetch(generalConfig.ownerId ?? '')
-					.catch(() => undefined)
+					.catch(() => void 0)
 			)?.toJSON(),
 		};
 	}
@@ -96,7 +96,7 @@ export class BotController extends BaseController {
 		// get discord guild
 		const discordRawGuild = await this.client.guilds
 			.fetch(id)
-			.catch(() => undefined);
+			.catch(() => void 0);
 		if (!discordRawGuild) throw new NotFound('Guild not found');
 
 		const discordGuild = discordRawGuild.toJSON() as Record<string, unknown>;
@@ -114,7 +114,7 @@ export class BotController extends BaseController {
 
 	@Delete('/guilds/:id')
 	async deleteGuild(@PathParams('id') id: string) {
-		const guild = await this.client.guilds.fetch(id).catch(() => undefined);
+		const guild = await this.client.guilds.fetch(id).catch(() => void 0);
 		if (!guild) throw new NotFound('Guild not found');
 
 		await guild.leave();
@@ -127,7 +127,7 @@ export class BotController extends BaseController {
 
 	@Get('/guilds/:id/invite')
 	async invite(@PathParams('id') id: string) {
-		const guild = await this.client.guilds.fetch(id).catch(() => undefined);
+		const guild = await this.client.guilds.fetch(id).catch(() => void 0);
 		if (!guild) throw new NotFound('Guild not found');
 
 		const guildChannels = await guild.channels.fetch();
@@ -191,7 +191,7 @@ export class BotController extends BaseController {
 		// get discord user
 		const discordRawUser = await this.client.users
 			.fetch(id)
-			.catch(() => undefined);
+			.catch(() => void 0);
 		if (!discordRawUser) throw new NotFound('User not found');
 
 		const discordUser = discordRawUser.toJSON() as Record<string, unknown>;
