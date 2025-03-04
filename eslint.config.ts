@@ -14,7 +14,8 @@ export default [
 	...tseslint.configs.strictTypeChecked,
 	...tseslint.configs.stylisticTypeChecked,
 	stylistic.configs.customize({ indent: 'tab', semi: true, braceStyle: '1tbs' }),
-	unicorn.configs.all,
+	// TODO: unicorn.configs.all,
+	unicorn.configs.recommended,
 	{
 		languageOptions: {
 			parserOptions: {

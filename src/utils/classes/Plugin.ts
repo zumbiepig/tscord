@@ -108,21 +108,21 @@ export class Plugin {
 	}
 
 	private async getControllers() {
-		const path = path.join(this._path, 'api', 'controllers');
-		if (!existsSync(path)) return {};
-		return (await import(path)) as Record<string, typeof BaseController>;
+		const importPath = path.join(this._path, 'api', 'controllers');
+		if (!existsSync(importPath)) return {};
+		return (await import(importPath)) as Record<string, typeof BaseController>;
 	}
 
 	private async getEntities() {
-		const path = path.join(this._path, 'entities');
-		if (!existsSync(path)) return {};
-		return (await import(path)) as Record<string, EntityClass<AnyEntity>>;
+		const importPath = path.join(this._path, 'entities');
+		if (!existsSync(importPath)) return {};
+		return (await import(importPath)) as Record<string, EntityClass<AnyEntity>>;
 	}
 
 	private async getServices() {
-		const path_ = path.join(this._path, 'services');
-		if (!existsSync(path_)) return {};
-		return (await import(path_)) as Record<string, unknown>;
+		const importPath = path.join(this._path, 'services');
+		if (!existsSync(importPath)) return {};
+		return (await import(importPath)) as Record<string, unknown>;
 	}
 
 	private async getTranslations(): Promise<Record<Locales, Translation>> {

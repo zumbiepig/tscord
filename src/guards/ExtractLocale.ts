@@ -15,9 +15,9 @@ import type { InteractionData } from '@/utils/types';
 export const ExtractLocale: GuardFunction<
 	ArgsOf<'interactionCreate' | 'messageCreate'>,
 	InteractionData
-> = async ([arg], _client, next, guardData) => {
-	if (arg instanceof BaseInteraction || arg instanceof SimpleCommandMessage) {
-		const locale = await getLocaleFromInteraction(arg);
+> = async ([interaction], _client, next, guardData) => {
+	if (interaction instanceof BaseInteraction || interaction instanceof SimpleCommandMessage) {
+		const locale = await getLocaleFromInteraction(interaction);
 		guardData.localize = L[locale];
 	}
 

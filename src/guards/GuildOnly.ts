@@ -17,16 +17,16 @@ export function GuildOnly(
 	ArgsOf<'interactionCreate' | 'messageCreate'>,
 	InteractionData
 > {
-	return async ([arg], _client, next, guardData) => {
+	return async ([interaction], _client, next, guardData) => {
 		const inGuild =
-			arg instanceof SimpleCommandMessage
-				? arg.message.inGuild()
-				: arg.inGuild();
+			interaction instanceof SimpleCommandMessage
+				? interaction.message.inGuild()
+				: interaction.inGuild();
 
 		if (inGuild === !invert) await next();
 		else
 			await replyToInteraction(
-				arg,
+				interaction,
 				guardData.localize.GUARDS[invert ? 'DM_ONLY' : 'GUILD_ONLY'](),
 			);
 	};

@@ -9,7 +9,7 @@ export function Match(
 	regex: RegExp,
 	invert = false,
 ): GuardFunction<ArgsOf<'messageCreate'>> {
-	return async ([arg], _client, next) => {
-		if (!!regex.exec(arg.content) === !invert) await next();
+	return async ([interaction], _client, next) => {
+		if (!!regex.exec(interaction.content) === !invert) await next();
 	};
 }

@@ -13,7 +13,6 @@ import { Database } from "@/services";
 import { Schedule, Service } from "@/utils/decorators";
 import {
 	dayjsTimezone,
-	formatDate,
 	getHostCPUUsage,
 	getProcessCPUUsage,
 	getTypeOfInteraction,

@@ -2,20 +2,19 @@ import type { ConnectionOptions, MikroORMOptions } from '@mikro-orm/core';
 import type {
 	ActivitiesOptions,
 	Colors,
+	Locale,
 	PresenceStatusData,
-	Snowflake,
-} from 'discord.js';
+	Snowflake } from 'discord.js';
 import type { SetRequiredDeep, ValueOf } from 'type-fest';
 
 import type { env } from '@/env';
-import type { Locales } from '@/i18n';
 import type { Timezone } from '@/utils/types';
 
 export interface GeneralConfigType {
 	name: string;
 	description: string;
 
-	defaultLocale: Locales;
+	defaultLocale: `${Locale}`;
 	timezone: Timezone;
 
 	simpleCommandsPrefix: string | undefined;

@@ -7,7 +7,7 @@ import { resolveUser } from '@/utils/functions';
  */
 export const NotBot: GuardFunction<
 	ArgsOf<'interactionCreate' | 'messageCreate'>
-> = async ([arg], _client, next) => {
-	const user = resolveUser(arg);
+> = async ([interaction], _client, next) => {
+	const user = resolveUser(interaction);
 	if (!user.bot) await next();
 };

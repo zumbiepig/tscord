@@ -14,7 +14,7 @@ import type { InteractionData } from '@/utils/types';
 export const Maintenance: GuardFunction<
 	ArgsOf<'interactionCreate' | 'messageCreate'>,
 	InteractionData
-> = async ([arg], _client, next, guardData) => {
-	if (!(await isInMaintenance()) || isDev(resolveUser(arg).id)) await next();
-	else await replyToInteraction(arg, guardData.localize.GUARDS.MAINTENANCE());
+> = async ([interaction], _client, next, guardData) => {
+	if (!(await isInMaintenance()) || isDev(resolveUser(interaction).id)) await next();
+	else await replyToInteraction(interaction, guardData.localize.GUARDS.MAINTENANCE());
 };
