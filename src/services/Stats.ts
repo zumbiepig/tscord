@@ -21,7 +21,7 @@ import {
 	resolveGuild,
 	resolveUser,
 } from '@/utils/functions';
-import type { StatPerInterval, StatType } from '@/utils/types';
+import type { StatAdditionalData, StatPerInterval, StatType } from '@/utils/types';
 
 const allInteractions = {
 	type: {
@@ -51,7 +51,7 @@ export class Stats {
 	 * @param value
 	 * @param additionalData
 	 */
-	register(type: StatType, value: string, additionalData?: object) {
+	register(type: StatType, value: string, additionalData?: StatAdditionalData) {
 		this.db.em.create(Stat, { type, value, additionalData });
 	}
 
@@ -62,7 +62,6 @@ export class Stats {
 	registerInteraction(interaction: Interaction | SimpleCommandMessage) {
 		// we extract data from the interaction
 		const type = getTypeOfInteraction(interaction);
-
 		const value = resolveAction(interaction);
 		const additionalData = {
 			user: resolveUser(interaction).id,

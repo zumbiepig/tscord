@@ -6,40 +6,30 @@ import {
 
 import {
 	constantPreserveDots,
-	setFallbackDescription,
 	setOptionsLocalization,
 } from '@/utils/functions';
-import type { ApplicationCommandOptions, TranslationPath } from '@/utils/types';
+import type { SlashOptions, TranslationPaths } from '@/utils/types';
 
-export function Slash (options?: ApplicationCommandOptions) {
-	if (!options) options = {};
-	else if (typeof options === 'string') options = { name: options };
+export function Slash (options?: SlashOptions) {
+	if (!options) options = {} as SlashOptions;
+	else if (typeof options === 'string') options = { name: options } as SlashOptions;
 
-	let localizationSource: TranslationPath | undefined;
+	let localizationSource: TranslationPaths | undefined;
 
 	if (options.localizationSource)
 		localizationSource = constantPreserveDots(
 			options.localizationSource,
-		) as TranslationPath;
+		) as TranslationPaths;
 	else if (options.name)
 		localizationSource =
-			`COMMANDS.${constantPreserveDots(options.name)}` as TranslationPath;
+			`COMMANDS.${constantPreserveDots(options.name)}` as TranslationPaths;
 
-	if (localizationSource) {
+	if (localizationSource)
 		options = setOptionsLocalization({
-			target: 'description',
+			target: 'name_and_description',
 			options,
 			localizationSource,
 		});
-
-		options = setOptionsLocalization({
-			target: 'name',
-			options,
-			localizationSource,
-		});
-	}
-
-	if (!options.description) options = setFallbackDescription(options);
 
 	return SlashX(
 		options as ApplicationCommandOptionsX<VerifyName<string>, string>,

@@ -6,7 +6,7 @@ import {
 } from '@mikro-orm/core';
 
 import { BaseEntity, BaseRepository } from '@/utils/classes';
-import type { StatType } from '@/utils/types';
+import type { StatAdditionalData, StatType } from '@/utils/types';
 
 @Entity({ repository: () => StatRepository })
 export class Stat extends BaseEntity<Stat> {
@@ -22,7 +22,7 @@ export class Stat extends BaseEntity<Stat> {
 	value!: string;
 
 	@Property()
-	additionalData?: object;
+	additionalData?: StatAdditionalData | undefined;
 }
 
 export class StatRepository extends BaseRepository<Stat> {}

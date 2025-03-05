@@ -1,4 +1,5 @@
 import type { getTypeOfInteraction } from '@/utils/functions';
+import type { Snowflake } from 'discord.js';
 
 export type StatType =
 	| ReturnType<typeof getTypeOfInteraction>
@@ -12,6 +13,12 @@ export type StatType =
 	| 'TOTAL_GUILDS'
 	| 'TOTAL_ACTIVE_USERS'
 	| 'TOTAL_COMMANDS';
+
+export interface StatAdditionalData {
+	user?: Snowflake | undefined;
+	guild?: Snowflake | undefined;
+	channel?: Snowflake | undefined;
+}
 
 export type StatPerInterval = {
 	date: Date;

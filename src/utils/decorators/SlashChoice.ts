@@ -5,43 +5,26 @@ import {
 	setOptionsLocalization,
 } from '@/utils/functions';
 import type {
-	SanitizedOptions,
-	SlashChoiceType,
-	TranslationPath,
+	SlashChoiceOptions,
+	TranslationPaths,
 } from '@/utils/types';
 
-export function SlashChoice (...options: SanitizedOptions[]) {
-	for (let i = 0; i < options.length; i++) {
-		let option = options[i];
-
-		if (option && typeof option !== 'number' && typeof option !== 'string') {
-			let localizationSource: TranslationPath | undefined;
-			if (option.localizationSource)
-				localizationSource = constantPreserveDots(
+export function SlashChoice (...options: string[]|number[]|SlashChoiceOptions[]) {
+	options.map(option => {
+		if (typeof option === 'object' && option.localizationSource)
+			return setOptionsLocalization({
+				target: 'name',
+				options: option,
+				localizationSource: constantPreserveDots(
 					option.localizationSource,
-				) as TranslationPath;
+				) as TranslationPaths,
+			})
+		else return option;
+	})
 
-			if (localizationSource) {
-				option = setOptionsLocalization({
-					target: 'description',
-					options: option,
-					localizationSource,
-				});
-
-				option = setOptionsLocalization({
-					target: 'name',
-					options: option,
-					localizationSource,
-				});
-			}
-
-			options[i] = option;
-		}
-	}
-
-	if (typeof options[0] === 'string')
-		return SlashChoiceX(...(options as string[]));
-	else if (typeof options[0] === 'number')
-		return SlashChoiceX(...(options as number[]));
-	else return SlashChoiceX(...(options as SlashChoiceType[]));
+	const optionsType = typeof options[0]; // for proper type inference
+	if (optionsType === 'object') return SlashChoiceX(...(options as SlashChoiceOptions[]));
+	else if (optionsType === 'string') return SlashChoiceX(...(options as string[]));
+	else if (optionsType === 'number') return SlashChoiceX(...(options as number[]));
+	else return SlashChoiceX(...(options as never[]));
 };

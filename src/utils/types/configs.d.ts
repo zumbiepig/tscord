@@ -2,14 +2,12 @@ import type { ConnectionOptions, MikroORMOptions } from '@mikro-orm/core';
 import type {
 	ActivitiesOptions,
 	Colors,
-	Locale,
 	PresenceStatusData,
 	Snowflake } from 'discord.js';
 import type { SetRequiredDeep, ValueOf } from 'type-fest';
 
 import type { env } from '@/env';
-import type { Locales } from '@/i18n';
-import type { Timezone } from '@/utils/types';
+import type { Timezone, BotLocales } from '@/utils/types';
 
 export interface APIConfigType {
 	enabled: boolean;
@@ -35,7 +33,7 @@ export interface GeneralConfigType {
 	name: string;
 	description: string;
 
-	defaultLocale: Extract<`${Locale}`, Locales>;
+	defaultLocale: BotLocales;
 	timezone: Timezone;
 
 	simpleCommandsPrefix: string | undefined;

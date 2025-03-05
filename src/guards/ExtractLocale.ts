@@ -1,4 +1,4 @@
-import { BaseInteraction, type Locale } from 'discord.js';
+import { BaseInteraction } from 'discord.js';
 import {
 	type ArgsOf,
 	type GuardFunction,
@@ -6,7 +6,7 @@ import {
 } from 'discordx';
 
 import { L } from '@/i18n';
-import { getLocaleFromInteraction, resolveGuildLocale, resolveLocale } from '@/utils/functions';
+import { getLocaleFromInteraction } from '@/utils/functions';
 import type { InteractionData } from '@/utils/types';
 
 /**

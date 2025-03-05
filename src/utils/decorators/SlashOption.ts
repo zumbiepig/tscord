@@ -7,42 +7,27 @@ import {
 import { InvalidOptionNameError } from '@/utils/errors';
 import {
 	constantPreserveDots,
-	setFallbackDescription,
 	setOptionsLocalization,
 } from '@/utils/functions';
-import type { SlashOptionOptions, TranslationPath } from '@/utils/types';
+import type { SlashOptionOptions, TranslationPaths } from '@/utils/types';
 
 export function SlashOption (options: SlashOptionOptions)  {
-	let localizationSource: TranslationPath | undefined;
-
 	if (options.localizationSource)
-		localizationSource = constantPreserveDots(
-			options.localizationSource,
-		) as TranslationPath;
-
-	if (localizationSource) {
 		options = setOptionsLocalization({
-			target: 'description',
+			target: 'name_and_description',
 			options,
-			localizationSource,
+			localizationSource: constantPreserveDots(
+				options.localizationSource,
+			) as TranslationPaths,
 		});
-
-		options = setOptionsLocalization({
-			target: 'name',
-			options,
-			localizationSource,
-		});
-	}
 
 	if (!isValidOptionName(options.name))
 		throw new InvalidOptionNameError(options.name);
 	if (options.nameLocalizations) {
 		for (const name of Object.values(options.nameLocalizations)) {
-			if (!isValidOptionName(name)) throw new InvalidOptionNameError(name);
+			if (!isValidOptionName(name ?? '')) throw new InvalidOptionNameError(name ?? '');
 		}
 	}
-
-	if (!options.description) options = setFallbackDescription(options);
 
 	return SlashOptionX(
 		options as SlashOptionOptionsX<VerifyName<string>, string>,

@@ -6,37 +6,27 @@ import {
 
 import {
 	constantPreserveDots,
-	setFallbackDescription,
 	setOptionsLocalization,
 } from '@/utils/functions';
-import type { SlashGroupOptions, TranslationPath } from '@/utils/types';
+import type { SlashGroupOptions, TranslationPaths } from '@/utils/types';
 
 export function SlashGroup <TRoot extends string>(
 	options: VerifyName<string> | SlashGroupOptions,
 	root?: VerifyName<TRoot>,
 ) {
 	if (typeof options !== 'string') {
-		let localizationSource: TranslationPath | undefined;
+		let localizationSource: TranslationPaths | undefined;
 		if (options.localizationSource)
 			localizationSource = constantPreserveDots(
 				options.localizationSource,
-			) as TranslationPath;
+			) as TranslationPaths;
 
-		if (localizationSource) {
+		if (localizationSource)
 			options = setOptionsLocalization({
-				target: 'description',
+				target: 'name_and_description',
 				options,
 				localizationSource,
 			});
-
-			options = setOptionsLocalization({
-				target: 'name',
-				options,
-				localizationSource,
-			});
-		}
-
-		if (!options.description) options = setFallbackDescription(options);
 
 		return SlashGroupX(
 			options as SlashGroupOptionsX<

@@ -1,8 +1,13 @@
-import type { ApplicationCommandType,	LocalizationMap} from 'discord.js';
+import type { ApplicationCommandType,	LocalizationMap,Locale} from 'discord.js';
 import type {
 	ApplicationCommandOptions as ApplicationCommandOptionsX,
+	ContextMenu as ContextMenuX,
 	NotEmpty as NotEmptyX,
-	SlashChoiceType as SlashChoiceTypeX,
+	Slash as SlashX,
+	SlashChoice as SlashChoiceX,
+	SlashGroup as SlashGroupX,
+	SlashOption as SlashOptionX,
+	SlashChoiceOptions as SlashChoiceOptionsX,
 	SlashGroupOptions as SlashGroupOptionsX,
 	SlashOptionOptions as SlashOptionOptionsX,
 } from 'discordx';
@@ -18,49 +23,24 @@ import type {
 
 import type { Locales, Translations } from '@/i18n';
 
-export type TranslationPath = Paths<
-	Translations,
-	{ maxRecursionDepth: PositiveInfinity }
->;
+export type BotLocales = Extract<`${Locale}`, Locales>;
 
-export type TranslationType<K extends TranslationPath> = Simplify<
-	Get<Translations, K>
->;
+export type TranslationPaths = Paths<Translations, { maxRecursionDepth: PositiveInfinity, leavesOnly: true }>;
 
 export interface SanitizedOptions {
-	descriptionLocalizations?: LocalizationMap;
 	nameLocalizations?: LocalizationMap;
-	localizationSource?: TranslationPath;
+	descriptionLocalizations?: LocalizationMap;
+	localizationSource?: TranslationPaths;
 }
 
-type Sanitization<K> = OverrideProperties<K, SanitizedOptions>;
+type Sanitization<T> = OverrideProperties<T, SanitizedOptions>;
 
-export type ApplicationCommandOptions = Sanitization<
-	SetOptional<ApplicationCommandOptionsX<string, string>, 'description'>
->;
+export type ContextMenuOptions = Sanitization<Parameters<typeof ContextMenuX>[0]>
 
-export type SlashGroupOptions = Sanitization<
-	SetOptional<SlashGroupOptionsX<string, string, string>, 'description'>
->;
+export type SlashOptions = Sanitization<Parameters<typeof SlashX>[0]>;
 
-export type SlashOptionOptions = Sanitization<
-	SetOptional<SlashOptionOptionsX<string, string>, 'description'>
->;
+export type SlashChoiceOptions = Sanitization<Parameters<typeof SlashChoiceX>[0]>;
 
-export type SlashChoiceType = OverrideProperties<
-	SlashChoiceTypeX,
-	SanitizedOptions
->;
+export type SlashGroupOptions = Sanitization<Parameters<typeof SlashGroupX>[0]>;
 
-export type ContextMenuOptions = OverrideProperties<
-	OverrideProperties<
-		Except<
-			ApplicationCommandOptionsX<NotEmptyX<string>, string>,
-			'description' | 'descriptionLocalizations'
-		>,
-		SanitizedOptions
-	>,
-	{
-		type: Exclude<ApplicationCommandType, ApplicationCommandType.ChatInput>;
-	}
->;
+export type SlashOptionOptions = Sanitization<Parameters<typeof SlashOptionX>[0]>;

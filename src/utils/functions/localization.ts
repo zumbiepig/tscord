@@ -1,9 +1,9 @@
-import { BaseInteraction, type Interaction, Locale, type LocalizationMap } from 'discord.js';
+import { BaseInteraction, type Interaction, Locale } from 'discord.js';
 import { SimpleCommandMessage } from 'discordx';
 
 import { generalConfig } from '@/configs';
 import { User } from '@/entities';
-import { isLocale, L, loadedLocales, type Locales, locales as i18nLocales, type TranslationFunctions } from '@/i18n';
+import { isLocale, L, loadedLocales, locales as i18nLocales, type Translations } from '@/i18n';
 import { Database } from '@/services';
 import {
 	resolveDependency,
@@ -11,77 +11,36 @@ import {
 	resolveLocale,
 	resolveUser,
 } from '@/utils/functions';
-import type { SanitizedOptions, TranslationPath } from '@/utils/types';
-import type { Get } from 'type-fest';
-
-export function getLocalizedInfo(
-	target: 'NAME' | 'DESCRIPTION',
-	localizationSource: TranslationPath,
-) {
-	return  Object.fromEntries(
-		i18nLocales
-			.map(locale => [
-				locale,
-				getLocalizationFromPathString(
-					`${localizationSource}.${target}` as TranslationPath,
-					locale,
-				),
-			])
-			.filter(([_, value]) => value),
-	) as Record<Locales, string>;
-}
+import type { SanitizedOptions, TranslationPaths, BotLocales } from '@/utils/types';
+import type { Get, Replace } from 'type-fest';
 
 export function setOptionsLocalization<
-	K extends SanitizedOptions & { name?: string },
+	K extends SanitizedOptions & { name?: string, description?: string },
 >({
 	options,
 	target,
 	localizationSource,
-	nameFallback,
 }: {
 	options: K;
-	target: 'name' | 'description';
-	localizationSource: TranslationPath;
-	nameFallback?: string;
+	target: 'name' | 'name_and_description';
+	localizationSource: Replace<TranslationPaths, '.NAME' | '.DESCRIPTION', ''>;
 }) {
-	const localizedInfo = getLocalizedInfo(
-		target.toUpperCase() as Uppercase<typeof target>,
-		localizationSource,
-	);
-	if (!options[`${target}Localizations`] && localizedInfo)
-		options[`${target}Localizations`] = localizedInfo;
+	const nameLocalizations = getLocalizationMap(`${localizationSource}.NAME`);
+	const descriptionLocalizations = getLocalizationMap(`${localizationSource}.DESCRIPTION`);
 
-	if (!options[target as keyof typeof options]) {
-		options[target as keyof typeof options] = (localizedInfo[
-			generalConfig.defaultLocale
-		] ?? (target === 'name' ? nameFallback : undefined)) as K[keyof K];
+	options.name ??= nameLocalizations[generalConfig.defaultLocale];
+	options.nameLocalizations ??= nameLocalizations;
+
+	if (target !== 'name_and_description') {
+		options.description ??= descriptionLocalizations[generalConfig.defaultLocale];
+		options.descriptionLocalizations ??= descriptionLocalizations;
+
+		if (!options.description) {
+			const fallbackDescriptionLocalizations = getLocalizationMap('SHARED.NO_COMMAND_DESCRIPTION')
+			options.description = fallbackDescriptionLocalizations[generalConfig.defaultLocale]
+			options.descriptionLocalizations = fallbackDescriptionLocalizations;
+		}
 	}
-
-	return options;
-}
-
-export function getLocalizationFromPathString(
-	localePath: TranslationPath,
-	locale?: Locales,
-): string {
-	return localePath.split('.').reduce<unknown>(
-		(object, key) => {
-			return (object as Record<string, unknown>)[key] ?? undefined;
-		},
-		loadedLocales[locale ?? generalConfig.defaultLocale],
-	) as string;
-}
-
-export function setFallbackDescription<K extends SanitizedOptions>(
-	options: K & { description?: string },
-) {
-	options.description
-		= L[generalConfig.defaultLocale].SHARED.NO_COMMAND_DESCRIPTION();
-	if (!options.descriptionLocalizations) options.descriptionLocalizations = {};
-
-	for (const locale of i18nLocales)
-		options.descriptionLocalizations[locale]
-			= L[locale].SHARED.NO_COMMAND_DESCRIPTION();
 
 	return options;
 }
@@ -95,7 +54,7 @@ export function setFallbackDescription<K extends SanitizedOptions>(
 export async function getLocaleFromInteraction(
 	interaction: Interaction | SimpleCommandMessage,
 	skipTranslationCheck?: false,
-): Promise<Locales>
+): Promise<BotLocales>
 export async function getLocaleFromInteraction(
 	interaction: Interaction | SimpleCommandMessage,
 	skipTranslationCheck: true,
@@ -103,7 +62,7 @@ export async function getLocaleFromInteraction(
 export async function getLocaleFromInteraction(
 	interaction: Interaction | SimpleCommandMessage,
 	skipTranslationCheck = false,
-): Promise<Locales|Locale> {
+): Promise<BotLocales|Locale> {
 	const resolvedLocales: (Locale | undefined)[] = [];
 
 	const db = await resolveDependency(Database);
@@ -122,17 +81,11 @@ export async function getLocaleFromInteraction(
 	return resolvedLocales.find(locale => locale !== undefined && (skipTranslationCheck || isLocale(locale))) ?? generalConfig.defaultLocale;
 }
 
-export async function getLocalizationFromPathString(
-	localePath: TranslationPath,
-): Promise<Record<Locales, string>> {
-	const localeMap: Record<Locales, string> = {} as Record<Locales, string>;
-	for (const locale of i18nLocales) {
-			const keys = localePath.split('.');
-			let localizedFunction = L[locale];
-			for (const key of keys) {
-				localizedFunction = localizedFunction[key];
-			}
-			localeMap[locale] = (localizedFunction as Get<TranslationFunctions, typeof localePath>)();
-	}
-	return localeMap;
+/**
+ * Populate a localization map with translations from a specified key.
+ * @param key
+ * @returns An object containing translations for every locale.
+ */
+export function getLocalizationMap<K extends TranslationPaths>(key: K): Record<BotLocales, Get<Translations, K>> {
+	return Object.fromEntries(i18nLocales.map(locale => [locale, key.split('.').reduce((obj, key) => obj?.[key as keyof typeof obj], loadedLocales[locale] as object) as Get<Translations, K>])) as Record<BotLocales, Get<Translations, K>>;
 }

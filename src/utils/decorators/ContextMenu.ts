@@ -4,26 +4,17 @@ import {
 	constantPreserveDots,
 	setOptionsLocalization,
 } from '@/utils/functions';
-import type { ContextMenuOptions, TranslationPath } from '@/utils/types';
+import type { ContextMenuOptions, TranslationPaths } from '@/utils/types';
 
 export function ContextMenu  (options: ContextMenuOptions) {
-	let localizationSource: TranslationPath | undefined;
+	const localizationSource: TranslationPaths | undefined = options.localizationSource ?? (options.name ? `COMMANDS.${constantPreserveDots(options.name)}` as TranslationPaths : undefined);
 
-	if (options.localizationSource)
-		localizationSource = constantPreserveDots(
-			options.localizationSource,
-		) as TranslationPath;
-	else if (options.name)
-		localizationSource =
-			`COMMANDS.${constantPreserveDots(options.name)}` as TranslationPath;
-
-	if (localizationSource) {
+	if (localizationSource)
 		options = setOptionsLocalization({
 			options,
 			target: 'name',
 			localizationSource,
 		});
-	}
 
 	return ContextMenuX(options);
 };
