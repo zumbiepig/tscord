@@ -17,6 +17,7 @@ export default {
 	},
 	COMMANDS: {
 		INVITE: {
+			NAME: 'invite',
 			DESCRIPTION: 'Invite the bot to your server!',
 			EMBED: {
 				TITLE: 'Invite me on your server!',
@@ -37,14 +38,28 @@ export default {
 			},
 		},
 		MAINTENANCE: {
+			NAME: 'maintenance',
 			DESCRIPTION: 'Set the maintenance mode of the bot.',
+			OPTIONS: {
+				STATE: {
+					NAME: 'new_status',
+					DESCRIPTION: 'The new status of the maintenance',
+				},
+			},
 			EMBED: {
 				DESCRIPTION:
 					'Maintenance mode has been {status|{enabled:enabled,disabled:disabled}}.',
 			},
 		},
 		STATS: {
+			NAME: 'stats',
 			DESCRIPTION: 'Get some stats about the bot.',
+			OPTIONS: {
+				DAYS: {
+					NAME: 'days',
+					DESCRIPTION: 'The number of days to get the stats from.',
+				}
+			},
 			HEADERS: {
 				USERS: 'Users',
 				GUILDS: 'Guild',
@@ -53,6 +68,7 @@ export default {
 			},
 		},
 		HELP: {
+			NAME: 'help',
 			DESCRIPTION: 'Get global help about the bot and its commands',
 			EMBED: {
 				TITLE: 'Help panel',
@@ -64,6 +80,7 @@ export default {
 			},
 		},
 		PING: {
+			NAME: 'ping',
 			DESCRIPTION: 'Get the ping of the bot.',
 			MESSAGE:
 				'Pong! The message round-trip took {time}ms. The heartbeat ping is {heartbeat}ms.',

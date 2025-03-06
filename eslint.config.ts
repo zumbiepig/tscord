@@ -18,7 +18,6 @@ export default [
 	eslintPluginN.configs['flat/recommended'],
 	unicorn.configs.all,
 	{
-		root: true,
 		languageOptions: { parserOptions: { projectService: { allowDefaultProject: ['eslint.config.ts'] }, tsconfigRootDir: import.meta.dirname } },
 		plugins: { 'simple-import-sort': simpleImportSort },
 		rules: {

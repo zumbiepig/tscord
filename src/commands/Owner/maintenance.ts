@@ -17,20 +17,20 @@ export default class MaintenanceCommand {
 	@Guard(DevsOnly)
 	async maintenance(
 		@SlashOption({
-			name: 'state',
+			name: 'new_status',
 			type: ApplicationCommandOptionType.Boolean,
 			required: true,
 		})
-		state: boolean,
+		new_status: boolean,
 		interaction: RepliableInteraction,
 		{ translations }: InteractionData,
 	) {
-		await setMaintenance(state);
+		await setMaintenance(new_status);
 
 		await simpleSuccessEmbed(
 			interaction,
 			translations.COMMANDS.MAINTENANCE.EMBED.DESCRIPTION({
-				status: state ? 'enabled' : 'disabled',
+				status: new_status ? 'enabled' : 'disabled',
 			}),
 		);
 	}

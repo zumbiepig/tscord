@@ -7,14 +7,10 @@ import {
 import type { ContextMenuOptions, TranslationPaths } from '@/utils/types';
 
 export function ContextMenu  (options: ContextMenuOptions) {
-	const localizationSource: TranslationPaths | undefined = options.localizationSource ?? (options.name ? `COMMANDS.${constantPreserveDots(options.name)}` as TranslationPaths : undefined);
+	if (!options.localizationSource && options.name)
+		options.localizationSource = `COMMANDS.${constantPreserveDots(options.name)}` as ContextMenuOptions['localizationSource'];
 
-	if (localizationSource)
-		options = setOptionsLocalization({
-			options,
-			target: 'name',
-			localizationSource,
-		});
+	options = setOptionsLocalization(options);
 
 	return ContextMenuX(options);
 };

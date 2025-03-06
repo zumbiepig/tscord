@@ -3,7 +3,7 @@ import { SimpleCommandMessage } from 'discordx';
 
 import { generalConfig } from '@/configs';
 import { User } from '@/entities';
-import { isLocale, L, loadedLocales, locales as i18nLocales, type Translations } from '@/i18n';
+import { isLocale, loadedLocales, locales as i18nLocales, type Translations } from '@/i18n';
 import { Database } from '@/services';
 import {
 	resolveDependency,
@@ -11,35 +11,23 @@ import {
 	resolveLocale,
 	resolveUser,
 } from '@/utils/functions';
-import type { SanitizedOptions, TranslationPaths, BotLocales } from '@/utils/types';
-import type { Get, Replace } from 'type-fest';
+import type { TranslationPaths, BotLocales,ContextMenuOptions,SlashOptions,SlashChoiceOptions,SlashGroupOptions,SlashOptionOptions } from '@/utils/types';
+import type { Get } from 'type-fest';
 
-export function setOptionsLocalization<
-	K extends SanitizedOptions & { name?: string, description?: string },
->({
-	options,
-	target,
-	localizationSource,
-}: {
-	options: K;
-	target: 'name' | 'name_and_description';
-	localizationSource: Replace<TranslationPaths, '.NAME' | '.DESCRIPTION', ''>;
-}) {
-	const nameLocalizations = getLocalizationMap(`${localizationSource}.NAME`);
-	const descriptionLocalizations = getLocalizationMap(`${localizationSource}.DESCRIPTION`);
+export function setOptionsLocalization<T extends ContextMenuOptions | SlashOptions | SlashChoiceOptions | SlashGroupOptions | SlashOptionOptions>(options: T): T {
+	if ('name' in options) {
+		const nameLocalizations = getLocalizationMap(`${options.localizationSource}.NAME`);
+		options.name ??= nameLocalizations[generalConfig.defaultLocale];
+		options.nameLocalizations ??= nameLocalizations;
+	}
 
-	options.name ??= nameLocalizations[generalConfig.defaultLocale];
-	options.nameLocalizations ??= nameLocalizations;
+	if ('description' in options) {
+		let descriptionLocalizations = getLocalizationMap(`${options.localizationSource}.DESCRIPTION`);
+		if (!descriptionLocalizations[generalConfig.defaultLocale])
+			descriptionLocalizations = getLocalizationMap('SHARED.NO_COMMAND_DESCRIPTION')
 
-	if (target !== 'name_and_description') {
 		options.description ??= descriptionLocalizations[generalConfig.defaultLocale];
 		options.descriptionLocalizations ??= descriptionLocalizations;
-
-		if (!options.description) {
-			const fallbackDescriptionLocalizations = getLocalizationMap('SHARED.NO_COMMAND_DESCRIPTION')
-			options.description = fallbackDescriptionLocalizations[generalConfig.defaultLocale]
-			options.descriptionLocalizations = fallbackDescriptionLocalizations;
-		}
 	}
 
 	return options;
@@ -86,6 +74,6 @@ export async function getLocaleFromInteraction(
  * @param key
  * @returns An object containing translations for every locale.
  */
-export function getLocalizationMap<K extends TranslationPaths>(key: K): Record<BotLocales, Get<Translations, K>> {
+export function getLocalizationMap<K extends TranslationPaths>(key: K): {[x in BotLocales]: Get<Translations, K>} {
 	return Object.fromEntries(i18nLocales.map(locale => [locale, key.split('.').reduce((obj, key) => obj?.[key as keyof typeof obj], loadedLocales[locale] as object) as Get<Translations, K>])) as Record<BotLocales, Get<Translations, K>>;
 }

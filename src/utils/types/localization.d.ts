@@ -10,6 +10,7 @@ import type {
 	SlashChoiceOptions as SlashChoiceOptionsX,
 	SlashGroupOptions as SlashGroupOptionsX,
 	SlashOptionOptions as SlashOptionOptionsX,
+	SlashGroupBase,
 } from 'discordx';
 import type {
 	Except,
@@ -18,7 +19,7 @@ import type {
 	Paths,
 	PositiveInfinity,
 	SetOptional,
-	Simplify,
+	Simplify,Replace
 } from 'type-fest';
 
 import type { Locales, Translations } from '@/i18n';
@@ -27,13 +28,11 @@ export type BotLocales = Extract<`${Locale}`, Locales>;
 
 export type TranslationPaths = Paths<Translations, { maxRecursionDepth: PositiveInfinity, leavesOnly: true }>;
 
-export interface SanitizedOptions {
-	nameLocalizations?: LocalizationMap;
-	descriptionLocalizations?: LocalizationMap;
-	localizationSource?: TranslationPaths;
+export type SanitizedOptions = {
+	localizationSource: Replace<Extract<TranslationPaths, `${string}.NAME`>, '.NAME', ''>&Replace<Extract<TranslationPaths, `${string}.DESCRIPTION`>, '.DESCRIPTION', ''>;
 }
 
-type Sanitization<T> = OverrideProperties<T, SanitizedOptions>;
+type Sanitization<T extends SlashGroupBase> = Omit<T, 'nameLocalizations' | 'descriptionLocalizations'> & OverrideProperties<T, SanitizedOptions>;
 
 export type ContextMenuOptions = Sanitization<Parameters<typeof ContextMenuX>[0]>
 
