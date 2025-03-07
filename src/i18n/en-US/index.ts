@@ -28,7 +28,7 @@ export default {
 			NAME: 'prefix',
 			DESCRIPTION: 'Change the prefix of the bot.',
 			OPTIONS: {
-				PREFIX: {
+				NEW_PREFIX: {
 					NAME: 'new_prefix',
 					DESCRIPTION: 'The new prefix of the bot.',
 				},

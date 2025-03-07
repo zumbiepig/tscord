@@ -1,39 +1,21 @@
 import {
 	SlashOption as SlashOptionX,
-	type SlashOptionOptions as SlashOptionOptionsX,
-	type VerifyName,
 } from 'discordx';
 
 import { InvalidOptionNameError } from '@/utils/errors';
 import {
-	constantPreserveDots,
+	isValidDiscordName,
 	setOptionsLocalization,
 } from '@/utils/functions';
-import type { SlashOptionOptions, TranslationPaths } from '@/utils/types';
+import type { SlashOptionOptions } from '@/utils/types';
 
-export function SlashOption (options: SlashOptionOptions)  {
-	if (options.localizationSource)
-		options = setOptionsLocalization({
-			target: 'name_and_description',
-			options,
-			localizationSource: constantPreserveDots(
-				options.localizationSource,
-			) as TranslationPaths,
-		});
+export function SlashOption<T extends string = never, TD extends string = never>(options: SlashOptionOptions<T, TD>) {
+	options = setOptionsLocalization(options);
 
-	if (!isValidOptionName(options.name))
-		throw new InvalidOptionNameError(options.name);
-	if (options.nameLocalizations) {
-		for (const name of Object.values(options.nameLocalizations)) {
-			if (!isValidOptionName(name ?? '')) throw new InvalidOptionNameError(name ?? '');
-		}
-	}
+	for (const name of [options.name, ...Object.values(options.nameLocalizations ?? {})])
+		if (!isValidDiscordName(name ?? '')) throw new InvalidOptionNameError(name ?? '');
 
-	return SlashOptionX(
-		options as SlashOptionOptionsX<VerifyName<string>, string>,
-	);
+	return SlashOptionX(options);
 };
 
-function isValidOptionName(name: string) {
-	return /^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$/u.exec(name);
-}
+SlashOption<>('a')

@@ -14,13 +14,13 @@ import {
 	Discord,
 	SelectMenuComponent,
 } from 'discordx';
+import { injectable } from 'tsyringe';
 
 import { colorsConfig } from '@/configs';
 import { type TranslationFunctions } from '@/i18n';
 import { Slash } from '@/utils/decorators';
 import { chunkArray, resolveGuild, validString } from '@/utils/functions';
 import type { InteractionData } from '@/utils/types';
-import { injectable } from 'tsyringe';
 
 @Discord()
 @injectable()
@@ -175,9 +175,8 @@ export default class HelpCommand {
 				).values(),
 			];
 
-			const { description } = item;
-			const fieldValue = validString(description)
-				? description
+			const fieldValue = validString(item.description)
+				? item.description
 				: 'No description';
 			const name = `</${item.group ? `${item.group} ` : ''}${item.subgroup ? `${item.subgroup} ` : ''}${item.name}:${applicationCommands.find((acmd) => acmd.name === (item.group ?? item.name))?.id ?? ''}>`;
 

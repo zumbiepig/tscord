@@ -8,14 +8,16 @@ import {
 } from '@/utils/functions';
 import type { SlashOptions } from '@/utils/types';
 
-export function Slash (options?: SlashOptions | string) {
-	if (typeof options === 'string') options = { name: options } as SlashOptions;
-	else if (!options) options = {} as SlashOptions;
+export function Slash<T extends string, TD extends string> (options?: SlashOptions<T, TD>) {
+	if (typeof options === 'string') options = { name: options } as SlashOptions<T, TD>;
+	else if (!options) options = {} as SlashOptions<T, TD>;
 
 	if (!options.localizationSource && options.name)
-		options.localizationSource = `COMMANDS.${constantPreserveDots(options.name)}` as SlashOptions['localizationSource'];
+		options.localizationSource = `COMMANDS.${constantPreserveDots(options.name)}` as SlashOptions<T, TD>['localizationSource'];
 
 	options = setOptionsLocalization(options);
 
 	return SlashX(options);
 };
+
+Slash('j')

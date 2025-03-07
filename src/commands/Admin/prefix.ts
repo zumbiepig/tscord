@@ -24,7 +24,7 @@ export default class PrefixCommand {
 	@Guard(PermissionGuard(['Administrator']))
 	async prefix(
 		@SlashOption({
-			name: 'prefix',
+			name: 'new_prefix',
 			type: ApplicationCommandOptionType.String,
 		})
 		prefix: string | undefined,
