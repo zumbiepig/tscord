@@ -20,4 +20,4 @@ export function Slash<T extends string, TD extends string> (options?: SlashOptio
 	return SlashX(options);
 };
 
-Slash('j')
+Slash({name: 'a'})

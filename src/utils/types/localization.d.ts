@@ -7,10 +7,15 @@ import type {
 	SlashOption as SlashOptionX,
 } from 'discordx';
 import type {
+  IsTuple,
+  OptionalKeysOf,
 	OverrideProperties,
 	Paths,
 	PositiveInfinity,
-	Replace
+	Replace,
+  RequiredKeysOf,
+  Simplify,
+  SimplifyDeep
 } from 'type-fest';
 
 import type { Locales, Translations } from '@/i18n';
@@ -55,20 +60,29 @@ export type BotLocales = Extract<`${Locale}`, Locales>;
 
 export type TranslationPaths = Paths<Translations, { maxRecursionDepth: PositiveInfinity; leavesOnly: true }>;
 
-type Sanitization<T> = T extends object ? Omit<T, 'nameLocalizations' | 'descriptionLocalizations'> & OverrideProperties<T, {
-	localizationSource: Replace<Extract<TranslationPaths, `${string}.NAME`>, '.NAME', ''> & Replace<Extract<TranslationPaths, `${string}.DESCRIPTION`>, '.DESCRIPTION', ''>;
-}|Pick<Parameters<T>[0],('name'extends keyof Parameters<T>[0]?'name':never)|('description'extends keyof Parameters<T>[0] ? 'description' : never)>> : T;
+type Sanitization<const T> = T extends object ?
+  Simplify<
+    (Omit<T, 'name' | 'nameLocalizations' | 'description' | 'descriptionLocalizations'> &
+      ('name' extends RequiredKeysOf<T> ? { nameLocalizations: TranslationPaths } : {}) &
+      ('name' extends OptionalKeysOf<T> ? { nameLocalizations?: TranslationPaths } : {}) &
+      ('description' extends RequiredKeysOf<T> ? { descriptionLocalizations: TranslationPaths } : {}) &
+      ('description' extends OptionalKeysOf<T> ? { descriptionLocalizations?: TranslationPaths } : {}))
+  > : IsTuple<T, { fixedLengthOnly: false }> extends true ?
+    T extends readonly [...infer U] ? readonly [...{ [K in keyof U]: Sanitization<U[K]> }] : T
+  : T
 
-export type ContextMenuOptions<T extends string> = Sanitization<Parameters<typeof ContextMenuX<T>>[0]>;
+type test = Sanitization<{name: string, nameLocalizations?: Record<string, string>}>
 
-export type SlashOptions<> = Sanitization<Parameters<typeof SlashX<>>[0]>;
-export type SlashOptions<T extends string, TD extends string> = Sanitization<Parameters<typeof SlashX<T, TD>>[0]>;
+export type ContextMenuOptions<T extends string> = Sanitization<Parameters<typeof ContextMenuX<T>>>;
 
-export type SlashChoiceOptions<T extends string, X = string | number> = Sanitization<Parameters<Overloads<typeof SlashChoiceX<>|typeof SlashChoiceX<T>|typeof SlashChoiceX<T, X>>>[0]>;
+export type SlashOptions<T extends string, TD extends string> = Sanitization<Parameters<typeof SlashX<T, TD>>>;
 
-export type SlashGroupOptions<T extends string> = Sanitization<Parameters<typeof SlashGroupX<T>>[0]>;
-export type SlashGroupOptions<T extends string, TD extends string> = Sanitization<Parameters<typeof SlashGroupX<T, TD>>[0]>;
-export type SlashGroupOptions<T extends string, TD extends string, TR extends string> = Sanitization<Parameters<typeof SlashGroupX<T, TD, TR>>[0]>;
+export type SlashChoiceOptions<T extends string, X = string | number> = Sanitization<Parameters<typeof SlashChoiceX<T, X>>>;
 
-export type SlashOptionOptions<> = Sanitization<Parameters<typeof SlashOptionX<>>[0]>;
-export type SlashOptionOptions<T extends string, TD extends string> = Sanitization<Parameters<typeof SlashOptionX<T, TD>>[0]>;
+export type SlashGroupOptions<T extends string> = Sanitization<Parameters<typeof SlashGroupX<T>>>;
+type a<T,TD> = Parameters<typeof SlashGroupX<T,TD>>
+export type SlashGroupOptions<T extends string, TD extends string> = Sanitization<a<T,TD>>;
+export type SlashGroupOptions<T extends string, TD extends string, TR extends string> = Sanitization<Parameters<typeof SlashGroupX<T, TD, TR>>>;
+
+export type SlashOptionOptions<> = Sanitization<Parameters<typeof SlashOptionX<>>>;
+export type SlashOptionOptions<T extends string, TD extends string> = Sanitization<Parameters<typeof SlashOptionX<T, TD>>>;
