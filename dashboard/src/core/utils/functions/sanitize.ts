@@ -8,9 +8,7 @@ export const getSanitizedBotsConfig = (): SanitizededBotConfig[] => {
 	}));
 };
 
-export const getSanitizedBotConfig = (
-	botId: string,
-): SanitizededBotConfig | undefined => {
+export const getSanitizedBotConfig = (botId: string): SanitizededBotConfig | undefined => {
 	const botConfig = botsConfig.find((botConfig) => botConfig.id === botId);
 	if (!botConfig) {
 		return undefined;

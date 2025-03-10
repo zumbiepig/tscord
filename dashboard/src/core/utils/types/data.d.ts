@@ -1,4 +1,4 @@
-type MonitoringData = {
+interface MonitoringData {
 	fetchedAt: Date;
 	botStatus: {
 		online: boolean;
@@ -31,14 +31,14 @@ type MonitoringData = {
 	latency: {
 		ping: number;
 	};
-};
+}
 
-type LogsData = {
+interface LogsData {
 	info: string;
 	message: string;
-};
+}
 
-type BotData = {
+interface BotData {
 	info: {
 		name: string;
 		discriminator: string;
@@ -56,8 +56,6 @@ type BotData = {
 		name: string;
 		description: string;
 	}[];
-};
+}
 
-type BotsData = {
-	[key: string]: BotData;
-};
+type BotsData = Record<string, BotData>;

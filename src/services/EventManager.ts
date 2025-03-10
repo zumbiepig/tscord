@@ -5,15 +5,11 @@ export class EventManager {
 	private _events = new Map<string, ((...args: unknown[]) => unknown)[]>();
 
 	register(eventName: string, callback: (...args: unknown[]) => unknown): void {
-		this._events.set(eventName, [
-			...(this._events.get(eventName) ?? []),
-			callback,
-		]);
+		this._events.set(eventName, [...(this._events.get(eventName) ?? []), callback]);
 	}
 
 	async emit(eventName: string, ...args: unknown[]): Promise<void> {
 		const callbacks = this._events.get(eventName);
-		if (callbacks)
-			await Promise.all(callbacks.map((callback) => callback(...args)));
+		if (callbacks) await Promise.all(callbacks.map((callback) => callback(...args)));
 	}
 }

@@ -1,11 +1,7 @@
 import '@tsed/swagger';
 
 import { CreateRequestContext } from '@mikro-orm/core';
-import {
-	Inject,
-	PlatformAcceptMimesMiddleware,
-	PlatformApplication,
-} from '@tsed/common';
+import { Inject, PlatformAcceptMimesMiddleware, PlatformApplication } from '@tsed/common';
 import { PlatformExpress } from '@tsed/platform-express';
 
 import * as controllers from '@/api/controllers';
@@ -32,10 +28,7 @@ export class Server {
 			acceptMimes: ['application/json'],
 			middlewares: ['json-parser', Log, PlatformAcceptMimesMiddleware],
 			mount: {
-				'/': [
-					...Object.values(controllers),
-					...this.pluginsManager.getControllers(),
-				],
+				'/': [...Object.values(controllers), ...this.pluginsManager.getControllers()],
 			},
 			swagger: [
 				{

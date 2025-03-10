@@ -2,15 +2,10 @@ export const sanitizeCommands = (commands: any) => {
 	const sanitizedCommands = [];
 
 	for (const command of commands) {
-		const subcommandGroups = command.options.filter(
-			(option: any) => option.type === 2,
-		);
-		const subcommands = command.options.filter(
-			(option: any) => option.type === 1,
-		);
+		const subcommandGroups = command.options.filter((option: any) => option.type === 2);
+		const subcommands = command.options.filter((option: any) => option.type === 1);
 
-		if (!subcommandGroups.length && !subcommands.length)
-			sanitizedCommands.push(command);
+		if (subcommandGroups.length === 0 && subcommands.length === 0) sanitizedCommands.push(command);
 		else {
 			subcommands.forEach((subcommand: any) => {
 				subcommand.name = `${command.name} ${subcommand.name}`;
@@ -28,8 +23,6 @@ export const sanitizeCommands = (commands: any) => {
 
 	return sanitizedCommands.map((sanitizeCommand) => ({
 		name: sanitizeCommand.name,
-		description: sanitizeCommand.name.endsWith(sanitizeCommand.description)
-			? ''
-			: sanitizeCommand.description,
+		description: sanitizeCommand.name.endsWith(sanitizeCommand.description) ? '' : sanitizeCommand.description,
 	}));
 };

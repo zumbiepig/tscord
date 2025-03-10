@@ -1,12 +1,4 @@
-import {
-	BodyParams,
-	Controller,
-	Delete,
-	Get,
-	PathParams,
-	Post,
-	UseBefore,
-} from '@tsed/common';
+import { BodyParams, Controller, Delete, Get, PathParams, Post, UseBefore } from '@tsed/common';
 import { NotFound, Unauthorized } from '@tsed/exceptions';
 import { Required } from '@tsed/schema';
 import {
@@ -26,13 +18,7 @@ import { generalConfig } from '@/configs';
 import { Guild, User } from '@/entities';
 import { Database } from '@/services';
 import { BaseController } from '@/utils/classes';
-import {
-	getDevs,
-	isDev,
-	isInMaintenance,
-	resolveDependency,
-	setMaintenance,
-} from '@/utils/functions';
+import { getDevs, isDev, isInMaintenance, resolveDependency, setMaintenance } from '@/utils/functions';
 
 @Controller('/bot')
 @UseBefore(BotOnline, DevAuthenticated)
@@ -53,11 +39,7 @@ export class BotController extends BaseController {
 
 		return {
 			user,
-			owner: (
-				await this.client.users
-					.fetch(generalConfig.ownerId ?? '')
-					.catch(() => void 0)
-			)?.toJSON(),
+			owner: (await this.client.users.fetch(generalConfig.ownerId ?? '').catch(() => void 0))?.toJSON(),
 		};
 	}
 
@@ -78,9 +60,7 @@ export class BotController extends BaseController {
 			discordGuild['iconURL'] = discordRawGuild.iconURL();
 			discordGuild['bannerURL'] = discordRawGuild.bannerURL();
 
-			const databaseGuild = await this.db
-				.get(Guild)
-				.findOne(discordRawGuild.id);
+			const databaseGuild = await this.db.get(Guild).findOne(discordRawGuild.id);
 
 			body.push({
 				discord: discordGuild,
@@ -94,9 +74,7 @@ export class BotController extends BaseController {
 	@Get('/guilds/:id')
 	async guild(@PathParams('id') id: string) {
 		// get discord guild
-		const discordRawGuild = await this.client.guilds
-			.fetch(id)
-			.catch(() => void 0);
+		const discordRawGuild = await this.client.guilds.fetch(id).catch(() => void 0);
 		if (!discordRawGuild) throw new NotFound('Guild not found');
 
 		const discordGuild = discordRawGuild.toJSON() as Record<string, unknown>;
@@ -136,27 +114,16 @@ export class BotController extends BaseController {
 		for (const channel of guildChannels.values()) {
 			if (
 				channel &&
-				guild.members.me
-					?.permissionsIn(channel)
-					.has(PermissionsBitField.Flags.CreateInstantInvite) &&
-				[
-					ChannelType.GuildText,
-					ChannelType.GuildVoice,
-					ChannelType.GuildAnnouncement,
-				].includes(channel.type)
+				guild.members.me?.permissionsIn(channel).has(PermissionsBitField.Flags.CreateInstantInvite) &&
+				[ChannelType.GuildText, ChannelType.GuildVoice, ChannelType.GuildAnnouncement].includes(channel.type)
 			) {
-				invite = await (
-					channel as BaseGuildTextChannel | BaseGuildVoiceChannel | NewsChannel
-				).createInvite();
+				invite = await (channel as BaseGuildTextChannel | BaseGuildVoiceChannel | NewsChannel).createInvite();
 				break;
 			}
 		}
 
 		if (invite) return invite.toJSON();
-		else
-			throw new Unauthorized(
-				'Missing permission to create an invite in this guild',
-			);
+		else throw new Unauthorized('Missing permission to create an invite in this guild');
 	}
 
 	@Get('/users')
@@ -189,9 +156,7 @@ export class BotController extends BaseController {
 	@Get('/users/:id')
 	async user(@PathParams('id') id: string) {
 		// get discord user
-		const discordRawUser = await this.client.users
-			.fetch(id)
-			.catch(() => void 0);
+		const discordRawUser = await this.client.users.fetch(id).catch(() => void 0);
 		if (!discordRawUser) throw new NotFound('User not found');
 
 		const discordUser = discordRawUser.toJSON() as Record<string, unknown>;
@@ -220,9 +185,7 @@ export class BotController extends BaseController {
 	}
 
 	@Post('/maintenance')
-	async setMaintenance(
-		@Required() @BodyParams('maintenance') maintenance: boolean,
-	) {
+	async setMaintenance(@Required() @BodyParams('maintenance') maintenance: boolean) {
 		await setMaintenance(maintenance);
 
 		return {

@@ -9,22 +9,15 @@ export class ErrorHandler {
 	constructor(private logger: Logger) {
 		// catch all uncaught exceptions
 		process.on('uncaughtException', (error: Error, origin: string) => {
-			if (origin === 'unhandledRejection') {
-				return;
-			} else if (error instanceof BaseError) {
-				void error.handle();
-			} else {
-				void this.logger.logError('uncaughtException', error);
-			}
+			if (origin === 'unhandledRejection') return;
+			else if (error instanceof BaseError) void error.handle();
+			else void this.logger.logError('uncaughtException', error);
 		});
 
 		// catch all unhandled rejections (promise)
-		process.on('unhandledRejection', (error: Error, _: Promise<unknown>) => {
-			if (error instanceof BaseError) {
-				void error.handle();
-			} else {
-				void this.logger.logError('unhandledRejection', error);
-			}
+		process.on('unhandledRejection', (error: Error, _promise: Promise<unknown>) => {
+			if (error instanceof BaseError) void error.handle();
+			else void this.logger.logError('unhandledRejection', error);
 		});
 	}
 }

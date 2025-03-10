@@ -1,4 +1,5 @@
 import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { type AnyEntity, type EntityClass } from '@mikro-orm/core';
@@ -11,7 +12,6 @@ import { type Locales, locales as i18nLocales, type Translation } from '@/i18n';
 import { Logger } from '@/services';
 import { BaseController } from '@/utils/classes';
 import { getTscordVersion, resolveDependency } from '@/utils/functions';
-import { readFile } from 'node:fs/promises';
 
 @autoInjectable()
 export class Plugin {
@@ -34,7 +34,7 @@ export class Plugin {
 		this.logger = await resolveDependency(Logger);
 
 		// read plugin.json
-		const pluginJsonFile = await readFile(path.join(this._path, 'plugin.json'), 'utf8').catch(() => void 0)
+		const pluginJsonFile = await readFile(path.join(this._path, 'plugin.json'), 'utf8').catch(() => void 0);
 		if (!pluginJsonFile) {
 			await this.stopLoad('plugin.json not found');
 			return false;
@@ -77,9 +77,7 @@ export class Plugin {
 		}
 
 		// check if the plugin is compatible with the current version of Tscord
-		if (
-			!satisfies(coerce(getTscordVersion()) ?? '', pluginJson.tscordVersion)
-		) {
+		if (!satisfies(coerce(getTscordVersion()) ?? '', pluginJson.tscordVersion)) {
 			await this.stopLoad(`Incompatible with TSCord v${getTscordVersion()}`);
 			return false;
 		}
@@ -129,10 +127,7 @@ export class Plugin {
 	}
 
 	private async getTranslations(): Promise<Record<Locales, Translation>> {
-		const translations: Record<Locales, Translation> = {} as Record<
-			Locales,
-			Translation
-		>;
+		const translations: Record<Locales, Translation> = {} as Record<Locales, Translation>;
 
 		const missingLocales: Locales[] = [];
 
@@ -140,13 +135,10 @@ export class Plugin {
 			const path_ = path.join(this._path, 'i18n', `${locale}.ts`);
 			if (existsSync(path_)) {
 				translations[locale] = (await import(path_)) as Translation;
-			} else if (locale === generalConfig.defaultLocale) {
-				await this.stopLoad(
-					`Missing translation file for default locale '${locale}'`,
-				);
+			} else if ((locale as string) === generalConfig.defaultLocale) {
+				await this.stopLoad(`Missing translation file for default locale '${locale}'`);
 				return {} as Record<Locales, Translation>;
-			}
-			else {
+			} else {
 				missingLocales.push(locale);
 				continue;
 			}
@@ -155,7 +147,7 @@ export class Plugin {
 		if (missingLocales.length > 0) {
 			await this.logger.log(
 				'warn',
-				`Plugin ${this._name} v${this._version} is missing translations for locales: '${missingLocales.join('\', \'')}'`,
+				`Plugin ${this._name} v${this._version} is missing translations for locales: '${missingLocales.join("', '")}'`,
 			);
 		}
 
@@ -167,23 +159,17 @@ export class Plugin {
 	}
 
 	async importCommands() {
-		return Promise.all(
-			(
-				await glob(path.join(this._path, 'commands', '**', '*.ts'), {
-					windowsPathsNoEscape: true,
-				})
-			).map(file => import(file)),
-		);
+		const paths = await glob(path.join(this._path, 'commands', '**', '*.ts'), {
+			windowsPathsNoEscape: true,
+		});
+		return Promise.all(paths.map((file) => import(file)));
 	}
 
 	async importEvents() {
-		return Promise.all(
-			(
-				await glob(path.join(this._path, 'events', '**', '*.ts'), {
-					windowsPathsNoEscape: true,
-				})
-			).map(file => import(file)),
-		);
+		const paths = await glob(path.join(this._path, 'events', '**', '*.ts'), {
+			windowsPathsNoEscape: true,
+		});
+		return Promise.all(paths.map((file) => import(file)));
 	}
 
 	get path() {

@@ -28,11 +28,7 @@ module.exports = (plop) => {
 				choices: (answers) => {
 					const categories = fs
 						.readdirSync(`./src/components/${answers.type}`)
-						.filter((file) =>
-							fs
-								.statSync(`./src/components/${answers.type}/${file}`)
-								.isDirectory(),
-						);
+						.filter((file) => fs.statSync(`./src/components/${answers.type}/${file}`).isDirectory());
 
 					return [...categories, new plop.inquirer.Separator(), 'No Category'];
 				},

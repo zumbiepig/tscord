@@ -20,20 +20,14 @@ export async function getProcessCPUUsage() {
 
 export async function getHostCPUUsage() {
 	const [startIdle, startTotal] = cpus().reduce<[number, number]>(
-		(acc, { times }) => [
-			acc[0] + times.idle,
-			acc[1] + times.user + times.nice + times.sys + times.idle + times.irq,
-		],
+		(acc, { times }) => [acc[0] + times.idle, acc[1] + times.user + times.nice + times.sys + times.idle + times.irq],
 		[0, 0],
 	);
 
 	await setTimeout(100);
 
 	const [endIdle, endTotal] = cpus().reduce<[number, number]>(
-		(acc, { times }) => [
-			acc[0] + times.idle,
-			acc[1] + times.user + times.nice + times.sys + times.idle + times.irq,
-		],
+		(acc, { times }) => [acc[0] + times.idle, acc[1] + times.user + times.nice + times.sys + times.idle + times.irq],
 		[0, 0],
 	);
 

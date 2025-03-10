@@ -6,9 +6,7 @@ import { BaseError } from '@/utils/classes';
 import { getLocaleFromInteraction, simpleErrorEmbed } from '@/utils/functions';
 
 export class ReplyUnknownErrorError extends BaseError {
-	constructor(
-		private interaction: RepliableInteraction | SimpleCommandMessage,
-	) {
+	constructor(private interaction: RepliableInteraction | SimpleCommandMessage) {
 		super();
 	}
 

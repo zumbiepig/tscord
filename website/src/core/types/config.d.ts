@@ -1,4 +1,4 @@
-type Config = {
+interface Config {
 	site: {
 		title: string | null;
 		description: string;
@@ -11,4 +11,4 @@ type Config = {
 	};
 
 	articlesPath: string;
-};
+}

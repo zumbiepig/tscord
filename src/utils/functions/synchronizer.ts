@@ -10,11 +10,7 @@ import { resolveDependencies, resolveDependency } from '@/utils/functions';
  * @param user
  */
 export async function syncUser(user: DUser) {
-	const [db, stats, logger] = await resolveDependencies([
-		Database,
-		Stats,
-		Logger,
-	]);
+	const [db, stats, logger] = await resolveDependencies([Database, Stats, Logger]);
 
 	const userData = await db.get(User).findOne(user.id);
 
@@ -34,17 +30,11 @@ export async function syncUser(user: DUser) {
  * @param client
  */
 export async function syncGuild(guildId: Snowflake, client: Client) {
-	const [db, stats, logger] = await resolveDependencies([
-		Database,
-		Stats,
-		Logger,
-	]);
+	const [db, stats, logger] = await resolveDependencies([Database, Stats, Logger]);
 
 	const guildData = await db.get(Guild).findOne(guildId);
 
-	const fetchedGuild = await client.guilds
-		.fetch(guildId)
-		.catch(() => void 0);
+	const fetchedGuild = await client.guilds.fetch(guildId).catch(() => void 0);
 
 	// check if this guild exists in the database, if not it creates it (or recovers it from the deleted ones)
 	if (!guildData) {

@@ -3,10 +3,7 @@ import { join } from 'node:path';
 
 import { type AnyEntity, type EntityClass } from '@mikro-orm/core';
 import { glob } from 'glob';
-import {
-	type ImportLocaleMapping,
-	storeTranslationsToDisk,
-} from 'typesafe-i18n/importer';
+import { type ImportLocaleMapping, storeTranslationsToDisk } from 'typesafe-i18n/importer';
 
 import { type Locales, locales as i18nLocales, type Translation } from '@/i18n';
 import { BaseController, Plugin } from '@/utils/classes';
@@ -28,13 +25,11 @@ export class PluginsManager {
 	}
 
 	getEntities(): EntityClass<AnyEntity>[] {
-		return this._plugins.map((plugin) => Object.values(plugin.entities)).flat();
+		return this._plugins.flatMap((plugin) => Object.values(plugin.entities));
 	}
 
 	getControllers(): (typeof BaseController)[] {
-		return this._plugins
-			.map((plugin) => Object.values(plugin.controllers))
-			.flat();
+		return this._plugins.flatMap((plugin) => Object.values(plugin.controllers));
 	}
 
 	async importCommands(): Promise<void> {
@@ -49,10 +44,7 @@ export class PluginsManager {
 		const services: Record<string, unknown> = {};
 
 		for (const plugin of this._plugins) {
-			for (const service in plugin.services)
-				services[service] = new (plugin.services[
-					service
-				] as new () => unknown)();
+			for (const service in plugin.services) services[service] = new (plugin.services[service] as new () => unknown)();
 		}
 
 		return services;
@@ -89,17 +81,11 @@ export class PluginsManager {
 			}
 		}
 
-		const pluginNames = this._plugins.map((plugin) => plugin.name);
+		const pluginNames = new Set(this._plugins.map((plugin) => plugin.name));
 		for (const locale of i18nLocales) {
-			for (const path of await glob(
-				join('src', 'i18n', locale, '*', 'index.ts'),
-				{ windowsPathsNoEscape: true },
-			)) {
-				const name = new RegExp(
-					join('src', 'i18n', locale, '(.+)', 'index.ts$'),
-				).exec(path)?.[1];
-				if (name && !pluginNames.includes(name))
-					await rmdir(join('src', 'i18n', locale, name));
+			for (const path of await glob(join('src', 'i18n', locale, '*', 'index.ts'), { windowsPathsNoEscape: true })) {
+				const name = new RegExp(join('src', 'i18n', locale, '(.+)', 'index.ts$')).exec(path)?.[1];
+				if (name && !pluginNames.has(name)) await rmdir(join('src', 'i18n', locale, name));
 			}
 		}
 
@@ -107,9 +93,7 @@ export class PluginsManager {
 	}
 
 	isPluginLoad(pluginName: string): boolean {
-		return (
-			this._plugins.findIndex((plugin) => plugin.name === pluginName) !== -1
-		);
+		return this._plugins.some((plugin) => plugin.name === pluginName) ;
 	}
 
 	get plugins() {

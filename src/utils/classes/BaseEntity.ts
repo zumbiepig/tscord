@@ -1,10 +1,4 @@
-import {
-	Entity,
-	EntityRepositoryType,
-	OptionalProps,
-	Property,
-	type RequiredEntityData,
-} from '@mikro-orm/core';
+import { Entity, EntityRepositoryType, OptionalProps, Property, type RequiredEntityData } from '@mikro-orm/core';
 import type { RequiredKeysOf } from 'type-fest';
 
 import type { BaseRepository } from '@/utils/classes';
@@ -14,9 +8,7 @@ import { dayjsTimezone } from '@/utils/functions';
 export abstract class BaseEntity<
 	T extends Omit<BaseEntity<T>, typeof OptionalProps>,
 	// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
-	K extends RequiredKeysOf<
-		RequiredEntityData<Omit<T, keyof BaseEntity<T>>>
-	> = never,
+	K extends RequiredKeysOf<RequiredEntityData<Omit<T, keyof BaseEntity<T>>>> = never,
 > {
 	abstract [EntityRepositoryType]?: BaseRepository<T>;
 

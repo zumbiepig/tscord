@@ -1,10 +1,4 @@
-import {
-	BehaviorSubject,
-	distinctUntilKeyChanged,
-	map,
-	Observable,
-	Subscription,
-} from 'rxjs';
+import { BehaviorSubject, distinctUntilKeyChanged, map, Observable, Subscription } from 'rxjs';
 
 import { apiConfig } from '@/configs';
 import { Service } from '@/utils/decorators';

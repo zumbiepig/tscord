@@ -1,3 +1,1 @@
-type Rest = {
-	[x: string]: any;
-};
+type Rest = Record<string, any>;

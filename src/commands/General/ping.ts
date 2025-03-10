@@ -12,11 +12,7 @@ export default class PingCommand {
 	@Slash({
 		name: 'ping',
 	})
-	async ping(
-		interaction: RepliableInteraction,
-		client: Client,
-		{ translations }: InteractionData,
-	) {
+	async ping(interaction: RepliableInteraction, client: Client, { translations }: InteractionData) {
 		const reply = await replyToInteraction(interaction, 'Pinging…');
 
 		await reply.edit(

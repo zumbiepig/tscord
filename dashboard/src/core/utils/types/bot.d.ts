@@ -1,7 +1,7 @@
 type BotState = 'authorized' | 'unauthorized' | 'offline';
 
-type BotsState = {
+interface BotsState {
 	authorized: SanitizededBotConfig[];
 	unauthorized: SanitizededBotConfig[];
 	offline: SanitizededBotConfig[];
-};
+}

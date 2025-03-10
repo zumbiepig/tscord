@@ -1,8 +1,5 @@
 import { Category, PermissionGuard } from '@discordx/utilities';
-import {
-	ApplicationCommandOptionType,
-	type RepliableInteraction,
-} from 'discord.js';
+import { ApplicationCommandOptionType, type RepliableInteraction } from 'discord.js';
 import { Discord, Guard, SimpleCommandMessage } from 'discordx';
 import { injectable } from 'tsyringe';
 

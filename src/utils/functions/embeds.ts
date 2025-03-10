@@ -9,13 +9,8 @@ import { replyToInteraction } from '@/utils/functions';
  * @param interaction - discord interaction
  * @param message - message to log
  */
-export async function simpleSuccessEmbed(
-	interaction: RepliableInteraction | SimpleCommandMessage,
-	message: string,
-) {
-	const embed = new EmbedBuilder()
-		.setColor(colorsConfig.basicEmbeds.success)
-		.setTitle(`✅ ${message}`);
+export async function simpleSuccessEmbed(interaction: RepliableInteraction | SimpleCommandMessage, message: string) {
+	const embed = new EmbedBuilder().setColor(colorsConfig.basicEmbeds.success).setTitle(`✅ ${message}`);
 
 	await replyToInteraction(interaction, { embeds: [embed] });
 }
@@ -25,13 +20,8 @@ export async function simpleSuccessEmbed(
  * @param interaction - discord interaction
  * @param message - message to log
  */
-export async function simpleErrorEmbed(
-	interaction: RepliableInteraction | SimpleCommandMessage,
-	message: string,
-) {
-	const embed = new EmbedBuilder()
-		.setColor(colorsConfig.basicEmbeds.error)
-		.setTitle(`❌ ${message}`);
+export async function simpleErrorEmbed(interaction: RepliableInteraction | SimpleCommandMessage, message: string) {
+	const embed = new EmbedBuilder().setColor(colorsConfig.basicEmbeds.error).setTitle(`❌ ${message}`);
 
 	await replyToInteraction(interaction, { embeds: [embed] });
 }

@@ -16,9 +16,7 @@ import { dayjsTimezone } from '@/utils/functions';
 export abstract class BaseDiscordEntity<
 	T extends Omit<BaseDiscordEntity<T>, typeof OptionalProps>,
 	// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
-	K extends RequiredKeysOf<
-		RequiredEntityData<Omit<T, keyof BaseDiscordEntity<T>>>
-	> = never,
+	K extends RequiredKeysOf<RequiredEntityData<Omit<T, keyof BaseDiscordEntity<T>>>> = never,
 > extends BaseEntity<BaseDiscordEntity<T>, 'active' | 'lastInteract' | K> {
 	abstract override [EntityRepositoryType]?: BaseDiscordRepository<T>;
 

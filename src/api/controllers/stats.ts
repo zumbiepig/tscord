@@ -40,22 +40,10 @@ export class StatsController extends BaseController {
 	@Get('/commands/usage')
 	async commandsUsage(@QueryParams('numberOfDays') numberOfDays = 7) {
 		const commandsUsage = {
-			slashCommands: await this.stats.countStatsPerDays(
-				'CHAT_INPUT_COMMAND_INTERACTION',
-				numberOfDays,
-			),
-			simpleCommands: await this.stats.countStatsPerDays(
-				'SIMPLE_COMMAND_MESSAGE',
-				numberOfDays,
-			),
-			userContextMenus: await this.stats.countStatsPerDays(
-				'USER_CONTEXT_MENU_COMMAND_INTERACTION',
-				numberOfDays,
-			),
-			messageContextMenus: await this.stats.countStatsPerDays(
-				'MESSAGE_CONTEXT_MENU_COMMAND_INTERACTION',
-				numberOfDays,
-			),
+			slashCommands: await this.stats.countStatsPerDays('CHAT_INPUT_COMMAND_INTERACTION', numberOfDays),
+			simpleCommands: await this.stats.countStatsPerDays('SIMPLE_COMMAND_MESSAGE', numberOfDays),
+			userContextMenus: await this.stats.countStatsPerDays('USER_CONTEXT_MENU_COMMAND_INTERACTION', numberOfDays),
+			messageContextMenus: await this.stats.countStatsPerDays('MESSAGE_CONTEXT_MENU_COMMAND_INTERACTION', numberOfDays),
 		};
 
 		const body = [];
@@ -65,8 +53,7 @@ export class StatsController extends BaseController {
 				slashCommands: commandsUsage.slashCommands[i]?.count,
 				simpleCommands: commandsUsage.simpleCommands[i]?.count,
 				contextMenus:
-					(commandsUsage.messageContextMenus[i]?.count ?? 0) +
-					(commandsUsage.userContextMenus[i]?.count ?? 0),
+					(commandsUsage.messageContextMenus[i]?.count ?? 0) + (commandsUsage.userContextMenus[i]?.count ?? 0),
 			});
 		}
 
@@ -93,10 +80,7 @@ export class StatsController extends BaseController {
 		return {
 			users: await this.stats.countStatsPerDays('TOTAL_USERS', numberOfDays),
 			guilds: await this.stats.countStatsPerDays('TOTAL_GUILDS', numberOfDays),
-			activeUsers: await this.stats.countStatsPerDays(
-				'TOTAL_ACTIVE_USERS',
-				numberOfDays,
-			),
+			activeUsers: await this.stats.countStatsPerDays('TOTAL_ACTIVE_USERS', numberOfDays),
 		};
 	}
 }

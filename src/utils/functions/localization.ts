@@ -1,20 +1,25 @@
 import { BaseInteraction, type Interaction, Locale } from 'discord.js';
 import { SimpleCommandMessage } from 'discordx';
+import type { Get } from 'type-fest';
 
 import { generalConfig } from '@/configs';
 import { User } from '@/entities';
 import { isLocale, loadedLocales, locales as i18nLocales, type Translations } from '@/i18n';
 import { Database } from '@/services';
-import {
-	resolveDependency,
-	resolveGuildLocale,
-	resolveLocale,
-	resolveUser,
-} from '@/utils/functions';
-import type { TranslationPaths, BotLocales,ContextMenuOptions,SlashOptions,SlashChoiceOptions,SlashGroupOptions,SlashOptionOptions } from '@/utils/types';
-import type { Get } from 'type-fest';
+import { resolveDependency, resolveGuildLocale, resolveLocale, resolveUser } from '@/utils/functions';
+import type {
+	BotLocales,
+	ContextMenuOptions,
+	SlashChoiceOptions,
+	SlashGroupOptions,
+	SlashOptionOptions,
+	SlashOptions,
+	TranslationPaths,
+} from '@/utils/types';
 
-export function setOptionsLocalization<T extends ContextMenuOptions | SlashOptions | SlashChoiceOptions | SlashGroupOptions | SlashOptionOptions>(options: T): T {
+export function setOptionsLocalization<
+	T extends ContextMenuOptions | SlashOptions | SlashChoiceOptions | SlashGroupOptions | SlashOptionOptions,
+>(options: T): T {
 	if ('name' in options) {
 		const nameLocalizations = getLocalizationMap(`${options.localizationSource}.NAME`);
 		options.name ??= nameLocalizations[generalConfig.defaultLocale];
@@ -24,7 +29,7 @@ export function setOptionsLocalization<T extends ContextMenuOptions | SlashOptio
 	if ('description' in options) {
 		let descriptionLocalizations = getLocalizationMap(`${options.localizationSource}.DESCRIPTION`);
 		if (!descriptionLocalizations[generalConfig.defaultLocale])
-			descriptionLocalizations = getLocalizationMap('SHARED.NO_COMMAND_DESCRIPTION')
+			descriptionLocalizations = getLocalizationMap('SHARED.NO_COMMAND_DESCRIPTION');
 
 		options.description ??= descriptionLocalizations[generalConfig.defaultLocale];
 		options.descriptionLocalizations ??= descriptionLocalizations;
@@ -42,15 +47,15 @@ export function setOptionsLocalization<T extends ContextMenuOptions | SlashOptio
 export async function getLocaleFromInteraction(
 	interaction: Interaction | SimpleCommandMessage,
 	skipTranslationCheck?: false,
-): Promise<BotLocales>
+): Promise<BotLocales>;
 export async function getLocaleFromInteraction(
 	interaction: Interaction | SimpleCommandMessage,
 	skipTranslationCheck: true,
-): Promise<Locale>
+): Promise<Locale>;
 export async function getLocaleFromInteraction(
 	interaction: Interaction | SimpleCommandMessage,
 	skipTranslationCheck = false,
-): Promise<BotLocales|Locale> {
+): Promise<BotLocales | Locale> {
 	const resolvedLocales: (Locale | undefined)[] = [];
 
 	const db = await resolveDependency(Database);
@@ -66,7 +71,10 @@ export async function getLocaleFromInteraction(
 
 	resolvedLocales.push(resolveGuildLocale(interaction));
 
-	return resolvedLocales.find(locale => locale !== undefined && (skipTranslationCheck || isLocale(locale))) ?? generalConfig.defaultLocale;
+	return (
+		resolvedLocales.find((locale) => locale !== undefined && (skipTranslationCheck || isLocale(locale))) ??
+		generalConfig.defaultLocale
+	);
 }
 
 /**
@@ -74,6 +82,14 @@ export async function getLocaleFromInteraction(
  * @param key
  * @returns An object containing translations for every locale.
  */
-export function getLocalizationMap<K extends TranslationPaths>(key: K): {[x in BotLocales]: Get<Translations, K>} {
-	return Object.fromEntries(i18nLocales.map(locale => [locale, key.split('.').reduce((obj, key) => obj?.[key as keyof typeof obj], loadedLocales[locale] as object) as Get<Translations, K>])) as Record<BotLocales, Get<Translations, K>>;
+export function getLocalizationMap<K extends TranslationPaths>(key: K): Record<BotLocales, Get<Translations, K>> {
+	return Object.fromEntries(
+		i18nLocales.map((locale) => [
+			locale,
+			key.split('.').reduce<object>((obj, key) => obj[key as keyof typeof obj], loadedLocales[locale]) as Get<
+				Translations,
+				K
+			>,
+		]),
+	) as Record<BotLocales, Get<Translations, K>>;
 }

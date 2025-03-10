@@ -23,9 +23,7 @@ import {
 } from 'discord.js';
 import { SimpleCommandMessage } from 'discordx';
 
-export function getTypeOfInteraction(
-	interaction: Interaction | SimpleCommandMessage,
-) {
+export function getTypeOfInteraction(interaction: Interaction | SimpleCommandMessage) {
 	if (interaction instanceof ChatInputCommandInteraction) {
 		return 'CHAT_INPUT_COMMAND_INTERACTION';
 	} else if (interaction instanceof UserContextMenuCommandInteraction) {
@@ -49,10 +47,7 @@ export function getTypeOfInteraction(
 	} else if (interaction instanceof SimpleCommandMessage) {
 		return 'SIMPLE_COMMAND_MESSAGE';
 	} else {
-		throw new Error(
-			'Unknown interaction type: ' +
-				constantCase((interaction as object).constructor.name),
-		);
+		throw new TypeError('Unknown interaction type: ' + constantCase((interaction as object).constructor.name));
 	}
 }
 
@@ -103,28 +98,18 @@ export async function replyToInteraction(
 	editMessage = true,
 ) {
 	if (interaction instanceof SimpleCommandMessage) {
-		return await interaction.message.reply(
-			message as string | MessagePayload | MessageReplyOptions,
-		);
+		return await interaction.message.reply(message as string | MessagePayload | MessageReplyOptions);
 	} else if (interaction instanceof Message) {
-		return await interaction.reply(
-			message as string | MessagePayload | MessageReplyOptions,
-		);
+		return await interaction.reply(message as string | MessagePayload | MessageReplyOptions);
 	} else if (interaction instanceof AutocompleteInteraction) {
 		await interaction.respond(
-			Array.isArray(message)
-				? message
-				: [{ name: message as string, value: message as string }],
+			Array.isArray(message) ? message : [{ name: message as string, value: message as string }],
 		);
 		return;
 	} else if (editMessage) {
-		return await interaction.editReply(
-			message as string | MessagePayload | InteractionEditReplyOptions,
-		);
+		return await interaction.editReply(message as string | MessagePayload | InteractionEditReplyOptions);
 	} else {
-		return await interaction.followUp(
-			message as string | MessagePayload | InteractionReplyOptions,
-		);
+		return await interaction.followUp(message as string | MessagePayload | InteractionReplyOptions);
 	}
 }
 

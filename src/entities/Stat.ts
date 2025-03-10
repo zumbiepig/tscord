@@ -1,9 +1,4 @@
-import {
-	Entity,
-	EntityRepositoryType,
-	PrimaryKey,
-	Property,
-} from '@mikro-orm/core';
+import { Entity, EntityRepositoryType, PrimaryKey, Property } from '@mikro-orm/core';
 
 import { BaseEntity, BaseRepository } from '@/utils/classes';
 import type { StatAdditionalData, StatType } from '@/utils/types';

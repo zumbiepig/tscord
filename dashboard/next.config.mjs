@@ -6,17 +6,17 @@ const __dirname = path.dirname(__filename);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  output: 'standalone',
+	reactStrictMode: true,
+	output: 'standalone',
 
-  sassOptions: {
-    includePaths: [path.join(__dirname, 'public/styles/')],
-  },
+	sassOptions: {
+		includePaths: [path.join(__dirname, 'public/styles/')],
+	},
 
-  i18n: {
-    locales: ['en'],
-    defaultLocale: 'en',
-  },
+	i18n: {
+		locales: ['en'],
+		defaultLocale: 'en',
+	},
 };
 
 export default nextConfig;

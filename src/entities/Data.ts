@@ -1,10 +1,4 @@
-import {
-	Entity,
-	EntityRepositoryType,
-	PrimaryKey,
-	PrimaryKeyProp,
-	Property,
-} from '@mikro-orm/core';
+import { Entity, EntityRepositoryType, PrimaryKey, PrimaryKeyProp, Property } from '@mikro-orm/core';
 
 import { BaseEntity, BaseRepository } from '@/utils/classes';
 import { dayjsTimezone } from '@/utils/functions';
@@ -35,19 +29,13 @@ export class Data extends BaseEntity<Data> {
 }
 
 export class DataRepository extends BaseRepository<Data> {
-	async get<T extends keyof DataRepositoryType>(
-		key: T,
-	): Promise<DataRepositoryType[T]> {
+	async get<T extends keyof DataRepositoryType>(key: T): Promise<DataRepositoryType[T]> {
 		const data = await this.findOne(key);
 
-		if (data) return data.value as DataRepositoryType[T];
-		else return defaultData[key];
+		return data ? data.value as DataRepositoryType[T] : defaultData[key];
 	}
 
-	async set<T extends keyof DataRepositoryType>(
-		key: T,
-		value: DataRepositoryType[T],
-	): Promise<void> {
+	async set<T extends keyof DataRepositoryType>(key: T, value: DataRepositoryType[T]): Promise<void> {
 		const data = await this.findOne(key);
 
 		if (data) data.value = value;

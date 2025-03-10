@@ -8,12 +8,7 @@ import {
 	StringSelectMenuBuilder,
 	type StringSelectMenuInteraction,
 } from 'discord.js';
-import {
-	Client,
-	DApplicationCommand,
-	Discord,
-	SelectMenuComponent,
-} from 'discordx';
+import { Client, DApplicationCommand, Discord, SelectMenuComponent } from 'discordx';
 import { injectable } from 'tsyringe';
 
 import { colorsConfig } from '@/configs';
@@ -30,7 +25,7 @@ export default class HelpCommand {
 
 	constructor(private client: Client) {
 		// load categories
-		const commands = this.client.applicationCommandSlashesFlat
+		const commands = this.client.applicationCommandSlashesFlat;
 
 		for (const command of commands) {
 			const { group } = command;
@@ -47,11 +42,7 @@ export default class HelpCommand {
 	@Slash({
 		name: 'help',
 	})
-	async help(
-		interaction: CommandInteraction,
-		client: Client,
-		{ translations }: InteractionData,
-	) {
+	async help(interaction: CommandInteraction, client: Client, { translations }: InteractionData) {
 		const embed = await this.getEmbed({
 			client,
 			interaction,
@@ -70,11 +61,7 @@ export default class HelpCommand {
 	@SelectMenuComponent({
 		id: 'help-category-selector',
 	})
-	async selectCategory(
-		interaction: StringSelectMenuInteraction,
-		client: Client,
-		{ translations }: InteractionData,
-	) {
+	async selectCategory(interaction: StringSelectMenuInteraction, client: Client, { translations }: InteractionData) {
 		const category = interaction.values[0] ?? '';
 
 		const embed = await this.getEmbed({
@@ -117,17 +104,13 @@ export default class HelpCommand {
 					}),
 				})
 				.setTitle(translations.COMMANDS.HELP.EMBED.TITLE())
-				.setThumbnail(
-					'https://upload.wikimedia.org/wikipedia/commons/a/a4/Cute-Ball-Help-icon.png',
-				)
+				.setThumbnail('https://upload.wikimedia.org/wikipedia/commons/a/a4/Cute-Ball-Help-icon.png')
 				.setColor(colorsConfig.basicEmbeds.primary);
 
 			const currentGuild = resolveGuild(interaction as Interaction);
 			const applicationCommands = [
 				...(currentGuild ? (await currentGuild.commands.fetch()).values() : []),
-				...(client.application
-					? (await client.application.commands.fetch()).values()
-					: []),
+				...(client.application ? (await client.application.commands.fetch()).values() : []),
 			];
 
 			for (const category of this._categories) {
@@ -169,15 +152,10 @@ export default class HelpCommand {
 			const currentGuild = resolveGuild(interaction as Interaction);
 			const applicationCommands = [
 				...(currentGuild ? (await currentGuild.commands.fetch()).values() : []),
-				...(client.application
-					? await client.application.commands.fetch()
-					: []
-				).values(),
+				...(client.application ? await client.application.commands.fetch() : []).values(),
 			];
 
-			const fieldValue = validString(item.description)
-				? item.description
-				: 'No description';
+			const fieldValue = validString(item.description) ? item.description : 'No description';
 			const name = `</${item.group ? `${item.group} ` : ''}${item.subgroup ? `${item.subgroup} ` : ''}${item.name}:${applicationCommands.find((acmd) => acmd.name === (item.group ?? item.name))?.id ?? ''}>`;
 
 			embed.addFields([
@@ -206,10 +184,9 @@ export default class HelpCommand {
 		});
 
 		for (const [category] of this._categories) {
-			const description =
-				translations.COMMANDS.HELP.SELECT_MENU.CATEGORY_DESCRIPTION({
-					category,
-				});
+			const description = translations.COMMANDS.HELP.SELECT_MENU.CATEGORY_DESCRIPTION({
+				category,
+			});
 			optionsForEmbed.push({
 				description,
 				label: category,
@@ -218,12 +195,8 @@ export default class HelpCommand {
 			});
 		}
 
-		const selectMenu = new StringSelectMenuBuilder()
-			.addOptions(optionsForEmbed)
-			.setCustomId('help-category-selector');
+		const selectMenu = new StringSelectMenuBuilder().addOptions(optionsForEmbed).setCustomId('help-category-selector');
 
-		return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-			selectMenu,
-		);
+		return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
 	}
 }

@@ -6,10 +6,11 @@ import type { InteractionData } from '@/utils/types';
 /**
  * Only allow bot devs to run the command
  */
-export const DevsOnly: GuardFunction<
-	ArgsOf<'interactionCreate' | 'messageCreate'>,
-	InteractionData
-> = async ([arg], _client, next, guardData) => {
-	if (isDev(resolveUser(arg).id)) await next();
-	else await replyToInteraction(arg, guardData.translations.GUARDS.DEVS_ONLY());
+export const DevsOnly: GuardFunction<ArgsOf<'interactionCreate' | 'messageCreate'>, InteractionData> = async (
+	[arg],
+	_client,
+	next,
+	guardData,
+) => {
+	await (isDev(resolveUser(arg).id) ? next() : replyToInteraction(arg, guardData.translations.GUARDS.DEVS_ONLY()));
 };

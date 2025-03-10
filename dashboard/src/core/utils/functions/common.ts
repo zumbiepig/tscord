@@ -1,5 +1,6 @@
+import { IncomingMessage } from 'node:http';
+
 import { getAbsoluteUrl, getSanitizedBotsConfig } from '@core/utils/functions';
-import { IncomingMessage } from 'http';
 import { Session } from 'next-auth';
 
 const redirection = {
@@ -9,23 +10,17 @@ const redirection = {
 	},
 };
 
-export const adminDashboardServerSideProps = async (
-	botId: string,
-	session: Session | null,
-	req: IncomingMessage,
-) => {
+export const adminDashboardServerSideProps = async (botId: string, session: Session | null, req: IncomingMessage) => {
 	if (!session) return redirection;
 
 	try {
-		const response = await fetch(
-			getAbsoluteUrl(`/api/bot/allUserAuthorizations?userId=${session.userId}`),
-			{ method: 'GET' },
-		);
+		const response = await fetch(getAbsoluteUrl(`/api/bot/allUserAuthorizations?userId=${session.userId}`), {
+			method: 'GET',
+		});
 		if (!response.ok) throw new Error();
 
 		const authorizedBots = (await response.json()) as BotsState;
-		if (!authorizedBots.authorized.find((bot) => bot.id === botId))
-			throw new Error();
+		if (!authorizedBots.authorized.find((bot) => bot.id === botId)) throw new Error();
 
 		return {
 			props: {
@@ -35,7 +30,7 @@ export const adminDashboardServerSideProps = async (
 				currentBot: getSanitizedBotsConfig().find((bot) => bot.id === botId),
 			},
 		};
-	} catch (err) {
+	} catch {
 		return redirection;
 	}
 };

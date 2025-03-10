@@ -1,12 +1,7 @@
-import {
-	SlashOption as SlashOptionX,
-} from 'discordx';
+import { SlashOption as SlashOptionX } from 'discordx';
 
 import { InvalidOptionNameError } from '@/utils/errors';
-import {
-	isValidDiscordName,
-	setOptionsLocalization,
-} from '@/utils/functions';
+import { isValidDiscordName, setOptionsLocalization } from '@/utils/functions';
 import type { SlashOptionOptions } from '@/utils/types';
 
 export function SlashOption<T extends string = never, TD extends string = never>(options: SlashOptionOptions<T, TD>) {
@@ -16,6 +11,6 @@ export function SlashOption<T extends string = never, TD extends string = never>
 		if (!isValidDiscordName(name ?? '')) throw new InvalidOptionNameError(name ?? '');
 
 	return SlashOptionX(options);
-};
+}
 
-SlashOption<>('a')
+SlashOption<>('a');

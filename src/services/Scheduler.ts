@@ -23,14 +23,14 @@ export class Scheduler {
 	}
 
 	stopAllJobs() {
-		this._jobs.forEach((job) => {
+		for (const job of this._jobs) {
 			job.stop();
-		});
+		}
 	}
 
 	startAllJobs() {
-		this._jobs.forEach((job) => {
+		for (const job of this._jobs) {
 			job.start();
-		});
+		}
 	}
 }

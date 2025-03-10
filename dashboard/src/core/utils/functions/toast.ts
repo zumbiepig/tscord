@@ -1,8 +1,4 @@
-export const successToast = (
-	toast: Function,
-	title: string,
-	description?: string,
-) => {
+export const successToast = (toast: Function, title: string, description?: string) => {
 	toast({
 		title,
 		description,
@@ -13,11 +9,7 @@ export const successToast = (
 	});
 };
 
-export const errorToast = (
-	toast: Function,
-	title: string,
-	description?: string,
-) => {
+export const errorToast = (toast: Function, title: string, description?: string) => {
 	toast({
 		title,
 		description,

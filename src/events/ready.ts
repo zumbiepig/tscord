@@ -65,8 +65,7 @@ export default class ReadyEvent {
 				});
 			}
 
-			this.activityIndex =
-				(this.activityIndex + 1) % generalConfig.activities.length;
+			this.activityIndex = (this.activityIndex + 1) % generalConfig.activities.length;
 		}
 	}
 }

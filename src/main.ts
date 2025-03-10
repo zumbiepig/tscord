@@ -6,33 +6,15 @@ import { RequestContext } from '@mikro-orm/core';
 import chalk from 'chalk';
 import chokidar from 'chokidar';
 import { GatewayIntentBits, Partials } from 'discord.js';
-import {
-	Client,
-	DIService,
-	MetadataStorage,
-	tsyringeDependencyRegistryEngine,
-} from 'discordx';
+import { Client, DIService, MetadataStorage, tsyringeDependencyRegistryEngine } from 'discordx';
 import { container } from 'tsyringe';
 import type { constructor } from 'tsyringe/dist/typings/types';
 
 import { Server } from '@/api/server';
 import { apiConfig, generalConfig } from '@/configs';
 import { env, validateEnv } from '@/env';
-import {
-	ExtractLocale,
-	Maintenance,
-	NotBot,
-	RequestContextIsolator,
-} from '@/guards';
-import {
-	Database,
-	ErrorHandler,
-	EventManager,
-	ImagesUpload,
-	Logger,
-	PluginsManager,
-	Store,
-} from '@/services';
+import { ExtractLocale, Maintenance, NotBot, RequestContextIsolator } from '@/guards';
+import { Database, ErrorHandler, EventManager, ImagesUpload, Logger, PluginsManager, Store } from '@/services';
 import { persistedServices } from '@/utils/decorators';
 import { resolveDependency } from '@/utils/functions';
 
@@ -127,10 +109,7 @@ async function init() {
 		await client.login(env.BOT_TOKEN);
 
 		if (env.isDev) {
-			const watcher = chokidar.watch([
-				join(import.meta.dirname, 'commands'),
-				join(import.meta.dirname, 'events'),
-			]);
+			const watcher = chokidar.watch([join(import.meta.dirname, 'commands'), join(import.meta.dirname, 'events')]);
 
 			// reload commands and events when a file is updated
 			watcher.on('all', () => void reload(client));
@@ -156,7 +135,7 @@ async function init() {
 			if (
 				Object.values(state)
 					.filter((value) => value !== undefined)
-					.every((value) => value)
+					.every(Boolean)
 			) {
 				void eventManager.emit('fullyReady'); // the template is fully ready!
 			}
@@ -200,7 +179,7 @@ async function reload(client: Client, force = false) {
 	DIService.engine.clearAllServices();
 
 	// transfer store instance to the new container in order to keep the same states
-	instancesToKeep.forEach((instance, target) => container.registerInstance(target, instance));
+	for (const [target, instance] of instancesToKeep.entries()) container.registerInstance(target, instance);
 
 	// reload files (this does not work in esm)
 	/* await Promise.all(

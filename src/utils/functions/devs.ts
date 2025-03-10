@@ -6,12 +6,7 @@ import { generalConfig } from '@/configs';
  * Get a curated list of devs including the owner id
  */
 export function getDevs(): Snowflake[] {
-	return [
-		...new Set([
-			...(generalConfig.ownerId ? [generalConfig.ownerId] : []),
-			...(generalConfig.devs ?? []),
-		]),
-	];
+	return [...new Set([...(generalConfig.ownerId ? [generalConfig.ownerId] : []), ...generalConfig.devs])];
 }
 
 /**

@@ -1,5 +1,6 @@
-import type { getTypeOfInteraction } from '@/utils/functions';
 import type { Snowflake } from 'discord.js';
+
+import type { getTypeOfInteraction } from '@/utils/functions';
 
 export type StatType =
 	| ReturnType<typeof getTypeOfInteraction>

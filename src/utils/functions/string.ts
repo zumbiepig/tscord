@@ -7,7 +7,7 @@ import type { Join, ScreamingSnakeCase, Split } from 'type-fest';
  * @returns true if all strings are valid
  */
 export function validString(...strings: string[]): boolean {
-	return (strings.length > 0) && (strings.every(string => string.trim().length > 0));
+	return strings.length > 0 && strings.every((string) => string.trim().length > 0);
 }
 
 /**
@@ -23,8 +23,13 @@ export function numberAlign(number: number, align = 2) {
 	return number.toString().padStart(align, ' ');
 }
 
-export function constantPreserveDots<S extends string, T extends Split<S, '.'> = Split<S, '.'>>(string: S): Join<{ [K in keyof T]: ScreamingSnakeCase<T[K]> }, '.'> {
-	return string.split('.').map(word => constantCase(word)).join('.') as Join<{ [K in keyof T]: ScreamingSnakeCase<T[K]> }, '.'>;
+export function constantPreserveDots<S extends string, T extends Split<S, '.'> = Split<S, '.'>>(
+	string: S,
+): Join<{ [K in keyof T]: ScreamingSnakeCase<T[K]> }, '.'> {
+	return string
+		.split('.')
+		.map((word) => constantCase(word))
+		.join('.') as Join<{ [K in keyof T]: ScreamingSnakeCase<T[K]> }, '.'>;
 }
 
 export function isValidUrl(url: string) {

@@ -13,10 +13,6 @@ dayjs.tz.setDefault(generalConfig.timezone);
 
 export const dayjsTimezone = dayjs.tz;
 
-export function timeAgo(
-	date?: dayjs.ConfigType,
-	unit?: dayjs.QUnitType | dayjs.OpUnitType,
-	float?: boolean,
-): number {
+export function timeAgo(date?: dayjs.ConfigType, unit?: dayjs.QUnitType | dayjs.OpUnitType, float?: boolean): number {
 	return dayjsTimezone().diff(date, unit, float);
 }

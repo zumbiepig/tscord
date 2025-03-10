@@ -17,8 +17,7 @@ export class DevAuthenticated {
 	async use(@Context() { request }: PlatformContext) {
 		// check if the request includes valid authorization header
 		const authHeader = request.headers.authorization;
-		if (!authHeader?.startsWith('Bearer '))
-			throw new BadRequest('Missing token');
+		if (!authHeader?.startsWith('Bearer ')) throw new BadRequest('Missing token');
 
 		// get the token from the authorization header
 		const token = authHeader.split(' ')[1];
@@ -43,10 +42,7 @@ export class DevAuthenticated {
 		// check if logged user is a dev (= admin) of the bot
 		if (isDev(user.id)) {
 			// we add the token to the store and set a timeout to remove it after 10 minutes
-			this.store.update('authorizedAPITokens', (authorizedAPITokens) => [
-				...authorizedAPITokens,
-				token,
-			]);
+			this.store.update('authorizedAPITokens', (authorizedAPITokens) => [...authorizedAPITokens, token]);
 			setTimeout(
 				() => {
 					this.store.update('authorizedAPITokens', (authorizedAPITokens) =>

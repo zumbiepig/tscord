@@ -1,11 +1,7 @@
 import { FetchError } from '../classes';
 import { getAbsoluteUrl } from './url';
 
-export const fetcher = async (
-	uri: string,
-	botId?: string,
-	args?: { [key: string]: any },
-) => {
+export const fetcher = async (uri: string, botId?: string, args?: Record<string, any>) => {
 	// stringify all values of the args object
 	if (args) {
 		for (const key of Object.keys(args)) {
@@ -14,16 +10,12 @@ export const fetcher = async (
 	}
 
 	// prepare the elements for the request
-	const url = new URL(
-		getAbsoluteUrl(`/api/bot${botId ? `/${botId}` : ''}${uri}`),
-	);
+	const url = new URL(getAbsoluteUrl(`/api/bot${botId ? `/${botId}` : ''}${uri}`));
 	const query = {
 		logIgnore: 'true',
 		...args,
 	};
-	Object.keys(query).forEach((key) =>
-		url.searchParams.append(key, query[key as keyof typeof query]),
-	);
+	for (const key of Object.keys(query)) url.searchParams.append(key, query[key as keyof typeof query]);
 
 	// make the request
 	const res = await fetch(url, {

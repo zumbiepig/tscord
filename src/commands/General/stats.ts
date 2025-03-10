@@ -1,11 +1,7 @@
 import { Pagination, type PaginationItem } from '@discordx/pagination';
 import { Category } from '@discordx/utilities';
 import ChartJsImage from 'chartjs-to-image';
-import {
-	ApplicationCommandOptionType,
-	CommandInteraction,
-	EmbedBuilder,
-} from 'discord.js';
+import { ApplicationCommandOptionType, CommandInteraction, EmbedBuilder } from 'discord.js';
 import { Discord, SimpleCommandMessage } from 'discordx';
 import { injectable } from 'tsyringe';
 
@@ -20,12 +16,9 @@ import type { InteractionData } from '@/utils/types';
 @Category('General')
 export default class StatsCommand {
 	private statsResolver = {
-		USERS: async (days: number) =>
-			await this.stats.countStatsPerDays('TOTAL_USERS', days),
-		GUILDS: async (days: number) =>
-			await this.stats.countStatsPerDays('TOTAL_GUILDS', days),
-		ACTIVE_USERS: async (days: number) =>
-			await this.stats.countStatsPerDays('TOTAL_ACTIVE_USERS', days),
+		USERS: async (days: number) => await this.stats.countStatsPerDays('TOTAL_USERS', days),
+		GUILDS: async (days: number) => await this.stats.countStatsPerDays('TOTAL_GUILDS', days),
+		ACTIVE_USERS: async (days: number) => await this.stats.countStatsPerDays('TOTAL_ACTIVE_USERS', days),
 		COMMANDS: async (days: number) =>
 			this.stats.sumStats(
 				...(await Promise.all(
@@ -80,9 +73,7 @@ export default class StatsCommand {
 				options: {
 					title: {
 						display: true,
-						text: translations.COMMANDS.STATS.HEADERS[
-							resolver[0] as keyof typeof this.statsResolver
-						](),
+						text: translations.COMMANDS.STATS.HEADERS[resolver[0] as keyof typeof this.statsResolver](),
 						fontColor: 'rgba(255,255,254,0.6)',
 						fontSize: 20,
 						padding: 15,
@@ -117,11 +108,6 @@ export default class StatsCommand {
 			});
 		}
 
-		await new Pagination(
-			interaction instanceof SimpleCommandMessage
-				? interaction.message
-				: interaction,
-			pages,
-		).send();
+		await new Pagination(interaction instanceof SimpleCommandMessage ? interaction.message : interaction, pages).send();
 	}
 }

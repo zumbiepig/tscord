@@ -12,18 +12,11 @@ import { resolveDependency } from '../functions/dependency.js';
  * @param jobName - name of the job (the name of the function will be used if it is not provided)
  */
 export function Schedule(cronExpression: string) {
-	return (
-		target: unknown,
-		propertyKey: string,
-		descriptor: PropertyDescriptor,
-	) => {
+	return (target: unknown, propertyKey: string, descriptor: PropertyDescriptor) => {
 		// associate the context to the function, with the injected dependencies defined
 		const oldDescriptor = descriptor.value as (...args: unknown[]) => unknown;
 		descriptor.value = function (...args: unknown[]) {
-			return oldDescriptor.apply(
-				container.resolve(this.constructor as InjectionToken),
-				args,
-			);
+			return oldDescriptor.apply(container.resolve(this.constructor as InjectionToken), args);
 		};
 
 		const job = new CronJob(

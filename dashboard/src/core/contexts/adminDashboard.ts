@@ -1,10 +1,8 @@
 import { createContext } from 'react';
 
-type AdminDashboardContextType = {
+interface AdminDashboardContextType {
 	currentBot: SanitizededBotConfig;
 	authorizedBots: BotsState;
-};
+}
 
-export const AdminDashboardContext = createContext<AdminDashboardContextType>(
-	{} as AdminDashboardContextType,
-);
+export const AdminDashboardContext = createContext<AdminDashboardContextType>({} as AdminDashboardContextType);

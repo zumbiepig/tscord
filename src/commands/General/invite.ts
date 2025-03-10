@@ -13,10 +13,7 @@ export default class InviteCommand {
 	@Slash({
 		name: 'invite',
 	})
-	async invite(
-		interaction: RepliableInteraction,
-		{ translations }: InteractionData,
-	) {
+	async invite(interaction: RepliableInteraction, { translations }: InteractionData) {
 		const embed = new EmbedBuilder()
 			.setTitle(translations.COMMANDS.INVITE.EMBED.TITLE())
 			.setDescription(

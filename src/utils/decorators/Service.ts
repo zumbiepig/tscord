@@ -1,5 +1,5 @@
 import { singleton } from 'tsyringe';
-import type {constructor} from 'tsyringe/dist/typings/types';
+import type { constructor } from 'tsyringe/dist/typings/types';
 
 export const persistedServices = new Set<constructor<unknown>>();
 

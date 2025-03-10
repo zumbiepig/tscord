@@ -21,18 +21,15 @@ export const authorizationCache: {
 
 		for (const { id, apiUrl, apiToken } of botsConfig) {
 			try {
-				const response = await fetch(
-					new URL('/bot/devs?logIgnore=true', apiUrl),
-					{
-						headers: { Authorization: `Bearer ${apiToken}` },
-					},
-				);
+				const response = await fetch(new URL('/bot/devs?logIgnore=true', apiUrl), {
+					headers: { Authorization: `Bearer ${apiToken}` },
+				});
 
 				if (response.status === 200) {
 					const devs: string[] = await response.json();
 					this.data.set(id, devs);
 				} else throw new Error();
-			} catch (err) {
+			} catch {
 				this.data.set(id, null);
 			}
 		}

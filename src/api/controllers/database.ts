@@ -30,39 +30,26 @@ export class DatabaseController extends BaseController {
 				},
 			};
 		} else {
-			throw new InternalServerError(
-				"Couldn't generate backup, see the logs for more information",
-			);
+			throw new InternalServerError("Couldn't generate backup, see the logs for more information");
 		}
 	}
 
 	@Post('/restore')
-	async restoreBackup(
-		@Required() @BodyParams('snapshotName') snapshotName: string,
-	) {
+	async restoreBackup(@Required() @BodyParams('snapshotName') snapshotName: string) {
 		const success = await this.db.restoreDb(snapshotName);
 
 		if (success) return { message: 'Backup restored' };
-		else
-			throw new InternalServerError(
-				"Couldn't restore backup, see the logs for more information",
-			);
+		else throw new InternalServerError("Couldn't restore backup, see the logs for more information");
 	}
 
 	@Get('/backups')
 	async getBackups() {
-		if (!databaseConfig.path)
-			throw new InternalServerError(
-				"Database path not set, couldn't find backups",
-			);
+		if (!databaseConfig.path) throw new InternalServerError("Database path not set, couldn't find backups");
 
 		const backupList = await this.db.getBackupList();
 
 		if (backupList) return backupList;
-		else
-			throw new InternalServerError(
-				"Couldn't get backup list, see the logs for more information",
-			);
+		else throw new InternalServerError("Couldn't get backup list, see the logs for more information");
 	}
 
 	@Get('/size')

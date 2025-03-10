@@ -23,11 +23,7 @@ export async function getFolderSize(rootItemPath: string): Promise<number> {
 
 		if (stats.isDirectory()) {
 			const directoryItems = await readdir(itemPath);
-			await Promise.all(
-				directoryItems.map((directoryItem) =>
-					processItem(join(itemPath, directoryItem)),
-				),
-			);
+			await Promise.all(directoryItems.map((directoryItem) => processItem(join(itemPath, directoryItem))));
 		}
 	}
 

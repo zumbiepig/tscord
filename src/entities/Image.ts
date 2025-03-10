@@ -1,9 +1,4 @@
-import {
-	Entity,
-	EntityRepositoryType,
-	PrimaryKey,
-	Property,
-} from '@mikro-orm/core';
+import { Entity, EntityRepositoryType, PrimaryKey, Property } from '@mikro-orm/core';
 
 import { BaseEntity, BaseRepository } from '@/utils/classes';
 
@@ -45,13 +40,7 @@ export class ImageRepository extends BaseRepository<Image> {
 	async getImage(imageName: string) {
 		return await this.findOne({
 			fileName: {
-				$or: [
-					imageName,
-					`${imageName}.png`,
-					`${imageName}.jpeg`,
-					`${imageName}.jpg`,
-					`${imageName}.gif`,
-				],
+				$or: [imageName, `${imageName}.png`, `${imageName}.jpeg`, `${imageName}.jpg`, `${imageName}.gif`],
 			},
 		});
 	}

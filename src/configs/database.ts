@@ -48,6 +48,4 @@ const envConfig: MikroORMConfigType = {
 };
 
 export const mikroORMConfig =
-	env.NODE_ENV === 'development'
-		? { ...envConfig.production, ...envConfig.development }
-		: envConfig.production;
+	env.NODE_ENV === 'development' ? { ...envConfig.production, ...envConfig.development } : envConfig.production;

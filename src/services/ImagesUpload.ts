@@ -19,12 +19,11 @@ export class ImagesUpload {
 	private validImageExtensions = ['.png', '.jpeg', '.jpg', '.gif'];
 	private imageFolderPath = join(process.cwd(), 'assets', 'images');
 
-	private imgurClient: ImgurClient | undefined =
-		generalConfig.automaticUploadImagesToImgur
-			? new ImgurClient({
-					clientId: env.IMGUR_CLIENT_ID,
-				})
-			: undefined;
+	private imgurClient: ImgurClient | undefined = generalConfig.automaticUploadImagesToImgur
+		? new ImgurClient({
+				clientId: env.IMGUR_CLIENT_ID,
+			})
+		: undefined;
 
 	private imageRepo: ImageRepository;
 
@@ -36,7 +35,7 @@ export class ImagesUpload {
 	}
 
 	isValidImageFormat(file: string): boolean {
-		return this.validImageExtensions.some(extension => file.endsWith(extension));
+		return this.validImageExtensions.some((extension) => file.endsWith(extension));
 	}
 
 	async syncWithDatabase() {
@@ -51,7 +50,12 @@ export class ImagesUpload {
 		const images = [];
 		for (const file of files) {
 			if (this.isValidImageFormat(file)) images.push(file);
-			else await this.logger.log('error', `Image ${file} has an invalid format. Valid formats: ${this.validImageExtensions.join(', ')}`, `Image ${chalk.bold.green(file)} has an invalid format. Valid formats: ${chalk.bold(this.validImageExtensions.join(', '))}`);
+			else
+				await this.logger.log(
+					'error',
+					`Image ${file} has an invalid format. Valid formats: ${this.validImageExtensions.join(', ')}`,
+					`Image ${chalk.bold.green(file)} has an invalid format. Valid formats: ${chalk.bold(this.validImageExtensions.join(', '))}`,
+				);
 		}
 
 		// purge deleted images from the database, reupload expired images to imgur
@@ -76,19 +80,14 @@ export class ImagesUpload {
 
 		// check if the image is already in the database and that its sha256 hash is the same.
 		for (const imagePath of images) {
-			const imageHash = await getFileHash(
-				join(this.imageFolderPath, imagePath),
-			);
+			const imageHash = await getFileHash(join(this.imageFolderPath, imagePath));
 
 			const imageInDb = await this.imageRepo.findOne({
 				hash: imageHash,
 			});
 
 			if (!imageInDb) await this.addNewImageToImgur(imagePath, imageHash);
-			else if (
-				imageInDb.basePath !== dirname(imagePath) ||
-				imageInDb.fileName !== basename(imagePath)
-			)
+			else if (imageInDb.basePath !== dirname(imagePath) || imageInDb.fileName !== basename(imagePath))
 				await this.logger.log(
 					'warn',
 					`Image ${imagePath} has the same hash as ${join(imageInDb.basePath, imageInDb.fileName)} so it will be skipped`,
@@ -105,9 +104,7 @@ export class ImagesUpload {
 
 		// upload the image to imgur
 		const uploadResponse = await this.imgurClient.upload({
-			image: Readable.toWeb(
-				createReadStream(join(this.imageFolderPath, imagePath)),
-			),
+			image: Readable.toWeb(createReadStream(join(this.imageFolderPath, imagePath))),
 			type: 'stream',
 		});
 

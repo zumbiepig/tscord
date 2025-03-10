@@ -1,9 +1,7 @@
-type Rest = {
-	[x: string]: any;
-};
+type Rest = Record<string, any>;
 
-type AdminDashboardProps = {
+interface AdminDashboardProps {
 	bots: SanitizededBotConfig[];
 	authorizedBots: BotsState;
 	currentBot: SanitizededBotConfig;
-};
+}

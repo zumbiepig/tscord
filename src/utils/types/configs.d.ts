@@ -1,13 +1,9 @@
 import type { ConnectionOptions, MikroORMOptions } from '@mikro-orm/core';
-import type {
-	ActivitiesOptions,
-	Colors,
-	PresenceStatusData,
-	Snowflake } from 'discord.js';
+import type { ActivitiesOptions, Colors, PresenceStatusData, Snowflake } from 'discord.js';
 import type { SetRequiredDeep, ValueOf } from 'type-fest';
 
 import type { env } from '@/env';
-import type { Timezone, BotLocales } from '@/utils/types';
+import type { BotLocales, Timezone } from '@/utils/types';
 
 export interface APIConfigType {
 	enabled: boolean;
@@ -22,10 +18,7 @@ export interface DatabaseConfigType {
 }
 
 export type MikroORMConfigType = SetRequiredDeep<
-	Record<
-		typeof env.NODE_ENV,
-		Pick<MikroORMOptions, 'driver'> & ConnectionOptions
-	>,
+	Record<typeof env.NODE_ENV, Pick<MikroORMOptions, 'driver'> & ConnectionOptions>,
 	'production.driver'
 >;
 

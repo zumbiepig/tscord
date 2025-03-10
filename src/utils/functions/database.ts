@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { once } from 'node:events';
 import { createWriteStream } from 'node:fs';
 import { mkdir, open, readFile, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import path from 'node:path';
 
 import { BetterSqliteDriver } from '@mikro-orm/better-sqlite';
 import chalk from 'chalk';
@@ -21,11 +21,7 @@ export function isSQLiteDatabase() {
  * @param snapshotFile The file where the snapshot will be saved.
  * @param objectsDir The directory where the backup objects will be stored.
  */
-export async function backupDatabase(
-	dbFile: string,
-	snapshotFile: string,
-	objectsDir: string,
-) {
+export async function backupDatabase(dbFile: string, snapshotFile: string, objectsDir: string) {
 	const MAX_CONCURRENT_WRITES = 100;
 
 	const logger = await resolveDependency(Logger);
@@ -38,7 +34,7 @@ export async function backupDatabase(
 		const hash = createHash('sha256').update(chunk).digest('hex');
 
 		// use the hash as the object file name
-		const fileDest = join(objectsDir, hash.slice(0, 2), hash.slice(2));
+		const fileDest = path.join(objectsDir, hash.slice(0, 2), hash.slice(2));
 
 		// write the sqlite page content to the object file
 		const promise = logger
@@ -69,15 +65,14 @@ export async function backupDatabase(
 
 	// get header of the file
 	const fileHandle = await open(dbFile);
-	const headerBuffer = (await fileHandle.read(Buffer.alloc(100), 0, 100, 0))
-		.buffer;
+	const headerBuffer = (await fileHandle.read(Buffer.alloc(100), 0, 100, 0)).buffer;
 
 	// backup the database header
 	await saveChunk(headerBuffer);
 
 	// get the page size of the sqlite file at the 16th byte
 	let pageSize = headerBuffer.readUInt16BE(16);
-	if (pageSize === 1) pageSize = 65536;
+	if (pageSize === 1) pageSize = 65_536;
 
 	// read the database file
 	const reader = fileHandle.createReadStream({
@@ -115,11 +110,7 @@ export async function backupDatabase(
  * @param snapshotFile The filename of the snapshot from which you want to restore the database.
  * @param objectsDir The directory where the backup objects are stored.
  */
-export async function restoreDatabase(
-	dbFile: string,
-	snapshotFile: string,
-	objectsDir: string,
-) {
+export async function restoreDatabase(dbFile: string, snapshotFile: string, objectsDir: string) {
 	const logger = await resolveDependency(Logger);
 
 	// log the database restoration
@@ -130,9 +121,7 @@ export async function restoreDatabase(
 	);
 
 	// get object files from snapshot file
-	const hashes = (await readFile(snapshotFile, 'utf8'))
-		.split('\n')
-		.map((hash) => hash.trim());
+	const hashes = (await readFile(snapshotFile, 'utf8')).split('\n').map((hash) => hash.trim());
 
 	// write to the batabase file
 	const writer = createWriteStream(dbFile);
@@ -147,12 +136,7 @@ export async function restoreDatabase(
 			`Writing chunk ${chalk.bold.magenta(hash)} to ${chalk.bold.cyan(dbFile)}`,
 		);
 
-		if (
-			!writer.write(
-				await readFile(join(objectsDir, hash.slice(0, 2), hash.slice(2))),
-			)
-		)
-			await once(writer, 'drain');
+		if (!writer.write(await readFile(path.join(objectsDir, hash.slice(0, 2), hash.slice(2))))) await once(writer, 'drain');
 	}
 
 	// end the write stream and wait for it to close

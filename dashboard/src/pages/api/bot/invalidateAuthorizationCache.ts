@@ -1,6 +1,5 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-
 import { authorizationCache } from '@core/utils/cache';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 	authorizationCache.invalidate();

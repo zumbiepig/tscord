@@ -1,7 +1,4 @@
-import {
-	ApplicationCommandOptionType,
-	type RepliableInteraction,
-} from 'discord.js';
+import { ApplicationCommandOptionType, type RepliableInteraction } from 'discord.js';
 import { Discord, Guard } from 'discordx';
 
 import { DevsOnly } from '@/guards';

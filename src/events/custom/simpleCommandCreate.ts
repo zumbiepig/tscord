@@ -1,10 +1,4 @@
-import {
-	type ArgsOf,
-	Client,
-	Discord,
-	On,
-	SimpleCommandMessage,
-} from 'discordx';
+import { type ArgsOf, Client, Discord, On, SimpleCommandMessage } from 'discordx';
 import { injectable } from 'tsyringe';
 
 import { Guild, User } from '@/entities';
@@ -29,23 +23,18 @@ export default class SimpleCommandCreateEvent {
 
 		// update last interaction time of both user and guild
 		await this.db.get(User).updateLastInteract(command.message.author.id);
-		if (command.message.guild)
-			await this.db.get(Guild).updateLastInteract(command.message.guild.id);
+		if (command.message.guild) await this.db.get(Guild).updateLastInteract(command.message.guild.id);
 
 		await this.stats.registerInteraction(command);
 		await this.logger.logInteraction(command);
 	}
 
 	@On({ event: 'messageCreate' })
-	async simpleCommandCreateEmitter(
-		[message]: ArgsOf<'messageCreate'>,
-		client: Client,
-	) {
+	async simpleCommandCreateEmitter([message]: ArgsOf<'messageCreate'>, client: Client) {
 		const prefix = await getPrefixFromMessage(message);
 		if (prefix) {
 			const command = await client.parseCommand(prefix, message, false);
-			if (command instanceof SimpleCommandMessage)
-				await this.eventManager.emit('simpleCommandCreate', command);
+			if (command instanceof SimpleCommandMessage) await this.eventManager.emit('simpleCommandCreate', command);
 		}
 	}
 }

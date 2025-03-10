@@ -1,9 +1,9 @@
+import { botsConfig } from '@config/bots';
+import { FetchError } from '@core/utils/classes';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { unstable_getServerSession } from 'next-auth/next';
 
 import { authOptions } from '../../auth/[...nextauth]';
-import { botsConfig } from '@config/bots';
-import { FetchError } from '@core/utils/classes';
 
 const proxyHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	const session = await unstable_getServerSession(req, res, authOptions);
@@ -18,10 +18,8 @@ const proxyHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	delete req.query.path;
 	delete req.query.botId;
 
-	const uri = path instanceof Array ? path.join('/') : (path as string);
-	const baseURL = botsConfig
-		.find((botConfig) => botConfig.id === botId)
-		?.apiUrl.replace(/\/+$/, '');
+	const uri = Array.isArray(path) ? path.join('/') : (path!);
+	const baseURL = botsConfig.find((botConfig) => botConfig.id === botId)?.apiUrl.replace(/\/+$/, '');
 	if (!baseURL) {
 		res.status(404).send('Bot not found');
 		return;
@@ -29,9 +27,7 @@ const proxyHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 	// create the url from the baseURL and the uri, and set the query params
 	const url = new URL(uri, baseURL);
-	Object.keys(req.query).forEach((key) =>
-		url.searchParams.append(key, <string>req.query[key]),
-	);
+	for (const key of Object.keys(req.query)) url.searchParams.append(key, (req.query[key] as string));
 
 	// authorization
 	const token = session.access_token;
@@ -45,9 +41,7 @@ const proxyHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		const options = {
 			method: req.method,
 			headers,
-			...(req.method === 'POST' || req.method === 'PUT'
-				? { body: req.body }
-				: {}),
+			...(req.method === 'POST' || req.method === 'PUT' ? { body: req.body } : {}),
 		};
 
 		const response = await fetch(url, options);
@@ -63,9 +57,9 @@ const proxyHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			error.info = await response.json();
 			throw error;
 		}
-	} catch (err) {
-		if (err instanceof Error) {
-			res.status(500).send(err.message);
+	} catch (error) {
+		if (error instanceof Error) {
+			res.status(500).send(error.message);
 			return;
 		}
 	}

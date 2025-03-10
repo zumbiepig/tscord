@@ -9,7 +9,6 @@ export class BotOnline {
 	constructor(private client: Client) {}
 
 	use() {
-		if (this.client.user?.presence.status === 'offline')
-			throw new InternalServerError('Bot is offline');
+		if (this.client.user?.presence.status === 'offline') throw new InternalServerError('Bot is offline');
 	}
 }

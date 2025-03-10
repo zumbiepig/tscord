@@ -17,15 +17,9 @@ import { dayjsTimezone, isValidUrl } from '@/utils/functions';
 import { getPackageJson, getTscordVersion } from '@/utils/functions';
 
 const links = [
-	...(generalConfig.links.botInvite
-		? [{ label: 'Invite me!', url: generalConfig.links.botInvite }]
-		: []),
-	...(generalConfig.links.supportServer
-		? [{ label: 'Support server', url: generalConfig.links.supportServer }]
-		: []),
-	...(generalConfig.links.gitRepo
-		? [{ label: 'GitHub', url: generalConfig.links.gitRepo }]
-		: []),
+	...(generalConfig.links.botInvite ? [{ label: 'Invite me!', url: generalConfig.links.botInvite }] : []),
+	...(generalConfig.links.supportServer ? [{ label: 'Support server', url: generalConfig.links.supportServer }] : []),
+	...(generalConfig.links.gitRepo ? [{ label: 'GitHub', url: generalConfig.links.gitRepo }] : []),
 ];
 
 @Discord()
@@ -54,9 +48,7 @@ export default class InfoCommand {
 		 * Owner field
 		 */
 		if (generalConfig.ownerId) {
-			const owner = await client.users
-				.fetch(generalConfig.ownerId)
-				.catch(() => void 0);
+			const owner = await client.users.fetch(generalConfig.ownerId).catch(() => void 0);
 			if (owner)
 				fields.push({
 					name: 'Owner',
@@ -114,10 +106,7 @@ export default class InfoCommand {
 			.map((link) => {
 				const url = link.url.split('_').join('');
 				return isValidUrl(url)
-					? new ButtonBuilder()
-							.setLabel(link.label)
-							.setURL(url)
-							.setStyle(ButtonStyle.Link)
+					? new ButtonBuilder().setLabel(link.label).setURL(url).setStyle(ButtonStyle.Link)
 					: undefined;
 			})
 			.filter(Boolean) as ButtonBuilder[];

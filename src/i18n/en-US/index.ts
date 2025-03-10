@@ -47,8 +47,7 @@ export default {
 				},
 			},
 			EMBED: {
-				DESCRIPTION:
-					'Maintenance mode has been {status|{enabled:enabled,disabled:disabled}}.',
+				DESCRIPTION: 'Maintenance mode has been {status|{enabled:enabled,disabled:disabled}}.',
 			},
 		},
 		STATS: {
@@ -58,7 +57,7 @@ export default {
 				DAYS: {
 					NAME: 'days',
 					DESCRIPTION: 'The number of days to get the stats from.',
-				}
+				},
 			},
 			HEADERS: {
 				USERS: 'Users',
@@ -82,8 +81,7 @@ export default {
 		PING: {
 			NAME: 'ping',
 			DESCRIPTION: 'Get the ping of the bot.',
-			MESSAGE:
-				'Pong! The message round-trip took {time}ms. The heartbeat ping is {heartbeat}ms.',
+			MESSAGE: 'Pong! The message round-trip took {time}ms. The heartbeat ping is {heartbeat}ms.',
 		},
 	},
 } satisfies Translation;

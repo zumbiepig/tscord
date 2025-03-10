@@ -1,4 +1,4 @@
-type BotData = {
+interface BotData {
 	info: {
 		name: string;
 		discriminator: string;
@@ -16,4 +16,4 @@ type BotData = {
 		name: string;
 		description: string;
 	}[];
-};
+}

@@ -1,6 +1,5 @@
 export const getAbsoluteUrl = (url: string) => {
 	if (url.startsWith('http')) return url;
 
-	if (typeof window === 'undefined') return `${process.env['BASE_URL']}/${url}`;
-	else return `${window.location.origin}/${url}`;
+	return globalThis.window === undefined ? `${process.env.BASE_URL}/${url}` : `${globalThis.location.origin}/${url}`;
 };
