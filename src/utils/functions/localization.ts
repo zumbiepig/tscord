@@ -1,4 +1,4 @@
-import { BaseInteraction, type Interaction, Locale } from 'discord.js';
+import { BaseInteraction, type Interaction, Locale, type LocalizationMap } from 'discord.js';
 import { SimpleCommandMessage } from 'discordx';
 import type { Get } from 'type-fest';
 
@@ -9,33 +9,31 @@ import { Database } from '@/services';
 import { resolveDependency, resolveGuildLocale, resolveLocale, resolveUser } from '@/utils/functions';
 import type {
 	BotLocales,
-	ContextMenuOptions,
-	SlashChoiceOptions,
-	SlashGroupOptions,
-	SlashOptionOptions,
-	SlashOptions,
+	Sanitization,
 	TranslationPaths,
 } from '@/utils/types';
 
 export function setOptionsLocalization<
-	T extends ContextMenuOptions | SlashOptions | SlashChoiceOptions | SlashGroupOptions | SlashOptionOptions,
->(options: T): T {
-	if ('name' in options) {
-		const nameLocalizations = getLocalizationMap(`${options.localizationSource}.NAME`);
-		options.name ??= nameLocalizations[generalConfig.defaultLocale];
-		options.nameLocalizations ??= nameLocalizations;
+	T extends object,
+>(options: T&Sanitization<{
+	name?: string;
+	nameLocalizations?: LocalizationMap;
+	description?: string;
+	descriptionLocalizations?: LocalizationMap;
+}>): T {
+	if ('nameLocalizations' in (options as T)) {
+		const nameLocalizations = getLocalizationMap(options.nameLocalizations);
+		options.name = nameLocalizations[generalConfig.defaultLocale];
+		options.nameLocalizations = nameLocalizations;
 	}
 
-	if ('description' in options) {
-		let descriptionLocalizations = getLocalizationMap(`${options.localizationSource}.DESCRIPTION`);
-		if (!descriptionLocalizations[generalConfig.defaultLocale])
-			descriptionLocalizations = getLocalizationMap('SHARED.NO_COMMAND_DESCRIPTION');
-
-		options.description ??= descriptionLocalizations[generalConfig.defaultLocale];
-		options.descriptionLocalizations ??= descriptionLocalizations;
+	if ('descriptionLocalizations' in options) {
+		const descriptionLocalizations = getLocalizationMap(options.descriptionLocalizations);
+		options.description = descriptionLocalizations[generalConfig.defaultLocale];
+		options.descriptionLocalizations = descriptionLocalizations;
 	}
 
-	return options;
+	return options as T;
 }
 
 /**
