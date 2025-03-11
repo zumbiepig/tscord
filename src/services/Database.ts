@@ -43,7 +43,7 @@ class CustomLogger extends DefaultLogger implements MikroORMLogger {
 		const chalkedLogMessage = `${chalk.grey(`[${namespace}] `)}${context?.label ? chalk.cyan(`(${context.label}) `) : ''}${message}`;
 
 		void this.logger.log(
-			context?.level === 'warning' ? 'warn' : (context?.level === 'error' ? 'error' : 'debug'),
+			context?.level === 'warning' ? 'warn' : context?.level === 'error' ? 'error' : 'debug',
 			logMessage,
 			chalkedLogMessage,
 			logsConfig.database,

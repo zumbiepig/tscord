@@ -1,4 +1,4 @@
-import { Box, Button,Flex, Heading, Image, Link, Stack, Text, useColorModeValue } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Image, Link, Stack, Text, useColorModeValue } from '@chakra-ui/react';
 import { Card, PopBox } from '@components/shared';
 import { motion } from 'framer-motion';
 import NextLink from 'next/link';
@@ -53,7 +53,9 @@ export const LatestArticles: React.FC<LatestArticlesProps> = ({ articles }) => {
 				<Button
 					bg="primary"
 					mb={8}
-					onClick={() => { setExpanded(!expanded); }}
+					onClick={() => {
+						setExpanded(!expanded);
+					}}
 					rightIcon={expanded ? <IoIosArrowUp /> : <IoIosArrowDown />}
 				>
 					{expanded ? 'Show less' : 'Show more'}

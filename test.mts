@@ -1,7 +1,5 @@
 import process from 'node:process';
 
-
-
 abstract class BaseError extends Error {
 	public shouldKill = false;
 
@@ -14,11 +12,8 @@ abstract class BaseError extends Error {
 		console.error(this.message);
 	}
 
-	kill(): never {
-		
-	}
+	kill(): never {}
 }
-
 
 class RegularError extends BaseError {
 	constructor(...args: ConstructorParameters<typeof BaseError>) {
@@ -26,11 +21,10 @@ class RegularError extends BaseError {
 	}
 
 	async handle() {
-		super.handle()
+		super.handle();
 		console.error('This is a regular error');
 	}
 }
-
 
 class FatalError extends BaseError {
 	constructor(...args: ConstructorParameters<typeof BaseError>) {
@@ -38,12 +32,11 @@ class FatalError extends BaseError {
 	}
 
 	async handle() {
-		super.handle()
+		super.handle();
 		console.error('This is a fatal error');
 		this.kill();
 	}
 }
-
 
 class ErrorHandler {
 	constructor() {
@@ -65,22 +58,22 @@ class ErrorHandler {
 
 class thisWillThrow {
 	constructor() {
-	throw new RegularError('regular error msg');
+		throw new RegularError('regular error msg');
 	}
 }
 
 class thisWillThrowFatal {
 	constructor() {
-	throw new FatalError('FATAL error msg');
+		throw new FatalError('FATAL error msg');
 	}
 }
 
 new ErrorHandler();
-console.log('start')
-console.log('throwing regular error')
+console.log('start');
+console.log('throwing regular error');
 //new thisWillThrow();
-console.log('threw regular error')
-console.log('throwing fatal error')
+console.log('threw regular error');
+console.log('throwing fatal error');
 new thisWillThrowFatal();
-console.log('threw fatal error')
-console.log('end')
+console.log('threw fatal error');
+console.log('end');

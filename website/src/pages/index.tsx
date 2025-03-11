@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 
 import { Box, Flex, Heading, SimpleGrid, VStack } from '@chakra-ui/react';
-import { Commands, Footer,HeroBanner, HomeStat, LandingSection, LatestArticles } from '@components/modules';
+import { Commands, Footer, HeroBanner, HomeStat, LandingSection, LatestArticles } from '@components/modules';
 import config from '@config';
 import { sanitizeCommands } from '@core/utils';
 import matter from 'gray-matter';

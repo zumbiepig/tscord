@@ -17,7 +17,7 @@ const CustomSkeleton: React.FC<{ children: React.ReactNode; key: number }> = ({ 
 };
 
 export const SkeletonLayout: React.FC<SkeletonLayoutProps> = ({ children, enabled }) => {
-	if (!(Array.isArray(children))) children = [children];
+	if (!Array.isArray(children)) children = [children];
 
 	return (
 		<>

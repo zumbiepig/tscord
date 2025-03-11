@@ -96,15 +96,13 @@ const StatisticsPage: NextPage<AdminDashboardProps> = ({ bots, authorizedBots, c
 		{
 			name: 'Simple commands',
 			data:
-				stats.commandsUsage.data
-					?.map((commandUsage: Record<string, any>) => commandUsage.simpleCommands)
-					.reverse() || [],
+				stats.commandsUsage.data?.map((commandUsage: Record<string, any>) => commandUsage.simpleCommands).reverse() ||
+				[],
 		},
 		{
 			name: 'Context menus',
 			data:
-				stats.commandsUsage.data?.map((commandUsage: Record<string, any>) => commandUsage.contextMenus).reverse() ||
-				[],
+				stats.commandsUsage.data?.map((commandUsage: Record<string, any>) => commandUsage.contextMenus).reverse() || [],
 		},
 		{
 			name: 'Slash commands',

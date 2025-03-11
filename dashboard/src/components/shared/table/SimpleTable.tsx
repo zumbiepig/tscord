@@ -1,7 +1,7 @@
 import { Checkbox, Flex, Table, Tbody, Td, Text, Th, Thead, Tr, useColorModeValue } from '@chakra-ui/react';
 import { Card } from '@components/shared';
 import React, { useMemo } from 'react';
-import { type Cell, type Column, useGlobalFilter, usePagination,useSortBy, useTable } from 'react-table';
+import { type Cell, type Column, useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
 
 interface Props {
 	title: string;

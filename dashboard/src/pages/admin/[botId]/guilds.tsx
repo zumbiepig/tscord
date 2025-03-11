@@ -59,16 +59,16 @@ const GuildsPage: NextPage<AdminDashboardProps> = ({ bots, authorizedBots, curre
 				})
 				.sort((a: any, b: any) => {
 					switch (sortBy) {
-					case 'name': {
-						return a.discord.name.toLowerCase().localeCompare(b.discord.name.toLowerCase());
-					}
-					case 'members': {
-						return b.discord.memberCount - a.discord.memberCount;
-					}
-					case 'activity': {
-						return new Date(b.database.lastInteract).getTime() - new Date(a.database.lastInteract).getTime();
-					}
-					// No default
+						case 'name': {
+							return a.discord.name.toLowerCase().localeCompare(b.discord.name.toLowerCase());
+						}
+						case 'members': {
+							return b.discord.memberCount - a.discord.memberCount;
+						}
+						case 'activity': {
+							return new Date(b.database.lastInteract).getTime() - new Date(a.database.lastInteract).getTime();
+						}
+						// No default
 					}
 				})
 		: [];
@@ -92,7 +92,9 @@ const GuildsPage: NextPage<AdminDashboardProps> = ({ bots, authorizedBots, curre
 								<InputLeftAddon display={{ base: 'none', md: 'flex' }}>Sort by</InputLeftAddon>
 								<Select
 									borderLeftRadius={{ md: '0' }}
-									onChange={(e) => { setSortBy(e.target.value as SortByOptionsType); }}
+									onChange={(e) => {
+										setSortBy(e.target.value as SortByOptionsType);
+									}}
 									value={sortBy}
 									icon={<>{sortByIcon}</>}
 									// fontSize='md'

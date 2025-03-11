@@ -1,4 +1,4 @@
-import { Box,Circle, HStack, Image, LinkBox, Text, VStack } from '@chakra-ui/react';
+import { Box, Circle, HStack, Image, LinkBox, Text, VStack } from '@chakra-ui/react';
 import { generalConfig } from '@config/general';
 import Link from 'next/link';
 import React from 'react';

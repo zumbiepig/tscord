@@ -32,7 +32,7 @@ export class DataRepository extends BaseRepository<Data> {
 	async get<T extends keyof DataRepositoryType>(key: T): Promise<DataRepositoryType[T]> {
 		const data = await this.findOne(key);
 
-		return data ? data.value as DataRepositoryType[T] : defaultData[key];
+		return data ? (data.value as DataRepositoryType[T]) : defaultData[key];
 	}
 
 	async set<T extends keyof DataRepositoryType>(key: T, value: DataRepositoryType[T]): Promise<void> {

@@ -40,7 +40,9 @@ export const SimpleSwitcher: React.FC<Props> = ({ title, subtitle, chart1, chart
 							h="37px"
 							lineHeight="100%"
 							borderRadius="10px"
-							onClick={() => { setCurrentChartId(currentChartId === chart1.id ? chart2.id : chart1.id); }}
+							onClick={() => {
+								setCurrentChartId(currentChartId === chart1.id ? chart2.id : chart1.id);
+							}}
 						>
 							<Icon as={getOtherChart().icon} color={useColorModeValue('brand.500', 'white')} w="24px" h="24px" />
 						</Button>

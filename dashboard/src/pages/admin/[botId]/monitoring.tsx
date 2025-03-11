@@ -127,7 +127,9 @@ const MonitoringPage: NextPage<AdminDashboardProps> = ({ bots, authorizedBots, c
 								</Card>
 
 								<Card
-									onClick={() => { onConfirmOpen(); }}
+									onClick={() => {
+										onConfirmOpen();
+									}}
 									cursor="pointer"
 									transition="0.2s linear"
 									_hover={{

@@ -18,7 +18,7 @@ const proxyHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	delete req.query.path;
 	delete req.query.botId;
 
-	const uri = Array.isArray(path) ? path.join('/') : (path!);
+	const uri = Array.isArray(path) ? path.join('/') : path!;
 	const baseURL = botsConfig.find((botConfig) => botConfig.id === botId)?.apiUrl.replace(/\/+$/, '');
 	if (!baseURL) {
 		res.status(404).send('Bot not found');
@@ -27,7 +27,7 @@ const proxyHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 	// create the url from the baseURL and the uri, and set the query params
 	const url = new URL(uri, baseURL);
-	for (const key of Object.keys(req.query)) url.searchParams.append(key, (req.query[key] as string));
+	for (const key of Object.keys(req.query)) url.searchParams.append(key, req.query[key] as string);
 
 	// authorization
 	const token = session.access_token;

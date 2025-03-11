@@ -141,7 +141,13 @@ export const DetailedGuild: React.FC<DetailedGuildProps> = ({ isOpen, onClose, g
 					</ModalBody>
 
 					<ModalFooter>
-						<Button colorScheme="red" mr={3} onClick={() => { onConfirmOpen(); }}>
+						<Button
+							colorScheme="red"
+							mr={3}
+							onClick={() => {
+								onConfirmOpen();
+							}}
+						>
 							Leave guild
 						</Button>
 						<Button colorScheme="blue" mr={3} onClick={() => getInviteLink()}>

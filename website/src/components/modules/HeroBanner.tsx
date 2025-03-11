@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, Image, Link,Text, useBreakpointValue } from '@chakra-ui/react';
+import { Box, Flex, Heading, Image, Link, Text, useBreakpointValue } from '@chakra-ui/react';
 import config from '@config';
 import React from 'react';
 import { Parallax } from 'react-scroll-parallax';

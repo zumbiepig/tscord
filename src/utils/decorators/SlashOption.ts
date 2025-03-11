@@ -4,7 +4,9 @@ import { InvalidOptionNameError } from '@/utils/errors';
 import { isValidDiscordName, setOptionsLocalization } from '@/utils/functions';
 import type { SlashOptionOptions } from '@/utils/types';
 
-export function SlashOption<T extends string = never, TD extends string = never>(...options: SlashOptionOptions<T, TD>[1]) {
+export function SlashOption<T extends string = never, TD extends string = never>(
+	...options: SlashOptionOptions<T, TD>[1]
+) {
 	options = setOptionsLocalization(options);
 
 	for (const name of [options.name, ...Object.values(options.nameLocalizations ?? {})])

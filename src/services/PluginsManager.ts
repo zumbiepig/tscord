@@ -93,7 +93,7 @@ export class PluginsManager {
 	}
 
 	isPluginLoad(pluginName: string): boolean {
-		return this._plugins.some((plugin) => plugin.name === pluginName) ;
+		return this._plugins.some((plugin) => plugin.name === pluginName);
 	}
 
 	get plugins() {

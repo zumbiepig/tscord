@@ -12,5 +12,7 @@ export const Maintenance: GuardFunction<ArgsOf<'interactionCreate' | 'messageCre
 	next,
 	guardData,
 ) => {
-	await (!(await isInMaintenance()) || isDev(resolveUser(arg).id) ? next() : replyToInteraction(arg, guardData.translations.GUARDS.MAINTENANCE()));
+	await (!(await isInMaintenance()) || isDev(resolveUser(arg).id)
+		? next()
+		: replyToInteraction(arg, guardData.translations.GUARDS.MAINTENANCE()));
 };

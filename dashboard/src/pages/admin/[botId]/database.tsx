@@ -1,7 +1,7 @@
 import { Box, Button, css, Flex, SimpleGrid, Spinner, Text, useColorModeValue, useToast } from '@chakra-ui/react';
 import { AdminDashboard } from '@components/layouts';
 import { Card, SimpleTable, StatCard } from '@components/shared';
-import { adminDashboardServerSideProps, errorToast,fetcher, successToast } from '@core/utils/functions';
+import { adminDashboardServerSideProps, errorToast, fetcher, successToast } from '@core/utils/functions';
 import axios from 'axios';
 import type { GetServerSideProps, NextPage } from 'next';
 import { getServerSession } from 'next-auth/next';

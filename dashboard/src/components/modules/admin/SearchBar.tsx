@@ -23,11 +23,19 @@ export const SearchBar: React.FC<SearchBarProps> = ({ search, setSearch, placeho
 					colorScheme="primary"
 					id="searchBar"
 					value={search}
-					onChange={(e) => { setSearch(e.target.value); }}
+					onChange={(e) => {
+						setSearch(e.target.value);
+					}}
 				/>
 				{search.length > 0 && (
 					<InputRightElement>
-						<CloseButton size="sm" rounded="full" onClick={() => { setSearch(''); }} />
+						<CloseButton
+							size="sm"
+							rounded="full"
+							onClick={() => {
+								setSearch('');
+							}}
+						/>
 					</InputRightElement>
 				)}
 			</InputGroup>

@@ -28,8 +28,11 @@ export const PopBox: React.FC<PopBoxProps> = ({ children, ...rest }) => {
 	});
 
 	useEffect(() => {
-		if (inView) {controls.start('visible');}
-		else {controls.start('hidden');}
+		if (inView) {
+			controls.start('visible');
+		} else {
+			controls.start('hidden');
+		}
 	}, [inView]);
 
 	return (

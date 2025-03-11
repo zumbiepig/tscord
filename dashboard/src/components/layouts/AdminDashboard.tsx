@@ -1,5 +1,5 @@
 import { Box } from '@chakra-ui/react';
-import { AdminNavbar,Sidebar } from '@components/modules';
+import { AdminNavbar, Sidebar } from '@components/modules';
 import { generalConfig } from '@config/general';
 import { sidebarConfig } from '@config/sidebar';
 import { AdminDashboardContext } from '@core/contexts';

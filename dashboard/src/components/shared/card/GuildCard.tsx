@@ -28,7 +28,7 @@ import {
 import { DetailedGuild } from '@components/modules';
 import { Card, DisplayCard, TextSection } from '@components/shared';
 import { AdminDashboardContext } from '@core/contexts';
-import { errorToast, getActivityColor,successToast } from '@core/utils/functions';
+import { errorToast, getActivityColor, successToast } from '@core/utils/functions';
 import axios from 'axios';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';

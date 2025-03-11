@@ -1,4 +1,4 @@
-import { Box, Container, Flex, GridItem, Heading, Img,SimpleGrid, Text, VStack } from '@chakra-ui/react';
+import { Box, Container, Flex, GridItem, Heading, Img, SimpleGrid, Text, VStack } from '@chakra-ui/react';
 import { ImageResolver, PopBox } from '@components/shared';
 import React from 'react';
 

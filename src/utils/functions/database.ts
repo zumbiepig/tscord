@@ -136,7 +136,8 @@ export async function restoreDatabase(dbFile: string, snapshotFile: string, obje
 			`Writing chunk ${chalk.bold.magenta(hash)} to ${chalk.bold.cyan(dbFile)}`,
 		);
 
-		if (!writer.write(await readFile(path.join(objectsDir, hash.slice(0, 2), hash.slice(2))))) await once(writer, 'drain');
+		if (!writer.write(await readFile(path.join(objectsDir, hash.slice(0, 2), hash.slice(2)))))
+			await once(writer, 'drain');
 	}
 
 	// end the write stream and wait for it to close

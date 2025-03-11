@@ -13,6 +13,8 @@ export function GuildOnly(
 	return async ([arg], _client, next, guardData) => {
 		const inGuild = arg instanceof SimpleCommandMessage ? arg.message.inGuild() : arg.inGuild();
 
-		await (inGuild === !invert ? next() : replyToInteraction(arg, guardData.translations.GUARDS[invert ? 'DM_ONLY' : 'GUILD_ONLY']()));
+		await (inGuild === !invert
+			? next()
+			: replyToInteraction(arg, guardData.translations.GUARDS[invert ? 'DM_ONLY' : 'GUILD_ONLY']()));
 	};
 }

@@ -88,7 +88,9 @@ const Menu: React.FC<{
 								borderRadius="8px"
 								_active={{ bg: 'transparent' }}
 								_focus={{ bg: 'transparent' }}
-								onClick={() => { setCurrentChartId(chart.id); }}
+								onClick={() => {
+									setCurrentChartId(chart.id);
+								}}
 								mb="10px"
 							>
 								<Flex align="center">

@@ -46,9 +46,9 @@ export function resolveMember(
 ): GuildMember | APIInteractionGuildMember | undefined {
 	return interaction instanceof BaseInteraction || interaction instanceof Message || interaction instanceof VoiceState
 		? (interaction.member ?? undefined)
-		: (interaction instanceof SimpleCommandMessage || interaction instanceof MessageReaction
+		: interaction instanceof SimpleCommandMessage || interaction instanceof MessageReaction
 			? (interaction.message.member ?? undefined)
-			: (undefined as never));
+			: (undefined as never);
 }
 
 export function resolveGuild(interaction: VoiceState): Guild;
@@ -80,9 +80,9 @@ export function resolveChannel(
 ): TextBasedChannel | VoiceBasedChannel | undefined {
 	return interaction instanceof BaseInteraction || interaction instanceof Message || interaction instanceof VoiceState
 		? (interaction.channel ?? undefined)
-		: (interaction instanceof SimpleCommandMessage || interaction instanceof MessageReaction
+		: interaction instanceof SimpleCommandMessage || interaction instanceof MessageReaction
 			? interaction.message.channel
-			: (undefined as never));
+			: (undefined as never);
 }
 
 export function resolveAction(interaction: BaseInteraction | SimpleCommandMessage): string {
@@ -102,7 +102,7 @@ export function resolveLocale(interaction: BaseInteraction): Locale {
 export function resolveGuildLocale(interaction: BaseInteraction | SimpleCommandMessage): Locale | undefined {
 	return interaction instanceof BaseInteraction
 		? (interaction.guildLocale ?? undefined)
-		: (interaction instanceof SimpleCommandMessage
+		: interaction instanceof SimpleCommandMessage
 			? interaction.message.guild?.preferredLocale
-			: (undefined as never));
+			: (undefined as never);
 }

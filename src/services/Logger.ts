@@ -261,9 +261,9 @@ export class Logger {
 		const additionalMessage =
 			type === 'NEW_USER'
 				? 'has been added to the db'
-				: (type === 'DELETE_USER'
+				: type === 'DELETE_USER'
 					? 'has been deleted'
-					: 'has been recovered');
+					: 'has been recovered';
 		const message = `(${type}) ${user.tag} (${user.id}) ${additionalMessage}`;
 		const chalkedMessage = `(${chalk.bold.white(type)}) ${chalk.bold.green(user.tag)} (${chalk.bold.blue(user.id)}) ${chalk.dim.italic.grey(additionalMessage)}`;
 
@@ -272,15 +272,15 @@ export class Logger {
 			discordEmbed: {
 				embeds: [
 					{
-						title: type === 'NEW_USER' ? 'New user' : (type === 'DELETE_USER' ? 'Deleted user' : 'Recovered user'),
+						title: type === 'NEW_USER' ? 'New user' : type === 'DELETE_USER' ? 'Deleted user' : 'Recovered user',
 						description: `**${user.tag}**`,
 						thumbnail: { url: user.displayAvatarURL({ forceStatic: false }) },
 						color:
 							type === 'NEW_USER'
 								? colorsConfig.discord.user.new
-								: (type === 'DELETE_USER'
+								: type === 'DELETE_USER'
 									? colorsConfig.discord.user.delete
-									: colorsConfig.discord.user.recover),
+									: colorsConfig.discord.user.recover,
 						timestamp: dayjsTimezone().toISOString(),
 						footer: { text: user.id },
 					},
@@ -299,9 +299,9 @@ export class Logger {
 		const additionalMessage =
 			type === 'NEW_GUILD'
 				? 'has been added to the db'
-				: (type === 'DELETE_GUILD'
+				: type === 'DELETE_GUILD'
 					? 'has been deleted'
-					: 'has been recovered');
+					: 'has been recovered';
 		const message = `(${type}) Guild ${guild ? `${guild.name} (${guildId})` : guildId} ${additionalMessage}`;
 		const chalkedMessage = `(${chalk.bold.white(type)}) ${chalk.dim.italic.grey('Guild')} ${guild ? `${chalk.bold.green(guild.name)} (${chalk.bold.blue(guildId)})` : guildId} ${chalk.dim.italic.grey(additionalMessage)}`;
 
@@ -310,7 +310,7 @@ export class Logger {
 			discordEmbed: {
 				embeds: [
 					{
-						title: type === 'NEW_GUILD' ? 'New guild' : (type === 'DELETE_GUILD' ? 'Deleted guild' : 'Recovered guild'),
+						title: type === 'NEW_GUILD' ? 'New guild' : type === 'DELETE_GUILD' ? 'Deleted guild' : 'Recovered guild',
 						fields: [
 							{
 								name: guild?.name ?? 'Unknown',
@@ -322,9 +322,9 @@ export class Logger {
 						color:
 							type === 'NEW_GUILD'
 								? colorsConfig.discord.guild.new
-								: (type === 'DELETE_GUILD'
+								: type === 'DELETE_GUILD'
 									? colorsConfig.discord.guild.delete
-									: colorsConfig.discord.guild.recover),
+									: colorsConfig.discord.guild.recover,
 						timestamp: dayjsTimezone().toISOString(),
 					},
 				],

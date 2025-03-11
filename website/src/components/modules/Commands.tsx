@@ -1,4 +1,4 @@
-import { Box, Code, Heading, Table, Tbody, Td, Text,Th as ChakraTh, Thead, Tr } from '@chakra-ui/react';
+import { Box, Code, Heading, Table, Tbody, Td, Text, Th as ChakraTh, Thead, Tr } from '@chakra-ui/react';
 import { variants } from '@components/shared';
 import { motion, useAnimation } from 'framer-motion';
 import React, { useEffect } from 'react';
@@ -30,8 +30,11 @@ const CommandRow: React.FC<{ command: any; index: number }> = ({ command, index 
 	});
 
 	useEffect(() => {
-		if (inView) {controls.start('visible');}
-		else {controls.start('hidden');}
+		if (inView) {
+			controls.start('visible');
+		} else {
+			controls.start('hidden');
+		}
 	}, [inView]);
 
 	return (

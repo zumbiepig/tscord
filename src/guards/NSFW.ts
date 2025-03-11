@@ -10,6 +10,8 @@ import type { InteractionData } from '@/utils/types';
 export function NSFW(invert = false): GuardFunction<ArgsOf<'interactionCreate' | 'messageCreate'>, InteractionData> {
 	return async ([arg], _client, next, guardData) => {
 		const channel = resolveChannel(arg);
-		await (channel && 'nsfw' in channel && channel.nsfw === !invert ? next() : replyToInteraction(arg, guardData.translations.GUARDS.NSFW()));
+		await (channel && 'nsfw' in channel && channel.nsfw === !invert
+			? next()
+			: replyToInteraction(arg, guardData.translations.GUARDS.NSFW()));
 	};
 }

@@ -1,4 +1,4 @@
-import { Box,Heading, Text, VStack } from '@chakra-ui/react';
+import { Box, Heading, Text, VStack } from '@chakra-ui/react';
 import { Card, PopBox } from '@components/shared';
 import React, { useEffect, useRef, useState } from 'react';
 import { useCountUp } from 'react-countup';

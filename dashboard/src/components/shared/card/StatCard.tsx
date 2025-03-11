@@ -40,12 +40,12 @@ export const StatCard: React.FC<Props> = ({ title, value, icon, growth, textFirs
 								<Text
 									color={
 										growth.value < 0
-											? (growth.invert
+											? growth.invert
 												? 'green.500'
-												: 'red.500')
-											: (growth.invert
+												: 'red.500'
+											: growth.invert
 												? 'red.500'
-												: 'green.500')
+												: 'green.500'
 									}
 									fontSize="xs"
 									fontWeight="700"
