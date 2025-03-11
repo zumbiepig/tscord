@@ -7,33 +7,31 @@ import { User } from '@/entities';
 import { isLocale, loadedLocales, locales as i18nLocales, type Translations } from '@/i18n';
 import { Database } from '@/services';
 import { resolveDependency, resolveGuildLocale, resolveLocale, resolveUser } from '@/utils/functions';
-import type {
-	BotLocales,
-	Sanitization,
-	TranslationPaths,
-} from '@/utils/types';
+import type { BotLocales, Sanitization, TranslationPaths } from '@/utils/types';
 
-export function setOptionsLocalization<
-	T extends object,
->(options: T&Sanitization<{
-	name?: string;
-	nameLocalizations?: LocalizationMap;
-	description?: string;
-	descriptionLocalizations?: LocalizationMap;
-}>): T {
-	if ('nameLocalizations' in (options as T)) {
+export function getLocalizedOptions<
+	T extends {
+		name?: string;
+		nameLocalizations?: LocalizationMap;
+		description?: string;
+		descriptionLocalizations?: LocalizationMap;
+	},
+>(options: Sanitization<T>): T {
+	const localizedOptions = options as T;
+
+	if ('nameLocalizations' in options) {
 		const nameLocalizations = getLocalizationMap(options.nameLocalizations);
-		options.name = nameLocalizations[generalConfig.defaultLocale];
-		options.nameLocalizations = nameLocalizations;
+		localizedOptions.name = nameLocalizations[generalConfig.defaultLocale];
+		localizedOptions.nameLocalizations = nameLocalizations;
 	}
 
 	if ('descriptionLocalizations' in options) {
 		const descriptionLocalizations = getLocalizationMap(options.descriptionLocalizations);
-		options.description = descriptionLocalizations[generalConfig.defaultLocale];
-		options.descriptionLocalizations = descriptionLocalizations;
+		localizedOptions.description = descriptionLocalizations[generalConfig.defaultLocale];
+		localizedOptions.descriptionLocalizations = descriptionLocalizations;
 	}
 
-	return options as T;
+	return localizedOptions;
 }
 
 /**
@@ -77,14 +75,14 @@ export async function getLocaleFromInteraction(
 
 /**
  * Populate a localization map with translations from a specified key.
- * @param key
+ * @param path
  * @returns An object containing translations for every locale.
  */
-export function getLocalizationMap<K extends TranslationPaths>(key: K): Record<BotLocales, Get<Translations, K>> {
+export function getLocalizationMap<K extends TranslationPaths>(path: K): Record<BotLocales, Get<Translations, K>> {
 	return Object.fromEntries(
 		i18nLocales.map((locale) => [
 			locale,
-			key.split('.').reduce<object>((obj, key) => obj[key as keyof typeof obj], loadedLocales[locale]) as Get<
+			path.split('.').reduce<object>((acc, key) => acc[key as keyof typeof acc], loadedLocales[locale]) as Get<
 				Translations,
 				K
 			>,
