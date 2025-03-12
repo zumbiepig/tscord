@@ -125,16 +125,34 @@ type ExtractReverse2<T, U> = U extends T ? T : never;
 type XX = Extract<o1<'t'>, o0> | ExtractReverse2<o0, o1<'t'>>; // get the rest of o0 that wasnt extracted from o1
 
 
-type a0 = string[] | number[] | object[]
-type a1 = 'a'[] | {name: string}[]
-// a2 should be: 'a'[] | {name: string}[] | number[]
-//type a2 = Extract<a1, a0> | restOfa0 // the rest of a0 that wasnt extracted from a1
-//type a2 = Extract<a1, a0> | Exclude<a0, Extract<a1, a0>>;
-type RemoveSuperTypes<A0, A1> = A0 extends unknown 
+type a0 = string[] | number[] | object[];
+type a1 = 'a'[] | {name: string}[];
+
+type a0 = string[] | number[] | object[];
+type a1 = 'a'[] | { name: string }[];
+
+type RemoveSuperTypes<A0, A1> = A0 extends any 
   ? (Extract<A1, A0> extends never ? A0 : never)
   : never;
 
 type a2 = Extract<a1, a0> | RemoveSuperTypes<a0, a1>;
+/////
+type a0 = string[] | number[] | object[];
+type a1 = 'a'[] | { name: string }[] | bigint[];
+
+// Returns those types in A0 that are not "covered" by any type in A1.
+type RemoveSuperTypes<A0, A1> = A0 extends any 
+  ? (Extract<A1, A0> extends never ? A0 : never)
+  : never;
+
+// Returns those types in A1 that are not assignable to any member of A0.
+type UniqueInA1<A1, A0> = A1 extends any 
+  ? (Extract<A0, A1> extends never ? A1 : never)
+  : never;
+
+// Combine the common specialized types, the remaining types from A0, and the unique types from A1.
+type a2 = Extract<a1, a0> | RemoveSuperTypes<a0, a1> | UniqueInA1<a1, a0>;
+
 
 
 type XX1 = Exclude<f4, f2&f4>; // never
