@@ -1,26 +1,12 @@
 import type { Locale } from 'discord.js';
 import type {
 	ContextMenu as ContextMenuX,
-	NotEmpty,
 	Slash as SlashX,
 	SlashChoice as SlashChoiceX,
-	SlashChoiceType,
 	SlashGroup as SlashGroupX,
 	SlashOption as SlashOptionX,
 } from 'discordx';
-import type {
-	LiteralToPrimitive,
-	LiteralToPrimitiveDeep,
-	OptionalKeysOf,
-	Or,
-	Paths,
-	PositiveInfinity,
-	RequiredKeysOf,
-	Simplify,
-	UnionToIntersection,
-	UnionToTuple,
-} from 'type-fest';
-import type { IsLiteral, IsLiteralUnion } from 'type-fest/source/is-literal.js';
+import type { IsEqual, OptionalKeysOf, Or, Paths, PositiveInfinity, RequiredKeysOf, Simplify } from 'type-fest';
 
 import type { Locales, Translations } from '@/i18n';
 
@@ -130,33 +116,87 @@ type XX = RemoveSuperTypesFromTuple<[o1<'t'>, o0, o2<'t'>]>;
 type a0 = 'b'[] | 5[] | string[] | bigint[] | object[];
 type a1 = 'a'[] | { name: string }[] | number[] | symbol[];
 
-// PairwiseFold takes a tuple and returns a new tuple by folding adjacent pairs.
-// For an even-length tuple, it produces a tuple of folded pairs.
-// For an odd-length tuple, the last element is left as-is.
-type PairwiseFold<T extends unknown[]> = T extends [infer A, infer B, ...infer Rest]
-	? [((A extends unknown ? (Extract<B, A> extends never ? A : never) : never) | (B extends unknown ? (Extract<A, B> extends never ? B : never) : never)), ...PairwiseFold<Rest>]
+type PairwiseFold0<T extends unknown[]> = T extends [infer A, infer B, ...infer Rest]
+	? [
+			(
+				| (A extends unknown ? (Extract<B, A> extends never ? A : never) : never)
+				| (B extends unknown ? (Extract<A, B> extends never ? B : never) : never)
+			),
+			...PairwiseFold0<Rest>,
+		]
 	: T extends [infer A]
 		? [A]
 		: [];
-
-// Use FullFold to fold an entire tuple of types. FullFold recursively folds the tuple pairwise until only one type remains.
-type RemoveSuperTypesFromTuple<T extends unknown[]> = T extends [infer U]
+type RemoveSuperTypesFromTuple0<T extends unknown[]> = T extends [infer U]
 	? U
-	: RemoveSuperTypesFromTuple<PairwiseFold<T>>;
+	: RemoveSuperTypesFromTuple0<PairwiseFold0<T>>;
+
+type PairwiseFold1<T extends unknown[]> = T extends [infer A, infer B, ...infer Rest]
+	? [
+			(
+				| (A extends unknown ? (Extract<B, A> extends never ? A : never) : never)
+				| (B extends unknown ? (Extract<A, B> extends never ? B : never) : never)
+			),
+			...Rest,
+		]
+	: T extends [infer A]
+		? [A]
+		: [];
+type RemoveSuperTypesFromTuple1<T extends unknown[]> = T extends [infer U]
+	? U
+	: RemoveSuperTypesFromTuple1<PairwiseFold1<T>>;
+
+type RemoveSuperTypesFromTuple2<T extends unknown[]> = T extends [infer U]
+	? U
+	: RemoveSuperTypesFromTuple2<
+			T extends [infer A, infer B, ...infer Rest]
+				? [
+						IsEqual<A, B> extends true
+							?
+									| (A extends unknown ? (Extract<B, A> extends never ? A : never) : never)
+									| (B extends unknown ? (Extract<A, B> extends never ? B : never) : never)
+							: A | B,
+						...Rest,
+					]
+				: []
+		>;
+type eq<t1, t2> = IsEqual<t1, t2> extends true ? (t1 & t2) : never;
+type eq1 = eq<'a'[], 'a'[]>;
 
 // Example usage:
-type ExampleTypes = [string[], number[], object[], 'a'[], { name: string }[], bigint[]];
-type FoldedExample = RemoveSuperTypesFromTuple<ExampleTypes>;
+type ExampleTypes0 = [a0, a1];
+type ExampleTypes1 = [string[], number[], object[], 'a'[], 'a'[], { name: string }[], bigint[]];
+type ExampleTypes4 = [string[], number[], 'a'[], { x: boolean }[]];
+type ExampleTypes5 = [{ a: string }[], { a: 'a' }[], { a: 'a' }[], { a: string }[]];
+type ExampleTypes2 = [
+	OverloadedParameters<typeof SlashChoiceX<>>,
+	OverloadedParameters<typeof SlashChoiceX<'t'>>,
+	OverloadedParameters<typeof SlashChoiceX<'t', 'x'>>,
+];
+type ExampleTypes3 = [o1<'t'>, o0, o2<'t'>];
 
+type FoldedExample0<T, T1 = RemoveSuperTypesFromTuple0<T>, T2 = RemoveSuperTypesFromTuple1<T>> = [
+	IsEqual<T1, T2>,
+	T1,
+	T2,
+];
+type FoldedExample1<T, T1 = RemoveSuperTypesFromTuple1<T>, T2 = RemoveSuperTypesFromTuple2<T>> = [
+	IsEqual<T1, T2>,
+	T1,
+	T2,
+];
+type check = FoldedExample1<ExampleTypes1>;
 
-
+/////////////////////////////
 
 type ArrayType<T> = T extends (infer U)[] ? U : never;
 
-type b<T extends string = 't', X = string | number> = ArrayIntersection<
-	| OverloadedParameters<typeof SlashChoiceX<T, X> | typeof SlashChoiceX<T>>
-	| OverloadedParameters<typeof SlashChoiceX<>>,
-	OverloadedParameters<typeof SlashChoiceX<T>> | OverloadedParameters<typeof SlashChoiceX<>>
+type b<T extends string = 't', X = 'x'> = RemoveSuperTypesFromTuple<
+	[
+		OverloadedParameters<typeof SlashChoiceX<>>,
+		OverloadedParameters<typeof SlashChoiceX<T>>,
+		OverloadedParameters<typeof SlashChoiceX<T, X>>,
+	]
 >;
 
 type c = b;
