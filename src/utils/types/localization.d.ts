@@ -4,9 +4,9 @@ import type {
 	NotEmpty,
 	Slash as SlashX,
 	SlashChoice as SlashChoiceX,
+	SlashChoiceType,
 	SlashGroup as SlashGroupX,
 	SlashOption as SlashOptionX,
-	SlashChoiceType,
 } from 'discordx';
 import type {
 	LiteralToPrimitive,
@@ -20,9 +20,9 @@ import type {
 	UnionToIntersection,
 	UnionToTuple,
 } from 'type-fest';
+import type { IsLiteral, IsLiteralUnion } from 'type-fest/source/is-literal.js';
 
 import type { Locales, Translations } from '@/i18n';
-import type { IsLiteral, IsLiteralUnion } from 'type-fest/source/is-literal.js';
 
 export type BotLocales = Extract<`${Locale}`, Locales>;
 
@@ -120,8 +120,25 @@ type p2<T extends string = 'p2', X = string | number> = Parameters<typeof SlashC
 type o0 = OverloadedParameters<typeof SlashChoiceX<>>;
 type o1<T extends string = 'o1'> = OverloadedParameters<typeof SlashChoiceX<T>>;
 type o2<T extends string = 'o2', X = string | number> = OverloadedParameters<typeof SlashChoiceX<T, X>>;
-type XX = Exclude<o0, o1<'t'>>;
-type YY = NotEmpty<'ttt'>[] extends string[] ? true : false;
+type ExtractReverse<T, U> = U extends T ? T : never;
+type ExtractReverse2<T, U> = U extends T ? T : never;
+type XX = Extract<o1<'t'>, o0> | ExtractReverse2<o0, o1<'t'>>; // get the rest of o0 that wasnt extracted from o1
+
+
+type a0 = string[] | number[] | object[]
+type a1 = 'a'[] | {name: string}[]
+// a2 should be: 'a'[] | {name: string}[] | number[]
+//type a2 = Extract<a1, a0> | restOfa0 // the rest of a0 that wasnt extracted from a1
+//type a2 = Extract<a1, a0> | Exclude<a0, Extract<a1, a0>>;
+type RemoveSuperTypes<A0, A1> = A0 extends unknown 
+  ? (Extract<A1, A0> extends never ? A0 : never)
+  : never;
+
+type a2 = Extract<a1, a0> | RemoveSuperTypes<a0, a1>;
+
+
+type XX1 = Exclude<f4, f2&f4>; // never
+type YY1 = NotEmpty<'ttt'>[] extends string[] ? true : false;
 //type test1 = ExcludeFromUnion<string[] | number[], NotEmpty<'t'>[]>
 //type test2 = Exclude<string[] | number[], string[]>
 
@@ -132,8 +149,13 @@ type bd = MostSpecificArr3<o1, o0>; // number[] | "o1" | object<"o1", default>
 type bd1 = bd
 
 type f3 = SlashChoiceType<"o1">[] extends SlashChoiceType<string, unknown>[] ? true : false
-type f2 = LiteralToPrimitive<SlashChoiceType<"o1">>
-type f1 = Exclude<SlashChoiceType<string, unknown>, f2>
+type f2 = SlashChoiceType<"o1">[]
+type f4 = SlashChoiceType<string, unknown>[]
+type f1 = Exclude<f2, f4>
+
+type uu<T> = T extends infer U ? U : never;
+type u1 = Exclude<uu<NotEmpty<'ttt'>[]>, string[]>
+type u2 = uu<SlashChoiceType<string, unknown>>
 
 type MostSpecificArr3<MoreSpecific, LessSpecific> = MoreSpecific extends LessSpecific ? MoreSpecific : LessSpecific
 type MostSpecificArr2<MoreSpecific, LessSpecific> = ArrayType<MoreSpecific> | Exclude<ArrayType<LessSpecific>, LiteralToPrimitive<ArrayType<MoreSpecific>>>;
