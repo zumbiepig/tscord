@@ -116,58 +116,33 @@ type XX = RemoveSuperTypesFromTuple<[o1<'t'>, o0, o2<'t'>]>;
 type a0 = 'b'[] | 5[] | string[] | bigint[] | object[];
 type a1 = 'a'[] | { name: string }[] | number[] | symbol[];
 
-type PairwiseFold0<T extends unknown[]> = T extends [infer A, infer B, ...infer Rest]
-	? [
-			(
-				| (A extends unknown ? (Extract<B, A> extends never ? A : never) : never)
-				| (B extends unknown ? (Extract<A, B> extends never ? B : never) : never)
-			),
-			...PairwiseFold0<Rest>,
-		]
-	: T extends [infer A]
-		? [A]
-		: [];
-type RemoveSuperTypesFromTuple0<T extends unknown[]> = T extends [infer U]
-	? U
-	: RemoveSuperTypesFromTuple0<PairwiseFold0<T>>;
-
-type PairwiseFold1<T extends unknown[]> = T extends [infer A, infer B, ...infer Rest]
-	? [
-			(
-				| (A extends unknown ? (Extract<B, A> extends never ? A : never) : never)
-				| (B extends unknown ? (Extract<A, B> extends never ? B : never) : never)
-			),
-			...Rest,
-		]
-	: T extends [infer A]
-		? [A]
-		: [];
-type RemoveSuperTypesFromTuple1<T extends unknown[]> = T extends [infer U]
-	? U
-	: RemoveSuperTypesFromTuple1<PairwiseFold1<T>>;
-
 type RemoveSuperTypesFromTuple2<T extends unknown[]> = T extends [infer U]
 	? U
 	: RemoveSuperTypesFromTuple2<
 			T extends [infer A, infer B, ...infer Rest]
 				? [
-						IsEqual<A, B> extends true
-							?
+						(A extends B ? (B extends A ? true : false) : false) extends true
+							? Extract<A, B> | Extract<B, A>
+							:
 									| (A extends unknown ? (Extract<B, A> extends never ? A : never) : never)
-									| (B extends unknown ? (Extract<A, B> extends never ? B : never) : never)
-							: A | B,
+									| (B extends unknown ? (Extract<A, B> extends never ? B : never) : never),
 						...Rest,
 					]
 				: []
 		>;
-type eq<t1, t2> = IsEqual<t1, t2> extends true ? (t1 & t2) : never;
-type eq1 = eq<'a'[], 'a'[]>;
+
 
 // Example usage:
 type ExampleTypes0 = [a0, a1];
 type ExampleTypes1 = [string[], number[], object[], 'a'[], 'a'[], { name: string }[], bigint[]];
 type ExampleTypes4 = [string[], number[], 'a'[], { x: boolean }[]];
 type ExampleTypes5 = [{ a: string }[], { a: 'a' }[], { a: 'a' }[], { a: string }[]];
+type ExampleTypes6 = [
+	{ a: string; b: number }[] | { a: 'a'; b: number }[] | { a: 'a'; b: 2 }[] | { a: string; b: 2 }[],
+];
+type ExampleTypes7 = ['a'[], never[]];
+type ExampleTypes8 = [string[], number[], (string | object)[], (number | object)[]];
+type ExampleTypes9 = [string, 'a', number | Date, 42 | Date];
 type ExampleTypes2 = [
 	OverloadedParameters<typeof SlashChoiceX<>>,
 	OverloadedParameters<typeof SlashChoiceX<'t'>>,
@@ -175,17 +150,7 @@ type ExampleTypes2 = [
 ];
 type ExampleTypes3 = [o1<'t'>, o0, o2<'t'>];
 
-type FoldedExample0<T, T1 = RemoveSuperTypesFromTuple0<T>, T2 = RemoveSuperTypesFromTuple1<T>> = [
-	IsEqual<T1, T2>,
-	T1,
-	T2,
-];
-type FoldedExample1<T, T1 = RemoveSuperTypesFromTuple1<T>, T2 = RemoveSuperTypesFromTuple2<T>> = [
-	IsEqual<T1, T2>,
-	T1,
-	T2,
-];
-type check = FoldedExample1<ExampleTypes1>;
+type check = RemoveSuperTypesFromTuple2<ExampleTypes5>;
 
 /////////////////////////////
 
