@@ -99,23 +99,6 @@ type Overloads<T extends (...args: unknown[]) => unknown> = T extends {
 
 type OverloadedParameters<T> = Parameters<Overloads<T>>;
 
-/////////////////////////////
-
-type p0 = Parameters<typeof SlashChoiceX<>>;
-type p1<T extends string = 'p1'> = Parameters<typeof SlashChoiceX<T>>;
-type p2<T extends string = 'p2', X = 'x'> = Parameters<typeof SlashChoiceX<T, X>>;
-type o0 = OverloadedParameters<typeof SlashChoiceX<>>;
-type o1<T extends string = 'o1'> = OverloadedParameters<typeof SlashChoiceX<T>>;
-type o2<T extends string = 'o2', X = 'x'> = OverloadedParameters<typeof SlashChoiceX<T, X>>;
-
-/////////////////////////////
-
-type XX = RemoveSuperTypesFromTuple<[o1<'t'>, o0, o2<'t'>]>;
-
-///////////////////////////////////
-type a0 = 'b'[] | 5[] | string[] | bigint[] | object[];
-type a1 = 'a'[] | { name: string }[] | number[] | symbol[];
-
 type RemoveSuperTypesFromTuple<T extends unknown[]> = T extends [infer U]
 	? U
 	: RemoveSuperTypesFromTuple<
@@ -132,29 +115,6 @@ type RemoveSuperTypesFromTuple<T extends unknown[]> = T extends [infer U]
 				: []
 		>;
 
-// Example usage:
-type ExampleTypes0 = [a0, a1];
-type ExampleTypes1 = [string[], number[], object[], 'a'[], 'a'[], { name: string }[], bigint[]];
-type ExampleTypes4 = [string[], number[], 'a'[], { x: boolean }[]];
-type ExampleTypes5 = [{ a: string }[], { a: 'a' }[], { a: 'a' }[], { a: string }[]];
-type ExampleTypes6 = [
-	{ a: string; b: number }[] | { a: 'a'; b: number }[] | { a: 'a'; b: 2 }[] | { a: string; b: 2 }[],
-];
-type ExampleTypes7 = ['a'[], never[]];
-type ExampleTypes8 = [string[], number[], (string | object)[], (number | object)[]];
-type ExampleTypes9 = [number | Date, 42 | Date];
-type ExampleTypes10 = [number, 42];
-type ExampleTypes2 = [
-	OverloadedParameters<typeof SlashChoiceX<>>,
-	OverloadedParameters<typeof SlashChoiceX<'t'>>,
-	OverloadedParameters<typeof SlashChoiceX<'t', 'x'>>,
-];
-type ExampleTypes3 = [o1<'t'>, o0, o2<'t'>];
-
-type check = RemoveSuperTypesFromTuple<ExampleTypes1>;
-
-/////////////////////////////
-
 type ArrayType<T> = T extends (infer U)[] ? U : never;
 
 type b<T extends string = 't', X = 'x'> = RemoveSuperTypesFromTuple<
@@ -164,5 +124,3 @@ type b<T extends string = 't', X = 'x'> = RemoveSuperTypesFromTuple<
 		OverloadedParameters<typeof SlashChoiceX<T, X>>,
 	]
 >;
-
-type c = b;
