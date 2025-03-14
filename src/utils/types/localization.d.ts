@@ -116,21 +116,21 @@ type XX = RemoveSuperTypesFromTuple<[o1<'t'>, o0, o2<'t'>]>;
 type a0 = 'b'[] | 5[] | string[] | bigint[] | object[];
 type a1 = 'a'[] | { name: string }[] | number[] | symbol[];
 
-type RemoveSuperTypesFromTuple2<T extends unknown[]> = T extends [infer U]
+type RemoveSuperTypesFromTuple<T extends unknown[]> = T extends [infer U]
 	? U
-	: RemoveSuperTypesFromTuple2<
+	: RemoveSuperTypesFromTuple<
 			T extends [infer A, infer B, ...infer Rest]
 				? [
-						(A extends B ? (B extends A ? true : false) : false) extends true
-							? Extract<A, B> | Extract<B, A>
-							:
-									| (A extends unknown ? (Extract<B, A> extends never ? A : never) : never)
-									| (B extends unknown ? (Extract<A, B> extends never ? B : never) : never),
+						(
+							| (A extends unknown ? (Extract<B, A> extends never ? A : never) : never)
+							| (B extends unknown ? (Extract<A, B> extends never ? B : never) : never)
+							| (A extends unknown ? (A extends Extract<B, A> ? A : never) : never)
+							| (B extends unknown ? (B extends Extract<A, B> ? B : never) : never)
+						),
 						...Rest,
 					]
 				: []
 		>;
-
 
 // Example usage:
 type ExampleTypes0 = [a0, a1];
@@ -142,7 +142,8 @@ type ExampleTypes6 = [
 ];
 type ExampleTypes7 = ['a'[], never[]];
 type ExampleTypes8 = [string[], number[], (string | object)[], (number | object)[]];
-type ExampleTypes9 = [string, 'a', number | Date, 42 | Date];
+type ExampleTypes9 = [number | Date, 42 | Date];
+type ExampleTypes10 = [number, 42];
 type ExampleTypes2 = [
 	OverloadedParameters<typeof SlashChoiceX<>>,
 	OverloadedParameters<typeof SlashChoiceX<'t'>>,
@@ -150,7 +151,7 @@ type ExampleTypes2 = [
 ];
 type ExampleTypes3 = [o1<'t'>, o0, o2<'t'>];
 
-type check = RemoveSuperTypesFromTuple2<ExampleTypes5>;
+type check = RemoveSuperTypesFromTuple<ExampleTypes1>;
 
 /////////////////////////////
 
