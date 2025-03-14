@@ -5,3 +5,4 @@ export type * from './localization.d.ts';
 export type * from './state.d.ts';
 export type * from './stats.d.ts';
 export type * from './timezone.d.ts';
+export type * from './util.d.ts';
