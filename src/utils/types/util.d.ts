@@ -222,8 +222,20 @@ export type ExtractMoreSpecificTypes<T extends unknown[]> = T extends [infer U]
 			T extends [infer A, infer B, ...infer Rest]
 				? [
 						(
-							| (A extends infer AA ? (Extract<B, AA> extends never ? AA : AA extends Extract<B, AA> ? AA : never) : never)
-							| (B extends infer BB ? (Extract<A, BB> extends never ? BB : BB extends Extract<A, BB> ? BB : never) : never)
+							| (A extends infer AA
+									? Extract<B, AA> extends never
+										? AA
+										: AA extends Extract<B, AA>
+											? AA
+											: never
+									: never)
+							| (B extends infer BB
+									? Extract<A, BB> extends never
+										? BB
+										: BB extends Extract<A, BB>
+											? BB
+											: never
+									: never)
 						),
 						...Rest,
 					]
@@ -241,10 +253,4 @@ export type ExtractMoreSpecificTypes<T extends unknown[]> = T extends [infer U]
  * type FunctionParameters = OverloadParameters<typeof someFunction>; // 42[] | string[]
  * ```
  */
-export type OverloadParameters<T> = ExtractMoreSpecificTypes<UnionToTuple<Parameters<Overloads<T>>>>
-
-
-declare function someFunction(...args: number[]): void;
-declare function someFunction(...args: 42[] | string[]): void;
- 
- type FunctionParameters = OverloadParameters<typeof someFunction>; // 42[] | string[]
+export type OverloadParameters<T> = ExtractMoreSpecificTypes<UnionToTuple<Parameters<Overloads<T>>>>;

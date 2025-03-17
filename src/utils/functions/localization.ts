@@ -7,7 +7,7 @@ import { User } from '@/entities';
 import { isLocale, loadedLocales, locales as i18nLocales, type Translations } from '@/i18n';
 import { Database } from '@/services';
 import { resolveDependency, resolveGuildLocale, resolveLocale, resolveUser } from '@/utils/functions';
-import type { BotLocales, Sanitization, TranslationPaths } from '@/utils/types';
+import type { BotLocales, LocalizedOptions, TranslationPaths } from '@/utils/types';
 
 export function getLocalizedOptions<
 	T extends {
@@ -16,7 +16,7 @@ export function getLocalizedOptions<
 		description?: string;
 		descriptionLocalizations?: LocalizationMap;
 	},
->(options: Sanitization<T>): T {
+>(options: LocalizedOptions<T>): T {
 	const localizedOptions = options as T;
 
 	if ('nameLocalizations' in options) {
