@@ -1,16 +1,11 @@
+import { ApplicationCommandOptionBase } from 'discord.js';
 import { SlashOption as SlashOptionX } from 'discordx';
 
-import { InvalidOptionNameError } from '@/utils/errors';
-import { isValidDiscordName, setOptionsLocalization } from '@/utils/functions';
+import { getLocalizedOptions } from '@/utils/functions';
 import type { SlashOptionOptions } from '@/utils/types';
 
-export function SlashOption<T extends string = never, TD extends string = never>(
-	...options: SlashOptionOptions<T, TD>[1]
-) {
-	options = setOptionsLocalization(options);
-
-	for (const name of [options.name, ...Object.values(options.nameLocalizations ?? {})])
-		if (!isValidDiscordName(name ?? '')) throw new InvalidOptionNameError(name ?? '');
-
-	return SlashOptionX(options);
+export function SlashOption<T extends string, TD extends string>(...[options, transformer]: SlashOptionOptions<T, TD>) {
+	return options instanceof ApplicationCommandOptionBase
+		? SlashOptionX(options, transformer)
+		: SlashOptionX<T, TD>(getLocalizedOptions<Parameters<typeof SlashOptionX<T, TD>>[0]>(options), transformer);
 }

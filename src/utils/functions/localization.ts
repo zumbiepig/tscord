@@ -19,13 +19,13 @@ export function getLocalizedOptions<
 >(options: LocalizedOptions<T>): T {
 	const localizedOptions = options as T;
 
-	if ('nameLocalizations' in options) {
+	if ('name' in options && 'nameLocalizations' in options) {
 		const nameLocalizations = getLocalizationMap(options.nameLocalizations);
 		localizedOptions.name = nameLocalizations[generalConfig.defaultLocale];
 		localizedOptions.nameLocalizations = nameLocalizations;
 	}
 
-	if ('descriptionLocalizations' in options) {
+	if ('description' in options && 'descriptionLocalizations' in options) {
 		const descriptionLocalizations = getLocalizationMap(options.descriptionLocalizations);
 		localizedOptions.description = descriptionLocalizations[generalConfig.defaultLocale];
 		localizedOptions.descriptionLocalizations = descriptionLocalizations;

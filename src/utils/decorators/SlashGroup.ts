@@ -1,14 +1,19 @@
 import { SlashGroup as SlashGroupX } from 'discordx';
 
-import { setOptionsLocalization } from '@/utils/functions';
-import type { SlashGroupOptions } from '@/utils/types';
+import { getLocalizedOptions } from '@/utils/functions';
+import type { LocalizedOptions, SlashGroupOptions } from '@/utils/types';
 
-export function SlashGroup<T extends string = never, TD extends string = never, TR extends string = never>(
-	...[nameOrOptions, root]: SlashGroupOptions<T, TD, TR>[1]
+export function SlashGroup<T extends string, TD extends string, TR extends string>(
+	...[nameOrOptions, root]: SlashGroupOptions<T, TD, TR>
 ) {
 	if (typeof nameOrOptions === 'string')
 		return root === undefined
-			? SlashGroupX<T>(nameOrOptions as Parameters<typeof SlashGroupX<T>>[0])
-			: SlashGroupX<T, TD>(nameOrOptions as Parameters<typeof SlashGroupX<T, TD>>[0], root);
-	else return SlashGroupX<T, TD, TR>(setOptionsLocalization(nameOrOptions));
+			? SlashGroupX<T>(...([nameOrOptions] as Parameters<typeof SlashGroupX<T>>))
+			: SlashGroupX<T, TD>(...([nameOrOptions, root] as Parameters<typeof SlashGroupX<T, TD>>));
+	else
+		return SlashGroupX<T, TD, TR>(
+			getLocalizedOptions<Parameters<typeof SlashGroupX<T, TD, TR>>[0]>(
+				...([nameOrOptions] as LocalizedOptions<Parameters<typeof SlashGroupX<T, TD, TR>>>),
+			),
+		);
 }

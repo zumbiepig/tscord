@@ -1,5 +1,3 @@
-import type { UnionToTuple } from 'type-fest';
-
 /**
  * Get a union of up to 100 overloads from a function.
  */
@@ -222,20 +220,10 @@ export type ExtractMoreSpecificTypes<T extends unknown[]> = T extends [infer U]
 			T extends [infer A, infer B, ...infer Rest]
 				? [
 						(
-							| (A extends infer AA
-									? Extract<B, AA> extends never
-										? AA
-										: AA extends Extract<B, AA>
-											? AA
-											: never
-									: never)
-							| (B extends infer BB
-									? Extract<A, BB> extends never
-										? BB
-										: BB extends Extract<A, BB>
-											? BB
-											: never
-									: never)
+							| (A extends unknown ? (Extract<B, A> extends never ? A : never) : never)
+							| (B extends unknown ? (Extract<A, B> extends never ? B : never) : never)
+							| (A extends unknown ? (A extends Extract<B, A> ? A : never) : never)
+							| (B extends unknown ? (B extends Extract<A, B> ? B : never) : never)
 						),
 						...Rest,
 					]
@@ -253,4 +241,6 @@ export type ExtractMoreSpecificTypes<T extends unknown[]> = T extends [infer U]
  * type FunctionParameters = OverloadParameters<typeof someFunction>; // 42[] | string[]
  * ```
  */
-export type OverloadParameters<T> = ExtractMoreSpecificTypes<UnionToTuple<Parameters<Overloads<T>>>>;
+export type OverloadParameters<T extends ((...args: unknown[]) => unknown)[]> = ExtractMoreSpecificTypes<{
+	[K in keyof T]: Parameters<Overloads<T[K]>>;
+}>;
