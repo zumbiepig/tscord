@@ -1,5 +1,5 @@
 import { Category, PermissionGuard } from '@discordx/utilities';
-import { ApplicationCommandOptionType, type RepliableInteraction } from 'discord.js';
+import { ApplicationCommandOptionType, PermissionFlagsBits, type RepliableInteraction } from 'discord.js';
 import { Discord, Guard, SimpleCommandMessage } from 'discordx';
 import { injectable } from 'tsyringe';
 
@@ -17,14 +17,15 @@ import type { InteractionData } from '@/utils/types';
 export default class PrefixCommand {
 	constructor(private db: Database) {}
 
-	@Slash({ name: 'prefix' })
+	@Slash({ nameLocalizations: 'COMMANDS.PREFIX.NAME', descriptionLocalizations: 'COMMANDS.PREFIX.DESCRIPTION', defaultMemberPermissions: PermissionFlagsBits.Administrator })
 	@Guard(PermissionGuard(['Administrator']))
 	async prefix(
 		@SlashOption({
-			name: 'new_prefix',
 			type: ApplicationCommandOptionType.String,
+			nameLocalizations: 'COMMANDS.PREFIX.OPTIONS.NEW_PREFIX.NAME',
+			descriptionLocalizations: 'COMMANDS.PREFIX.OPTIONS.NEW_PREFIX.DESCRIPTION',
 		})
-		prefix: string | undefined,
+		new_prefix: string | undefined,
 		interaction: RepliableInteraction | SimpleCommandMessage,
 		{ translations }: InteractionData,
 	) {
@@ -32,12 +33,12 @@ export default class PrefixCommand {
 		if (!guild) throw new ReplyUnknownErrorError(interaction);
 
 		const guildData = await this.db.get(Guild).findOneOrFail(guild.id);
-		guildData.prefix = prefix;
+		guildData.prefix = new_prefix;
 
 		await simpleSuccessEmbed(
 			interaction,
 			translations.COMMANDS.PREFIX.EMBED.DESCRIPTION({
-				prefix: prefix ?? generalConfig.simpleCommandsPrefix ?? undefined,
+				new_prefix: new_prefix ?? generalConfig.simpleCommandsPrefix ?? undefined,
 			}),
 		);
 	}

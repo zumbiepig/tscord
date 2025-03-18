@@ -31,7 +31,7 @@ export default {
 				},
 			},
 			EMBED: {
-				DESCRIPTION: 'Prefix changed to `{prefix}`.',
+				DESCRIPTION: 'Prefix changed to `{new_prefix}`.',
 			},
 		},
 		MAINTENANCE: {
