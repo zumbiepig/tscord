@@ -8,8 +8,8 @@ import boxen from 'boxen';
 import chalk from 'chalk';
 import {
 	AttachmentBuilder,
+	type BaseInteraction,
 	type BaseMessageOptions,
-	type Interaction,
 	type Snowflake,
 	TextChannel,
 	ThreadChannel,
@@ -209,7 +209,7 @@ export class Logger {
 	 * Logs all interactions.
 	 * @param interaction
 	 */
-	async logInteraction(interaction: Interaction | SimpleCommandMessage): Promise<void> {
+	async logInteraction(interaction: BaseInteraction | SimpleCommandMessage): Promise<void> {
 		const type = getTypeOfInteraction(interaction);
 
 		const action = resolveAction(interaction);
@@ -217,8 +217,8 @@ export class Logger {
 		const guild = resolveGuild(interaction);
 		const user = resolveUser(interaction);
 
-		const message = `(${type}) "${action}" ${channel instanceof TextChannel || channel instanceof ThreadChannel ? `in channel #${channel.name}` : ''} ${guild ? `in guild ${guild.name}` : ''} by ${user.username}#${user.discriminator}`;
-		const chalkedMessage = `(${chalk.bold.white(type)}) "${chalk.bold.green(action)}" ${channel instanceof TextChannel || channel instanceof ThreadChannel ? `${chalk.dim.italic.grey('in channel')} ${chalk.bold.blue(`#${channel.name}`)}` : ''} ${guild ? `${chalk.dim.italic.grey('in guild')} ${chalk.bold.blue(guild.name)}` : ''} ${chalk.dim.italic.grey('by')} ${chalk.bold.blue(`${user.username}#${user.discriminator}`)}`;
+		const message = `(${type}) "${action}" ${(channel?.isTextBased() && !channel.isDMBased()) ? `in channel #${channel.name}` : ''} ${guild ? `in guild ${guild.name}` : ''} by ${user.username}#${user.discriminator}`;
+		const chalkedMessage = `(${chalk.bold.white(type)}) "${chalk.bold.green(action)}" ${channel?.isTextBased() && !channel.isDMBased() ? `${chalk.dim.italic.grey('in channel')} ${chalk.bold.blue(`#${channel.name}`)}` : ''} ${guild ? `${chalk.dim.italic.grey('in guild')} ${chalk.bold.blue(guild.name)}` : ''} ${chalk.dim.italic.grey('by')} ${chalk.bold.blue(`${user.username}#${user.discriminator}`)}`;
 
 		await this.log('info', message, chalkedMessage, {
 			...logsConfig.interaction,
@@ -230,7 +230,7 @@ export class Logger {
 							icon_url: user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}` : '',
 						},
 						title: `Interaction`,
-						thumbnail: { url: guild?.iconURL({ forceStatic: true }) ?? '' },
+						thumbnail: { url: guild?.iconURL() ?? '' },
 						fields: [
 							{ name: 'Type', value: type, inline: true },
 							{ name: '\u200B', value: '\u200B', inline: true },
@@ -240,7 +240,7 @@ export class Logger {
 							{
 								name: 'Channel',
 								value:
-									channel instanceof TextChannel || channel instanceof ThreadChannel ? `#${channel.name}` : 'Unknown',
+									channel?.isTextBased() && !channel.isDMBased() ? `#${channel.name}` : 'Unknown',
 								inline: true,
 							},
 						],
@@ -274,7 +274,7 @@ export class Logger {
 					{
 						title: type === 'NEW_USER' ? 'New user' : type === 'DELETE_USER' ? 'Deleted user' : 'Recovered user',
 						description: `**${user.tag}**`,
-						thumbnail: { url: user.displayAvatarURL({ forceStatic: false }) },
+						thumbnail: { url: user.displayAvatarURL() },
 						color:
 							type === 'NEW_USER'
 								? colorsConfig.discord.user.new

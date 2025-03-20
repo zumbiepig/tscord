@@ -108,6 +108,6 @@ export default class StatsCommand {
 			});
 		}
 
-		await new Pagination(interaction instanceof SimpleCommandMessage ? interaction.message : interaction, pages).send();
+		await new Pagination(interaction, pages).send();
 	}
 }

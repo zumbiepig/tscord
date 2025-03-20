@@ -1,9 +1,7 @@
 import os from 'node:os';
 import process from 'node:process';
 
-import type { SqlEntityManager } from '@mikro-orm/better-sqlite';
 import type { FilterQuery } from '@mikro-orm/core';
-import type { MongoEntityManager } from '@mikro-orm/mongodb';
 import type { Interaction, Snowflake } from 'discord.js';
 import { Client, SimpleCommandMessage } from 'discordx';
 import { delay, inject } from 'tsyringe';
@@ -118,7 +116,7 @@ export class Stats {
 	 */
 	async getTopCommands(): Promise<StatPerInterval> {
 		if ('createQueryBuilder' in this.db.em) {
-			const qb = (this.db.em as SqlEntityManager).createQueryBuilder(Stat);
+			const qb = (this.db.em as import('@mikro-orm/better-sqlite').SqlEntityManager).createQueryBuilder(Stat);
 			const query = qb
 				.select(['type', 'value as name', 'count(*) as count'])
 				.where(allInteractions)
@@ -128,7 +126,7 @@ export class Stats {
 
 			return slashCommands.sort((a, b) => b.count - a.count);
 		} else if ('aggregate' in this.db.em) {
-			const slashCommands = (await (this.db.em as MongoEntityManager).aggregate(Stat, [
+			const slashCommands = (await (this.db.em as import('@mikro-orm/mongodb').MongoEntityManager).aggregate(Stat, [
 				{
 					$match: allInteractions,
 				},

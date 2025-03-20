@@ -2,19 +2,20 @@ import path from 'node:path';
 
 import { includeIgnoreFile } from '@eslint/compat';
 import eslint from '@eslint/js';
-import type { FlatConfig } from '@typescript-eslint/utils/ts-eslint';
+import eslintConfigPrettier from 'eslint-config-prettier';
 import eslintPluginN from 'eslint-plugin-n';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import unicorn from 'eslint-plugin-unicorn';
-import tseslint from 'typescript-eslint';
+import typescriptEslint from 'typescript-eslint';
 
-export default [
-	eslint.configs.recommended,
+export default typescriptEslint.config(
 	includeIgnoreFile(path.resolve(import.meta.dirname, '.gitignore')),
-	...tseslint.configs.strictTypeChecked,
-	...tseslint.configs.stylisticTypeChecked,
+	eslint.configs.recommended,
+	typescriptEslint.configs.strictTypeChecked,
+	typescriptEslint.configs.stylisticTypeChecked,
 	eslintPluginN.configs['flat/recommended'],
 	unicorn.configs.all,
+	eslintConfigPrettier,
 	{
 		ignores: ['./eslint.config.ts'],
 		languageOptions: {
@@ -40,9 +41,10 @@ export default [
 			'simple-import-sort/imports': 'error',
 			'simple-import-sort/exports': 'error',
 
+			'n/no-unpublished-import': 'off', // this is so buggy
+
 			'unicorn/prevent-abbreviations': 'off',
-			'unicorn/string-content': ['error', { patterns: { '…': '…', '→': '→' } }],
 			'unicorn/filename-case': ['error', { cases: { camelCase: true, pascalCase: true } }],
 		},
 	},
-] satisfies FlatConfig.ConfigFile;
+);

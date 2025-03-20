@@ -1,4 +1,9 @@
-import { join } from 'node:path';
+import path from 'node:path';
+
+// import { MongoDriver } from '@mikro-orm/mongodb';
+// import { MariaDbDriver } from '@mikro-orm/mariadb';
+// import { PostgreSqlDriver } from '@mikro-orm/postgresql';
+import { BetterSqliteDriver } from '@mikro-orm/better-sqlite';
 
 import { env } from '@/env';
 import type { DatabaseConfigType, MikroORMConfigType } from '@/utils/types';
@@ -13,19 +18,19 @@ const envConfig: MikroORMConfigType = {
 		/**
 		 * SQLite
 		 */
-		driver: (await import('@mikro-orm/better-sqlite')).BetterSqliteDriver,
-		dbName: join(databaseConfig.path, 'sqlite.db'),
+		driver: BetterSqliteDriver,
+		dbName: path.join(databaseConfig.path, 'sqlite.db'),
 
 		/**
 		 * MongoDB
 		 */
-		// driver: (await import('@mikro-orm/mongodb')).MongoDriver,
+		// driver: MongoDriver,
 		// clientUrl: env.DATABASE_HOST,
 
 		/**
 		 * MariaDB (works with MySQL too)
 		 */
-		// driver: (await import('@mikro-orm/mariadb')).MariaDbDriver,
+		// driver: MariaDbDriver,
 		// dbName: env.DATABASE_NAME,
 		// host: env.DATABASE_HOST,
 		// port: env.DATABASE_PORT,
@@ -35,7 +40,7 @@ const envConfig: MikroORMConfigType = {
 		/**
 		 * PostgreSQL (works with CockroachDB too)
 		 */
-		// driver: (await import('@mikro-orm/postgresql')).PostgreSqlDriver,
+		// driver: PostgreSqlDriver,
 		// dbName: env.DATABASE_NAME,
 		// host: env.DATABASE_HOST,
 		// port: env.DATABASE_PORT,

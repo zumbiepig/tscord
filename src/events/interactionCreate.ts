@@ -1,4 +1,3 @@
-import { AutocompleteInteraction } from 'discord.js';
 import { type ArgsOf, Client, Discord, On } from 'discordx';
 import { injectable } from 'tsyringe';
 
@@ -19,7 +18,7 @@ export default class InteractionCreateEvent {
 	@On({ event: 'interactionCreate' })
 	async interactionCreateHandler([interaction]: ArgsOf<'interactionCreate'>, client: Client) {
 		// defer the reply
-		if (generalConfig.automaticDeferring && !(interaction instanceof AutocompleteInteraction))
+		if (generalConfig.automaticDeferring && !(interaction.isAutocomplete()))
 			await interaction.deferReply();
 
 		// insert user in db if not exists
@@ -30,7 +29,7 @@ export default class InteractionCreateEvent {
 		if (interaction.guild) await this.db.get(Guild).updateLastInteract(interaction.guild.id);
 
 		// register logs and stats
-		await this.stats.registerInteraction(interaction);
+		this.stats.registerInteraction(interaction);
 		await this.logger.logInteraction(interaction);
 
 		client.executeInteraction(interaction);

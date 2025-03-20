@@ -2,15 +2,6 @@ import { constantCase } from 'change-case';
 import type { Join, ScreamingSnakeCase, Split } from 'type-fest';
 
 /**
- * Ensures that all strings have a size after trimming
- * @param strings an array of strings to test
- * @returns true if all strings are valid
- */
-export function validString(...strings: string[]): boolean {
-	return strings.length > 0 && strings.every((string) => string.trim().length > 0);
-}
-
-/**
  * Checks if the string is a valid command/option name in discord
  * @param string string to test against regex
  * @returns true if the string is a valid discord name

@@ -67,11 +67,11 @@ export default {
 			NAME: 'help',
 			DESCRIPTION: 'Get global help about the bot and its commands',
 			EMBED: {
-				TITLE: 'Help panel',
+				SELECT_CATEGORY_TITLE: 'Help panel',
 				CATEGORY_TITLE: '{category} Commands',
 			},
 			SELECT_MENU: {
-				TITLE: 'Select a category',
+				SELECT_CATEGORY_DESCRIPTION: 'Select a category',
 				CATEGORY_DESCRIPTION: '{category} commands',
 			},
 		},
