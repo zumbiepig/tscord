@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { join } from 'node:path';
+import path from 'node:path';
 
 import { RequestContext } from '@mikro-orm/core';
 import chalk from 'chalk';
@@ -109,7 +109,7 @@ async function init() {
 		await client.login(env.BOT_TOKEN);
 
 		if (env.isDev) {
-			const watcher = chokidar.watch([join(import.meta.dirname, 'commands'), join(import.meta.dirname, 'events')]);
+			const watcher = chokidar.watch([path.join(import.meta.dirname, 'commands'), path.join(import.meta.dirname, 'events')]);
 
 			// reload commands and events when a file is updated
 			watcher.on('all', () => void reload(client));
@@ -185,7 +185,7 @@ async function reload(client: Client, force = false) {
 	/* await Promise.all(
 		(
 			await glob(
-				join(import.meta.dirname, '{commands,events}', '**', '*.{js,ts}'),
+				path.join(import.meta.dirname, '{commands,events}', '**', '*.{js,ts}'),
 				{ windowsPathsNoEscape: true },
 			)
 		).map(async (file) => {

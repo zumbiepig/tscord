@@ -1,20 +1,20 @@
-import path from 'node:path';
+import * as path from 'node:path';
 
 import { includeIgnoreFile } from '@eslint/compat';
-import eslint from '@eslint/js';
-import eslintConfigPrettier from 'eslint-config-prettier';
-import eslintPluginN from 'eslint-plugin-n';
-import simpleImportSort from 'eslint-plugin-simple-import-sort';
-import unicorn from 'eslint-plugin-unicorn';
+import * as eslintJs from '@eslint/js';
+import * as eslintConfigPrettier from 'eslint-config-prettier';
+import * as eslintPluginN from 'eslint-plugin-n';
+import * as eslintPluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
+import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import typescriptEslint from 'typescript-eslint';
 
 export default typescriptEslint.config(
 	includeIgnoreFile(path.resolve(import.meta.dirname, '.gitignore')),
-	eslint.configs.recommended,
+	eslintJs.configs.recommended,
 	typescriptEslint.configs.strictTypeChecked,
 	typescriptEslint.configs.stylisticTypeChecked,
 	eslintPluginN.configs['flat/recommended'],
-	unicorn.configs.all,
+	eslintPluginUnicorn.configs.all,
 	eslintConfigPrettier,
 	{
 		ignores: ['./eslint.config.ts'],
@@ -24,7 +24,7 @@ export default typescriptEslint.config(
 				tsconfigRootDir: import.meta.dirname,
 			},
 		},
-		plugins: { 'simple-import-sort': simpleImportSort },
+		plugins: { 'simple-import-sort': eslintPluginSimpleImportSort },
 		rules: {
 			'@typescript-eslint/no-unused-vars': [
 				'error',
@@ -42,6 +42,7 @@ export default typescriptEslint.config(
 			'simple-import-sort/exports': 'error',
 
 			'n/no-unpublished-import': 'off', // this is so buggy
+			'n/no-missing-import': 'off', // this is so buggy
 
 			'unicorn/prevent-abbreviations': 'off',
 			'unicorn/filename-case': ['error', { cases: { camelCase: true, pascalCase: true } }],
